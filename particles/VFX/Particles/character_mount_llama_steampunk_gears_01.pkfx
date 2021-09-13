@@ -1,0 +1,810 @@
+Version = 1.13.1.45791;
+CParticleEffect	$LOCAL$/Resource
+{
+	EditorInfosPosition = int2(73, 52);
+	OnSpawn = "$LOCAL$/Spawner";
+	CustomAttributes = "$LOCAL$/_GlobalAttributes";
+	Autostart = true;
+}
+CNEdEditorParticle_Data	$LOCAL$/EDITOR
+{
+	EditorInfosPosition = int2(413, -144);
+	Position = float3(7.0460087e-001, 3.1657923e-002, 2.7257538e+000);
+	EulerOrientation = float3(-3.0799999e+000, 6.5449991e+000, 0.0000000e+000);
+	Backdrops = "$LOCAL$/_BackdropList";
+}
+CParticleAttributeList	$LOCAL$/_GlobalAttributes
+{
+	EditorInfosPosition = int2(-599, -20);
+	AttributeList = 
+	{
+		"$LOCAL$/CParticleAttributeDeclaration_FACD5C9C",
+	};
+}
+CNEdEditorBackdrop_List	$LOCAL$/_BackdropList
+{
+	EditorInfosPosition = int2(125, -433);
+	BackgroundLayers2D = 
+	{
+		"$LOCAL$/CNEdEditorBackdrop_Brush_9A913525",
+	};
+	SceneLayers3D = 
+	{
+		"$LOCAL$/CNEdEditorBackdrop_Model3D_578F322E",
+		"$LOCAL$/_Backdrop_Light",
+	};
+}
+CActionFactoryWithChilds	$LOCAL$/Spawner
+{
+	EditorInfosPosition = int2(-162, -81);
+	ChildList = 
+	{
+		"$LOCAL$/Clockwork_LeftSide",
+		"$LOCAL$/Clockwork_RightSide",
+	};
+}
+CNEdEditorBackdrop_Brush	$LOCAL$/CNEdEditorBackdrop_Brush_9A913525
+{
+	EditorInfosPosition = int2(-27, -485);
+	LayerName = "Layer_Brush";
+}
+CNEdEditorBackdrop_Model3D	$LOCAL$/CNEdEditorBackdrop_Model3D_578F322E
+{
+	EditorInfosPosition = int2(-17, -380);
+	IsVisible = false;
+	LayerName = "Model";
+	ResourceModel = "Meshes/CubeRoom_Default.pkmm";
+}
+CNEdEditorBackdrop_Light	$LOCAL$/_Backdrop_Light
+{
+	LayerName = "GlobalLight";
+	UniformScale = 9.9999988e-001;
+	Position = float3(1.1233553e+002, 2.8270447e+002, 2.2297581e+002);
+	EulerOrientation = float3(-4.8550171e+001, 2.6739031e+001, -9.5600376e-007);
+	LightFactory = "$LOCAL$/_Backdrop_Light_Factory";
+	LightDistance = 3.7717276e+002;
+}
+CNEdEditorLightFactory	$LOCAL$/_Backdrop_Light_Factory
+{
+	NearClipPlane = 1.0000000e+002;
+	SpotFalloff = 8.8541701e-002;
+	Magnitude = 1.0000000e+005;
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Clockwork_L1
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_9F9A9F9F";
+	Infinite = true;
+	DurationInSeconds = 2.0000000e+000;
+	SpawnCountMode = TotalParticleCount;
+	SpawnCount = 1.0000000e+001;
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_9F9A9F9F
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Mesh_35D41175";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_C6B3884D",
+		"$LOCAL$/CParticleFieldDeclaration_39B5743E",
+		"$LOCAL$/CParticleFieldDeclaration_F9F3D74E",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_0F92D74E";
+	States = 
+	{
+		"$LOCAL$/CParticleState_349D32A0",
+	};
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_0F92D74E
+{
+	Expression = "function void	Eval()
+{
+	Life = 0.1;
+//	Size = 0.25;
+	TimeSeed = floor(scene.Time*2);
+	RotAxis = float3(1,0,0);
+	Position = float3(0.23,-0.0,-0.04);
+	ForwardAxis = float3(0,0,1);
+}
+";
+}
+CParticleState	$LOCAL$/CParticleState_349D32A0
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_67BC75E3",
+		"$LOCAL$/Script_1",
+		"$LOCAL$/Evolver_1",
+		"$LOCAL$/LocalSpace_3",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_67BC75E3
+{
+	CustomName = "Physics";
+}
+CParticleEvolver_Script	$LOCAL$/Script_1
+{
+	CustomName = "Script";
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_684688E2";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_684688E2
+{
+	Expression = "function void	Eval()
+{
+	Rotation = TimeSeed/4;
+	
+}
+";
+}
+CParticleEvolver_Rotation	$LOCAL$/Evolver_1
+{
+	CustomName = "Rotation";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_C6B3884D
+{
+	FieldName = "TimeSeed";
+}
+CActionFactoryWithChilds	$LOCAL$/Clockwork_LeftSide
+{
+	ChildList = 
+	{
+		"$LOCAL$/Clockwork_L1",
+		"$LOCAL$/Clockwork_L2",
+		"$LOCAL$/Clockwork_L3",
+	};
+}
+CParticleRenderer_Mesh	$LOCAL$/CParticleRenderer_Mesh_35D41175
+{
+	CustomName = "Mesh";
+	Meshes = 
+	{
+		"$LOCAL$/CParticleRenderer_Mesh_Descriptor_A48BA2DC",
+	};
+	Scale = float3(1.0000000e+000, 1.2000000e+000, 1.2000000e+000);
+	RotationAxisField = "RotAxis";
+	ForwardAxisField = "ForwardAxis";
+}
+CParticleRenderer_Mesh_Descriptor	$LOCAL$/CParticleRenderer_Mesh_Descriptor_A48BA2DC
+{
+	Mesh = "Meshes/vfx_gear_01.pkmm";
+	Material = Solid;
+	Diffuse = "Textures/Meshes/vfx_gear_01.dds";
+	DiffuseColor = float3(1.5000000e+000, 1.5000000e+000, 0.0000000e+000);
+	CustomName = "Mesh_Descriptor";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_39B5743E
+{
+	FieldName = "RotAxis";
+	FieldType = float3;
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_7B13EF8E
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Mesh_F8005E69";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_D3895923",
+		"$LOCAL$/CParticleFieldDeclaration_B2178D22",
+		"$LOCAL$/CParticleFieldDeclaration_B3A68129",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_33DAC18D";
+	States = 
+	{
+		"$LOCAL$/CParticleState_D3F988D4",
+	};
+}
+CParticleRenderer_Mesh	$LOCAL$/CParticleRenderer_Mesh_F8005E69
+{
+	CustomName = "Mesh";
+	Meshes = 
+	{
+		"$LOCAL$/CParticleRenderer_Mesh_Descriptor_293AB8E0",
+	};
+	Scale = float3(1.0000000e+000, 8.0000001e-001, 8.0000001e-001);
+	RotationAxisField = "RotAxis";
+	ForwardAxisField = "ForwardAxis";
+}
+CParticleRenderer_Mesh_Descriptor	$LOCAL$/CParticleRenderer_Mesh_Descriptor_293AB8E0
+{
+	Mesh = "Meshes/vfx_gear_01.pkmm";
+	Material = Solid;
+	Diffuse = "Textures/Meshes/vfx_gear_01.dds";
+	DiffuseColor = float3(1.5000000e+000, 1.5000000e+000, 0.0000000e+000);
+	CustomName = "Mesh_Descriptor";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_D3895923
+{
+	FieldName = "TimeSeed";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_B2178D22
+{
+	FieldName = "RotAxis";
+	FieldType = float3;
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_33DAC18D
+{
+	Expression = "function void	Eval()
+{
+	Life = 0.1;
+	//Size = 0.25;
+	TimeSeed = floor((scene.Time+1)*2);
+	RotAxis = float3(1,0,0);
+	//Position = float3(0.4,0.09,0.075);
+	Position = float3(0.23,0.08,0.03);
+	ForwardAxis = float3(0,0,1);
+}
+";
+}
+CParticleState	$LOCAL$/CParticleState_D3F988D4
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_F22BAE27",
+		"$LOCAL$/CParticleEvolver_Script_5AC24476",
+		"$LOCAL$/CParticleEvolver_Rotation_4BFEF488",
+		"$LOCAL$/LocalSpace_1",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_F22BAE27
+{
+	CustomName = "Physics";
+}
+CParticleEvolver_Script	$LOCAL$/CParticleEvolver_Script_5AC24476
+{
+	CustomName = "Script";
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_AF396171";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_AF396171
+{
+	Expression = "function void	Eval()
+{
+	Rotation = -1*TimeSeed/4;
+	
+}
+";
+}
+CParticleEvolver_Rotation	$LOCAL$/CParticleEvolver_Rotation_4BFEF488
+{
+	CustomName = "Rotation";
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Clockwork_L2
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_7B13EF8E";
+	Infinite = true;
+	DurationInSeconds = 2.0000000e+000;
+	SpawnCountMode = TotalParticleCount;
+	SpawnCount = 1.0000000e+001;
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_DEED7346
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Mesh_84A9D081";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_7AC7EC7B",
+		"$LOCAL$/CParticleFieldDeclaration_2F9D775A",
+		"$LOCAL$/CParticleFieldDeclaration_E0B632A0",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_005D5C25";
+	States = 
+	{
+		"$LOCAL$/CParticleState_5CC46B4C",
+	};
+}
+CParticleRenderer_Mesh	$LOCAL$/CParticleRenderer_Mesh_84A9D081
+{
+	CustomName = "Mesh";
+	Meshes = 
+	{
+		"$LOCAL$/CParticleRenderer_Mesh_Descriptor_C0C188D8",
+	};
+	Scale = float3(1.0000000e+000, 8.9999998e-001, 8.9999998e-001);
+	RotationAxisField = "RotAxis";
+	ForwardAxisField = "ForwardAxis";
+}
+CParticleRenderer_Mesh_Descriptor	$LOCAL$/CParticleRenderer_Mesh_Descriptor_C0C188D8
+{
+	Mesh = "Meshes/vfx_gear_01.pkmm";
+	Material = Solid;
+	Diffuse = "Textures/Meshes/vfx_gear_01.dds";
+	DiffuseColor = float3(1.5000000e+000, 1.5000000e+000, 0.0000000e+000);
+	CustomName = "Mesh_Descriptor";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_7AC7EC7B
+{
+	FieldName = "TimeSeed";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_2F9D775A
+{
+	FieldName = "RotAxis";
+	FieldType = float3;
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_005D5C25
+{
+	Expression = "function void	Eval()
+{
+	Life = 0.1;
+	//Size = 0.25;
+	TimeSeed = floor((scene.Time+1)*2);
+	RotAxis = float3(1,0,0);
+	Position = float3(0.23,-0.1,-0.0);
+	ForwardAxis = float3(0,0,1);
+}
+";
+}
+CParticleState	$LOCAL$/CParticleState_5CC46B4C
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_F39E85FF",
+		"$LOCAL$/CParticleEvolver_Script_E3378D2E",
+		"$LOCAL$/CParticleEvolver_Rotation_DD132180",
+		"$LOCAL$/LocalSpace_2",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_F39E85FF
+{
+	CustomName = "Physics";
+}
+CParticleEvolver_Script	$LOCAL$/CParticleEvolver_Script_E3378D2E
+{
+	CustomName = "Script";
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_AC177C89";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_AC177C89
+{
+	Expression = "function void	Eval()
+{
+	Rotation = -1*TimeSeed/4;
+	
+}
+";
+}
+CParticleEvolver_Rotation	$LOCAL$/CParticleEvolver_Rotation_DD132180
+{
+	CustomName = "Rotation";
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Clockwork_L3
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_DEED7346";
+	Infinite = true;
+	DurationInSeconds = 2.0000000e+000;
+	SpawnCountMode = TotalParticleCount;
+	SpawnCount = 1.0000000e+001;
+}
+CParticleEvolver_Localspace	$LOCAL$/LocalSpace_1
+{
+	CustomName = "Localspace";
+	
+}
+CParticleEvolver_Localspace	$LOCAL$/LocalSpace_2
+{
+	CustomName = "Localspace";
+	
+}
+CParticleEvolver_Localspace	$LOCAL$/LocalSpace_3
+{
+	CustomName = "Localspace";
+	
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_F9F3D74E
+{
+	FieldName = "ForwardAxis";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_B3A68129
+{
+	FieldName = "ForwardAxis";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_E0B632A0
+{
+	FieldName = "ForwardAxis";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Clockwork_R1
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_0D02904F";
+	Infinite = true;
+	DurationInSeconds = 2.0000000e+000;
+	SpawnCountMode = TotalParticleCount;
+	SpawnCount = 1.0000000e+001;
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_0D02904F
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Mesh_0D1C3DBE";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_8B497990",
+		"$LOCAL$/CParticleFieldDeclaration_8C59CF93",
+		"$LOCAL$/CParticleFieldDeclaration_7E0D0C52",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_C1A1987D";
+	States = 
+	{
+		"$LOCAL$/CParticleState_E97CB284",
+	};
+}
+CParticleRenderer_Mesh	$LOCAL$/CParticleRenderer_Mesh_0D1C3DBE
+{
+	CustomName = "Mesh";
+	Meshes = 
+	{
+		"$LOCAL$/CParticleRenderer_Mesh_Descriptor_6BDAB059",
+	};
+	Scale = float3(1.0000000e+000, 1.2000000e+000, 1.2000000e+000);
+	StaticOrientationOffset = float3(0.0000000e+000, 1.8000000e+002, 0.0000000e+000);
+	RotationAxisField = "RotAxis";
+	ForwardAxisField = "ForwardAxis";
+}
+CParticleRenderer_Mesh_Descriptor	$LOCAL$/CParticleRenderer_Mesh_Descriptor_6BDAB059
+{
+	Mesh = "Meshes/vfx_gear_01.pkmm";
+	Material = Solid;
+	Diffuse = "Textures/Meshes/vfx_gear_01.dds";
+	DiffuseColor = float3(1.5000000e+000, 1.5000000e+000, 0.0000000e+000);
+	CustomName = "Mesh_Descriptor";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_8B497990
+{
+	FieldName = "TimeSeed";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_8C59CF93
+{
+	FieldName = "RotAxis";
+	FieldType = float3;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_7E0D0C52
+{
+	FieldName = "ForwardAxis";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_C1A1987D
+{
+	Expression = "function void	Eval()
+{
+	Life = 0.1;
+	//Size = 0.25;
+	TimeSeed = floor(scene.Time*2);
+	RotAxis = float3(1,0,0);
+	Position = float3(-0.19,-0.0,-0.04);
+	ForwardAxis = float3(0,0,1); 
+}
+";
+}
+CParticleState	$LOCAL$/CParticleState_E97CB284
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_44E44197",
+		"$LOCAL$/CParticleEvolver_Script_CD83A4A6",
+		"$LOCAL$/CParticleEvolver_Rotation_F623B738",
+		"$LOCAL$/CParticleEvolver_Localspace_A8848A5B",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_44E44197
+{
+	CustomName = "Physics";
+}
+CParticleEvolver_Script	$LOCAL$/CParticleEvolver_Script_CD83A4A6
+{
+	CustomName = "Script";
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_B0D92D61";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_B0D92D61
+{
+	Expression = "function void	Eval()
+{
+	Rotation = TimeSeed/4;
+	
+}
+";
+}
+CParticleEvolver_Rotation	$LOCAL$/CParticleEvolver_Rotation_F623B738
+{
+	CustomName = "Rotation";
+}
+CParticleEvolver_Localspace	$LOCAL$/CParticleEvolver_Localspace_A8848A5B
+{
+	CustomName = "Localspace";
+	
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Clockwork_R2
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_F0F9F305";
+	Infinite = true;
+	DurationInSeconds = 2.0000000e+000;
+	SpawnCountMode = TotalParticleCount;
+	SpawnCount = 1.0000000e+001;
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_F0F9F305
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Mesh_3E1F5BAC";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_3CFBC28E",
+		"$LOCAL$/CParticleFieldDeclaration_204B2D69",
+		"$LOCAL$/CParticleFieldDeclaration_81E633E0",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_BA8CF023";
+	States = 
+	{
+		"$LOCAL$/CParticleState_08077022",
+	};
+}
+CParticleRenderer_Mesh	$LOCAL$/CParticleRenderer_Mesh_3E1F5BAC
+{
+	CustomName = "Mesh";
+	Meshes = 
+	{
+		"$LOCAL$/CParticleRenderer_Mesh_Descriptor_A6820DDF",
+	};
+	Scale = float3(1.0000000e+000, 8.0000001e-001, 8.0000001e-001);
+	StaticOrientationOffset = float3(0.0000000e+000, 1.8000000e+002, 0.0000000e+000);
+	RotationAxisField = "RotAxis";
+	ForwardAxisField = "ForwardAxis";
+}
+CParticleRenderer_Mesh_Descriptor	$LOCAL$/CParticleRenderer_Mesh_Descriptor_A6820DDF
+{
+	Mesh = "Meshes/vfx_gear_01.pkmm";
+	Material = Solid;
+	Diffuse = "Textures/Meshes/vfx_gear_01.dds";
+	DiffuseColor = float3(1.5000000e+000, 1.5000000e+000, 0.0000000e+000);
+	CustomName = "Mesh_Descriptor";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_3CFBC28E
+{
+	FieldName = "TimeSeed";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_204B2D69
+{
+	FieldName = "RotAxis";
+	FieldType = float3;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_81E633E0
+{
+	FieldName = "ForwardAxis";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_BA8CF023
+{
+	Expression = "function void	Eval()
+{
+	Life = 0.1;
+	//Size = 0.25;
+	TimeSeed = floor((scene.Time+1)*2);
+	RotAxis = float3(1,0,0);
+	//Position = float3(0.4,0.09,0.075);
+	Position = float3(-0.19,0.08,0.03);
+	ForwardAxis = float3(0,0,1);
+}
+";
+}
+CParticleState	$LOCAL$/CParticleState_08077022
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_CDC6E08D",
+		"$LOCAL$/CParticleEvolver_Script_D33893D4",
+		"$LOCAL$/CParticleEvolver_Rotation_E8153776",
+		"$LOCAL$/CParticleEvolver_Localspace_23BDD071",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_CDC6E08D
+{
+	CustomName = "Physics";
+}
+CParticleEvolver_Script	$LOCAL$/CParticleEvolver_Script_D33893D4
+{
+	CustomName = "Script";
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_C2821527";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_C2821527
+{
+	Expression = "function void	Eval()
+{
+	Rotation = -1*TimeSeed/4;
+	
+}
+";
+}
+CParticleEvolver_Rotation	$LOCAL$/CParticleEvolver_Rotation_E8153776
+{
+	CustomName = "Rotation";
+}
+CParticleEvolver_Localspace	$LOCAL$/CParticleEvolver_Localspace_23BDD071
+{
+	CustomName = "Localspace";
+	
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Clockwork_R3
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_FEEF20EB";
+	Infinite = true;
+	DurationInSeconds = 2.0000000e+000;
+	SpawnCountMode = TotalParticleCount;
+	SpawnCount = 1.0000000e+001;
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_FEEF20EB
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Mesh_10318C8A";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_7069FAFC",
+		"$LOCAL$/CParticleFieldDeclaration_6256776F",
+		"$LOCAL$/CParticleFieldDeclaration_5E1CA35E",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_C02A3679";
+	States = 
+	{
+		"$LOCAL$/CParticleState_160E6A30",
+	};
+}
+CParticleRenderer_Mesh	$LOCAL$/CParticleRenderer_Mesh_10318C8A
+{
+	CustomName = "Mesh";
+	Meshes = 
+	{
+		"$LOCAL$/CParticleRenderer_Mesh_Descriptor_773B8115",
+	};
+	Scale = float3(8.9999998e-001, 8.9999998e-001, 8.9999998e-001);
+	StaticOrientationOffset = float3(0.0000000e+000, 1.8000000e+002, 0.0000000e+000);
+	RotationAxisField = "RotAxis";
+	ForwardAxisField = "ForwardAxis";
+}
+CParticleRenderer_Mesh_Descriptor	$LOCAL$/CParticleRenderer_Mesh_Descriptor_773B8115
+{
+	Mesh = "Meshes/vfx_gear_01.pkmm";
+	Material = Solid;
+	Diffuse = "Textures/Meshes/vfx_gear_01.dds";
+	DiffuseColor = float3(1.5000000e+000, 1.5000000e+000, 0.0000000e+000);
+	CustomName = "Mesh_Descriptor";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_7069FAFC
+{
+	FieldName = "TimeSeed";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_6256776F
+{
+	FieldName = "RotAxis";
+	FieldType = float3;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_5E1CA35E
+{
+	FieldName = "ForwardAxis";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_C02A3679
+{
+	Expression = "function void	Eval()
+{
+	Life = 0.1;
+	TimeSeed = floor((scene.Time+1)*2);
+	RotAxis = float3(1,0,0);
+	Position = float3(-0.19,-0.1,-0.0);
+	ForwardAxis = float3(0,0,1);
+}
+";
+}
+CParticleState	$LOCAL$/CParticleState_160E6A30
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_13333CB3",
+		"$LOCAL$/CParticleEvolver_Script_429E6FF2",
+		"$LOCAL$/CParticleEvolver_Rotation_5A713124",
+		"$LOCAL$/CParticleEvolver_Localspace_C4BD54B7",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_13333CB3
+{
+	CustomName = "Physics";
+}
+CParticleEvolver_Script	$LOCAL$/CParticleEvolver_Script_429E6FF2
+{
+	CustomName = "Script";
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_BE36F49D";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_BE36F49D
+{
+	Expression = "function void	Eval()
+{
+	Rotation = -1*TimeSeed/4;
+	
+}
+";
+}
+CParticleEvolver_Rotation	$LOCAL$/CParticleEvolver_Rotation_5A713124
+{
+	CustomName = "Rotation";
+}
+CParticleEvolver_Localspace	$LOCAL$/CParticleEvolver_Localspace_C4BD54B7
+{
+	CustomName = "Localspace";
+	
+}
+CActionFactoryWithChilds	$LOCAL$/Clockwork_RightSide
+{
+	ChildList = 
+	{
+		"$LOCAL$/Clockwork_R1",
+		"$LOCAL$/Clockwork_R2",
+		"$LOCAL$/Clockwork_R3",
+	};
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_86B4C514
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		2.1369778e-001,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		1.0977353e+000,
+		8.1060869e-001,
+		1.9634023e-002,
+		0.0000000e+000,
+		1.1386656e+000,
+		8.3631176e-001,
+		1.7385222e-001,
+		2.7979749e-001,
+		4.0848821e-001,
+		2.9534060e-001,
+		9.6459091e-003,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_00ED7F67
+{
+	CustomName = "Field";
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_86B4C514";
+}
+CParticleAttributeDeclaration	$LOCAL$/CParticleAttributeDeclaration_FACD5C9C
+{
+	AttributeName = "KillAllOnDespawn";
+	AttributeType = int;
+	HasMin = true;
+	HasMax = true;
+	MaxValueF4 = float4(1.0000000e+000, 1.0000000e+000, 1.0000000e+000, 1.0000000e+000);
+	MaxValueI4 = int4(1, 10, 10, 10);
+}

@@ -1,0 +1,30 @@
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+KFloat Luma(KFloat3 rgb) {
+  return sqrt(dot(rgb, KFloat3(0.299, 0.387, 0.314)));
+}
+
+KPSMain(PostEffectBloomBoxPS)
+{
+  KFloat4 blurColor = KFloat4(0.0, 0.0, 0.0, 0.0);
+  
+  blurColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[0]*0.5);
+  blurColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[2]*0.5);
+  blurColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[6]*0.5);
+  blurColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[8]*0.5);
+  blurColor.xyz *= 0.25;
+  
+  KFloat blurStrength = Luma(blurColor.xyz);
+  blurStrength = clamp((blurStrength - 0.5)/(1.0 - 0.5), 0.0, 1.0);
+  blurColor.xyz *= blurStrength;
+  blurColor.w = blurStrength;
+  
+  KPSOutput(blurColor);
+}
+

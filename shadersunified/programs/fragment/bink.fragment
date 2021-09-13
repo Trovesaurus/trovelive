@@ -1,0 +1,54 @@
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat4, texCoord0, TEXCOORD0)
+  KPDataOutColor
+KPDataEnd
+
+KTexture(YTexture)
+KSampler(YSampler)
+
+KTexture(cRTexture)
+KSampler(cRSampler)
+
+KTexture(cBTexture)
+KSampler(cBSampler)
+
+KTexture(ATexture)
+KSampler(ASampler)
+
+KCBBegin(BINK_PS_CB)
+  KUniform(KFloat4, crc)
+  KUniform(KFloat4, cbc)
+  KUniform(KFloat4, adj)
+  KUniform(KFloat4, yscale)
+  KUniform(KFloat4, consta)
+KCBEnd
+
+KPSMain(BinkPS)
+{ 
+  KFloat y = KSampleTexture( YSampler, YTexture, KInput(texCoord0).xy ).r;
+  KFloat cr = KSampleTexture( cRSampler, cRTexture, KInput(texCoord0).zw ).r;
+  KFloat cb = KSampleTexture( cBSampler, cBTexture, KInput(texCoord0).zw ).r;
+
+  KFloat4 p = yscale * y;
+  p += crc * cr;
+  p += cbc * cb;
+  p += adj;
+  p *= consta;
+  KPSOutput(p);
+}
+
+KPSMain(BinkAlphaPS)
+{ 
+  KFloat y = KSampleTexture( YSampler, YTexture, KInput(texCoord0).xy ).r;
+  KFloat cr = KSampleTexture( cRSampler, cRTexture, KInput(texCoord0).zw ).r;
+  KFloat cb = KSampleTexture( cBSampler, cBTexture, KInput(texCoord0).zw ).r;
+
+  KFloat4 p = yscale * y;
+  p += crc * cr;
+  p += cbc * cb;
+  p += adj;
+  p.w = KSampleTexture( ASampler, ATexture, KInput(texCoord0).xy ).r;
+  p *= consta;
+  KPSOutput(p);
+}

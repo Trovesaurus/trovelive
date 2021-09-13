@@ -1,0 +1,47 @@
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+KFloat3 rgb2hsv(KFloat3 c)
+{
+    KFloat4 K = KFloat4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    KFloat4 p = KLerp(KFloat4(c.zy, K.wz), KFloat4(c.yz, K.xy), step(c.z, c.y));
+    KFloat4 q = KLerp(KFloat4(p.xyw, c.x), KFloat4(c.x, p.yzx), step(p.x, c.x));
+
+    KFloat d = q.x - min(q.w, q.y);
+    KFloat e = 1.0e-10;
+    return KFloat3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+ 
+KFloat3 hsv2rgb(KFloat3 c)
+{
+    KFloat4 K = KFloat4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    KFloat3 p = abs(KFrac(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * KLerp(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+
+KPSMain(PostEffectRetroPS)
+{ 
+  const KFloat numHues = 16.0;
+  const KFloat numSats = 4.0;
+  const KFloat numValues = 8.0;
+  
+  KFloat4 retroColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0)); 
+  
+  KFloat3 hsv = rgb2hsv(retroColor.xyz);
+  hsv = abs(hsv);
+  hsv.y = pow(hsv.y, 0.75);
+  hsv.z = pow(hsv.z, .75);
+  hsv.x = floor(hsv.x*numHues) / numHues + 1.0/(numHues*2.0);
+  hsv.y = floor(hsv.y*numSats) / numSats + 1.0/(numSats*2.0);
+  hsv.z = floor(hsv.z*numValues) / numValues + 1.0/(numValues*2.0);
+  
+  retroColor.xyz = hsv2rgb(hsv);
+  
+  KPSOutput(retroColor);
+}

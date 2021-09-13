@@ -1,0 +1,45 @@
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat2, in_TexCoord0, UV)
+  KVDataInOut( KFloat4, in_Color0, COLOR0)
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat4, color, COLOR0)
+KPDataEnd
+           
+KVSMain(Simple_FlatColorSingleTextureOffsetVS) 
+{
+  KDeclareOutput;
+
+  KFloat3 worldPos = KMUL(gModelViewMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  KFloat fogStrength = Lighting_DepthFogVertex(length(worldPos));
+  KFloat4 fadedColor = KInput(in_Color0);
+  fadedColor.w = 1.0 - fogStrength;
+  KOutput(color) = fadedColor;
+
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  
+  const KFloat zFar = 10000.0;
+  const KFloat zNear = 0.1;
+  KFloat4 tempPos = KMUL(gModelViewProjectionMatrix, KFloat4(KInput(in_Position), 1.0));
+  tempPos.z -= 0.001*(zFar + zNear)/(zFar - zNear); 
+  
+  KSetPosition(Pos, tempPos);
+  
+  
+  KVSOutput;
+}
+
+KVSMain(Simple_FlatColorSingleTextureVS)
+{
+  KDeclareOutput;
+  
+	KOutput(color) = KInput(in_Color0);
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  KSetPosition(Pos, KMUL(gModelViewProjectionMatrix, KFloat4(KInput(in_Position), 1.0)));
+  
+  KVSOutput;
+}

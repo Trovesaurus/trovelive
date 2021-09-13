@@ -1,0 +1,249 @@
+CMaterialMathsBlur	$LOCAL$/CMaterialMathsBlur_00005D03
+{
+	EditorInfosPosition = int2(578, 156);
+	Color = $LOCAL$/CMaterialTexture_000063CB.rgb;
+	BlurRadius = $LOCAL$/BlurFactor.Result;
+	SampleCount = 16;
+	Type = Vertical;
+	DistributionType = Gaussian;
+	UseCustomLength = true;
+	CustomLength = 1.0000000e+000;
+	StandardDeviation = 4.0000000e+000;
+}
+CMaterialMathsBlur	$LOCAL$/CMaterialMathsBlur_00007A5A
+{
+	EditorInfosPosition = int2(511, 451);
+	Color = $LOCAL$/CMaterialTexture_00001238.rgb;
+	BlurRadius = $LOCAL$/BlurFactor.Result;
+	SampleCount = 16;
+	DistributionType = Gaussian;
+	UseCustomLength = true;
+	CustomLength = 1.0000000e+000;
+	StandardDeviation = 4.0000000e+000;
+}
+CMaterial	$LOCAL$/CMaterial_0000767D
+{
+	EditorInfosPosition = int2(1313, 524);
+	EditorInfosIsBlockMinimized = 0;
+	GraphicsObject = $LOCAL$/CMaterialGraphics_00004509;
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_00004509
+{
+	EditorInfosPosition = int2(1199, 518);
+	EditorInfosIsBlockMinimized = 0;
+	Color = $LOCAL$/CMaterialTexture_6C0928E8.rgb;
+	DepthTest = false;
+	DepthWrite = false;
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_00001238
+{
+	EditorInfosPosition = int2(686, 301);
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	TexcoordsType = Pixels;
+	UseHalfPixelOffset = true;
+}
+CPostprocessSingle	$LOCAL$/CPostprocessSingle_00003B25
+{
+	EditorInfosPosition = int2(1427, 471);
+	Feed0 = $LOCAL$/CPostprocessFeedFramebuffer_00006BFC;
+	ShaderTexture0 = 
+	{
+		$LOCAL$/CMaterialTexture_00001238,
+	};
+	Shader = $LOCAL$/CMaterial_0000767D;
+	FramebufferFormat = RGBA_FP16;
+	FramebufferDepth = NoDepth;
+}
+CMaterial	$LOCAL$/CMaterial_00001E1F
+{
+	EditorInfosPosition = int2(712, 157);
+	GraphicsObject = $LOCAL$/CMaterialGraphics_00006E5D;
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_00006E5D
+{
+	EditorInfosPosition = int2(648, 156);
+	Color = $LOCAL$/CMaterialMathsBlur_00005D03.Result;
+	DepthTest = false;
+	DepthWrite = false;
+}
+CPostprocessSingle	$LOCAL$/CPostprocessSingle_00001AD4
+{
+	EditorInfosPosition = int2(785, 124);
+	Feed0 = $LOCAL$/CPostprocessSingle_0000323B;
+	ShaderTexture0 = 
+	{
+		$LOCAL$/CMaterialTexture_000063CB,
+	};
+	Shader = $LOCAL$/CMaterial_00001E1F;
+	FramebufferFormat = RGBA_FP16;
+	FramebufferDepth = NoDepth;
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_000063CB
+{
+	EditorInfosPosition = int2(508, 134);
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	TexcoordsType = Pixels;
+}
+CPostprocessFeedFramebuffer	$LOCAL$/CPostprocessFeedFramebuffer_00006BFC
+{
+	EditorInfosPosition = int2(479, -125);
+	FeedName = "ImageToProcess";
+}
+CMaterialMathsBlur	$LOCAL$/CMaterialMathsBlur_00007F96
+{
+	EditorInfosPosition = int2(362, 20);
+	Color = $LOCAL$/CMaterialTexture_00002213.rgb;
+	SampleCount = 16;
+	Type = Downsample2x2;
+	DistributionType = Box;
+	UseCustomLength = true;
+	CustomLength = 2.0000000e+000;
+	StandardDeviation = 1.0000000e+001;
+}
+CMaterial	$LOCAL$/CMaterial_00007FF5
+{
+	EditorInfosPosition = int2(496, 21);
+	GraphicsObject = $LOCAL$/CMaterialGraphics_00004E45;
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_00004E45
+{
+	EditorInfosPosition = int2(432, 20);
+	Color = $LOCAL$/CMaterialMathsBlur_00007F96.Result;
+	DepthTest = false;
+	DepthWrite = false;
+}
+CPostprocessSingle	$LOCAL$/CPostprocessSingle_0000323B
+{
+	EditorInfosPosition = int2(572, -19);
+	Feed0 = $LOCAL$/CPostprocessFeedFramebuffer_00006BFC;
+	ShaderTexture0 = 
+	{
+		$LOCAL$/CMaterialTexture_00002213,
+	};
+	Shader = $LOCAL$/CMaterial_00007FF5;
+	FramebufferFormat = RGBA_FP16;
+	FramebufferDepth = NoDepth;
+	SizeDivider = 2;
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_00002213
+{
+	EditorInfosPosition = int2(121, -60);
+	Filtering = Point;
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	TexcoordsType = Pixels;
+}
+CMaterialGlobalDataTime	$LOCAL$/CMaterialGlobalDataTime_0000260D
+{
+	EditorInfosPosition = int2(239, 381);
+}
+CMaterialMathsSin	$LOCAL$/CMaterialMathsSin_00006B89
+{
+	EditorInfosPosition = int2(309, 383);
+	Input = $LOCAL$/CMaterialGlobalDataTime_0000260D.Time;
+}
+CMaterialMathsMadd	$LOCAL$/CMaterialMathsMadd_0000030A
+{
+	EditorInfosPosition = int2(411, 393);
+	Input = $LOCAL$/CMaterialMathsSin_00006B89.Result;
+	AddCoeff = 1.0000000e+000;
+	MulCoeff = 5.0000000e-001;
+}
+CMaterialMathsConstant	$LOCAL$/BlurFactor
+{
+	EditorInfosPosition = int2(65, 391);
+	FloatValue = 1.0000000e+000;
+	GetFromParameter = "BlurFactor";
+}
+CMaterialGraphicsSaturate	$LOCAL$/CMaterialGraphicsSaturate_00000BDB
+{
+	EditorInfosPosition = int2(799, 338);
+	InputColor = $LOCAL$/CMaterialTexture_00001238.rgb;
+}
+CMaterialMathsConstant	$LOCAL$/SaturationFactor
+{
+	EditorInfosPosition = int2(304, 462);
+	FloatValue = 1.0000000e+000;
+	GetFromParameter = "SaturationFactor";
+}
+CPostprocessContext	$LOCAL$/Resource
+{
+	EditorInfosPosition = int2(1679, 436);
+	Feed = $LOCAL$/CPostprocessSingle_00003B25;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_00000029
+{
+	EditorInfosPosition = int2(600, 718);
+	Input0 = $LOCAL$/CMaterialMathsSub_000018BE.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant_000041BB.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_000041BB
+{
+	EditorInfosPosition = int2(522, 737);
+	FloatValue = 6.9999999e-001;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_00007E87
+{
+	EditorInfosPosition = int2(600, 757);
+	FloatValue = 3.0000001e-001;
+}
+CMaterialMathsAdd	$LOCAL$/CMaterialMathsAdd_00000F3E
+{
+	EditorInfosPosition = int2(677, 737);
+	Input0 = $LOCAL$/CMaterialMathsMul_00000029.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant_00007E87.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_00004823
+{
+	EditorInfosPosition = int2(446, 677);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_000018BE
+{
+	EditorInfosPosition = int2(525, 700);
+	Input0 = $LOCAL$/CMaterialMathsConstant_00004823.Result;
+	Input1 = $LOCAL$/BlurFactor.Result;
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_6C0928E8
+{
+	EditorInfosPosition = int2(985, 481);
+	EditorInfosIsBlockMinimized = 2;
+	Path = "Textures/Common/Overdraw.dds";
+	WrapU = Clamp;
+	WrapV = Clamp;
+	Anisotropy = 0.0000000e+000;
+	Texcoords = $LOCAL$/CMaterialMathsMul_352AFCE6.Result;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_273B5B56
+{
+	EditorInfosPosition = int2(798, 434);
+	EditorInfosIsBlockMinimized = 2;
+	Input = $LOCAL$/CMaterialGraphicsSaturate_00000BDB.OutputColor;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_60B964C1
+{
+	EditorInfosPosition = int2(897, 466);
+	EditorInfosIsBlockMinimized = 2;
+	x = $LOCAL$/CMaterialMathsVectorSplitter_273B5B56.x;
+	y = $LOCAL$/CMaterialMathsVectorSplitter_273B5B56.x;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_352AFCE6
+{
+	EditorInfosPosition = int2(869, 518);
+	EditorInfosIsBlockMinimized = 2;
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_273B5B56.x;
+	Input1 = $LOCAL$/CMaterialMathsConstant_C284C011.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_C284C011
+{
+	EditorInfosPosition = int2(769, 543);
+	FloatValue = 1.0000000e+000;
+}

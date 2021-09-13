@@ -1,0 +1,25 @@
+KCBBegin(BINK_VS_CB)
+  KUniform(KFloat4, coord_xy)
+  KUniform(KFloat4, constuv_0)
+  KUniform(KFloat4, constuv_1)
+  KUniform(KFloat4, constuv_2)
+KCBEnd 
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION0)
+  KVDataInOut( KFloat4, in_TexCoord0, UV)
+  KPDataInOut( KFloat4, color, COLOR0)
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat4, texCoord0, TEXCOORD0)
+KPDataEnd
+           
+KVSMain(BinkVS) 
+{
+  KDeclareOutput;
+  KSetPosition(Pos, KFloat4(KInput(in_Position).xy * coord_xy.xy + coord_xy.zw, 0.0, 1.0));
+  KOutput(texCoord0) = KInput(in_Position).x * constuv_0 + KInput(in_Position).y * constuv_1 + constuv_2;
+  KVSOutput;
+}

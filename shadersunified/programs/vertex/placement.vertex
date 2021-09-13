@@ -1,0 +1,60 @@
+#ifndef DAMAGE_OFFSET
+  #define DAMAGE_OFFSET 0.001
+#endif
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat2, in_TexCoord0, UV)
+  KVDataInOut( KFloat2, in_Extra, EXTRA)
+  KVDataInOut( KFloat4, in_Color0, COLOR0)
+  KVDataInOut( KFloat4, in_Color1, COLOR1)
+  KVDataInOut( KFloat3, in_Normal, NORMAL)
+  KVDataInOut( KFloat3, in_Tangent, TANGENT)
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat3, worldPos, TEXCOORD1)
+  KPDataInOut( KFloat4, color, TEXCOORD2)
+KPDataEnd
+
+KCBBegin(PLACEMENT_CB)
+  KUniformV(KFloat4, placementColor, KFloat4(1.0, 0.5, 1.0, 1.0))
+KCBEnd
+
+KVSMain(PlacementVS) {   
+  KDeclareOutput;
+  
+  KSetPosition(Pos, KMUL(gModelViewProjectionMatrix, KFloat4(KInput(in_Position), 1.0)));
+  
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  KOutput(worldPos) = KMUL(gModelMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  KOutput(color) = placementColor;
+  
+  KVSOutput;
+}
+
+KFloat4 CalcOffsetPosition(KFloat3 position, KFloat3 normal) {
+  //push the z value by a little epsilon
+  const KFloat zFar = 10000.0;
+  const KFloat zNear = 0.1;
+  
+  KFloat3 n = normalize(normal);
+  KFloat4 tempPos = KMUL(gModelViewProjectionMatrix, KFloat4(position + n*DAMAGE_OFFSET, 1.0));
+  tempPos.z -= 0.001*(zFar + zNear)/(zFar - zNear); 
+  return tempPos;
+  
+}
+
+KVSMain(PlacementTerraformingVS) {   
+  KDeclareOutput;
+  
+  KSetPosition(Pos, CalcOffsetPosition(KInput(in_Position), KInput(in_Normal)));
+  
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  KOutput(worldPos) = KMUL(gModelMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  KOutput(color) = KInput(in_Color0);
+  
+  KVSOutput;
+}

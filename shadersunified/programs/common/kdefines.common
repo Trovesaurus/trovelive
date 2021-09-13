@@ -1,0 +1,327 @@
+#ifndef KIWI_HLSL
+#define KIWI_HLSL 0
+#endif
+
+#ifndef ISVERTEXSHADER
+#define ISVERTEXSHADER 0
+#endif
+
+// GLSL in NVN does not suppport uniform outside of uniform blocks
+#ifndef NVN_GLSL
+#define NVN_GLSL 0
+#endif
+
+// Enable GLSL extensions before any non-preprocessing code.
+#if (KIWI_HLSL == 1)
+#elif (KIWI_PSSL == 1)
+#else
+#  ifndef APPLE
+#    extension GL_ARB_draw_instanced : require
+#  endif
+#endif
+
+#define MAX_INSTANCES 64
+
+#if (KIWI_HLSL == 1)
+  //////////////////// HLSL ////////////////////  
+  //////////////////// Types and functions ////////////////////  
+  #define KDiscard clip(-1)
+  #define KFloat float
+  #define KFloat2 float2
+  #define KFloat3 float3
+  #define KFloat4 float4
+  #define KHalf half
+  #define KHalf2 half2
+  #define KHalf3 half3
+  #define KHalf4 half4
+  #define mod(x,y) (x % y)
+  #define KCross(x,y) cross(x,y)
+  // HACCCCCCCCCCK
+  #define MERGE(a, b) a##b
+  #define KMat4 MERGE(MERGE(float, 4), x4)
+  #define KMat3 MERGE(MERGE(float, 3), x3)
+  
+  #define KSat(x) saturate(x)
+  #define KLerp(x, y, z) lerp(x, y, z)
+  #define KMUL(x,y) mul(y, x)
+  #define KFrac(x) frac(x)
+  #define KUpper3x3(x) KMat3(x##._m00, x##._m01, x##._m02, x##._m10, x##._m11, x##._m12, x##._m20, x##._m21, x##._m22)
+  #define KUVConvertDX(uv) KFloat2(uv.x, 1.0-uv.y)
+  //TODO fix these!
+  #define KSampleTexture(samplerName, texName, uvCoord) texName.Sample(samplerName, uvCoord)
+  #define KSampleTextureNoMip(samplerName, texName, uvCoord) texName.SampleLevel(samplerName, uvCoord, 0)
+  #define KSampleCube(samplerName, texName, uvCoord) texName.Sample(samplerName, uvCoord)
+  //////////////////// Uniform variables ////////////////////  
+  
+  #define KSampler(samplerName) SamplerState samplerName;
+  #define KTexture(textureName) Texture2D textureName; 
+  #define KSamplerCube(samplerName) SamplerState samplerName;
+  #define KTextureCube(textureName) TextureCube textureName;
+  #define KRescaleDepthValue(depthValue) depthValue  
+  #define KRescaleDepthValue4(depthValue) depthValue    
+  #define KCBBegin(bufferName) cbuffer bufferName {
+  #define KCBEnd }
+  #define KUniform(type, name) type name; 
+  #define KUniformV(type, name, value) type name = value; 
+  
+  //////////////////// Handle input/output variables/structs ////////////////////  
+  #define KModifierFunction PS_DATA
+  #define KPSData PS_DATA
+  #define KInputVar input
+  #define KOutputVar output
+  
+  #define KVSData VS_DATA
+  #define KModifyData(func) KOutputVar = func(KInputVar) 
+  #define KModifyDataWithArgs(func, arg0, arg1) KOutputVar = func(KInputVar, arg0, arg1) 
+
+  #define KVDataBegin struct KVSData {
+  #define KVDataEnd };
+  #define KPDataBegin struct KPSData {
+  #define KPDataEnd };
+  
+  #define KInput(var) KInputVar.##var
+  #define KInstanceID KInputVar.instanceID
+  #define KPosInput(var) KInputVar.##var
+  #define KOutput(var) KOutputVar.##var
+  #define KOutputVPos(var) KOutputVar.##var
+  #define KDeclareOutput KPSData KOutputVar
+  #define KSemantic(var) : var
+  
+  #define KPDataPosition(x, y, z) x y KSemantic(z);
+  #define KVDataInOut(x, y, z) x y KSemantic(z);
+  #define KPDataInOut(x, y, z) x y KSemantic(z);
+  #define KInstanceData uint instanceID : SV_InstanceID;
+  #define KPDataOutColor
+  //////////////////// Main functions/returns ////////////////////
+  #define KPSMain(name) KFloat4 name(KPSData KInputVar) : SV_Target
+  #define KVSMain(name) KPSData name(KVSData KInputVar)
+  
+  #define KFragColor 
+  #define KPSOutput(var) return var
+  #define KVSOutput return KOutputVar
+  
+  #define KDeclareColorDepthData struct PS_C_D_DATA { float4 Color :  SV_Target; float Depth : SV_Depth; };
+  #define KPSColorDepthMain(name) PS_C_D_DATA name(KPSData KInputVar)
+  #define KDeclareColorDepthOutput PS_C_D_DATA KOutputVar
+  #define KPSColorDepthOutput(x, y) KOutputVar.Color = x; KOutputVar.Depth = y; return KOutputVar
+
+  #define KSetPosition(var, pos) KOutputVPos(var) = pos
+#elif (KIWI_PSSL == 1)
+  //////////////////// PSSL ////////////////////  
+  //////////////////// Types and functions ////////////////////  
+  #define KDiscard clip(-1)
+  #define KFloat float
+  #define KFloat2 float2
+  #define KFloat3 float3
+  #define KFloat4 float4
+  #define KHalf half
+  #define KHalf2 half2
+  #define KHalf3 half3
+  #define KHalf4 half4
+  #define mod(x,y) (x % y)
+  #define KCross(x,y) cross(x,y)
+  // HACCCCCCCCCCK
+  #define MERGE(a, b) a##b
+  #define KMat4 MERGE(MERGE(float, 4), x4)
+  #define KMat3 MERGE(MERGE(float, 3), x3)
+  
+  #define KSat(x) saturate(x)
+  #define KLerp(x, y, z) lerp(x, y, z)
+  #define KMUL(x,y) mul(y, x)
+  #define KFrac(x) frac(x)
+  #define KUpper3x3(x) KMat3(x##._m00, x##._m01, x##._m02, x##._m10, x##._m11, x##._m12, x##._m20, x##._m21, x##._m22)
+  #define KUVConvertDX(uv) KFloat2(uv.x, 1.0-uv.y)
+  //TODO fix these!
+  #define KSampleTexture(samplerName, texName, uvCoord) texName.Sample(samplerName, uvCoord)
+  #define KSampleTextureNoMip(samplerName, texName, uvCoord) texName.SampleLOD(samplerName, uvCoord, 0)
+  #define KSampleCube(samplerName, texName, uvCoord) texName.Sample(samplerName, uvCoord)
+  //////////////////// Uniform variables ////////////////////  
+  
+  #define KSampler(samplerName) SamplerState samplerName;
+  #define KTexture(textureName) Texture2D textureName; 
+  #define KSamplerCube(samplerName) SamplerState samplerName;
+  #define KTextureCube(textureName) TextureCube textureName;
+  #define KRescaleDepthValue(depthValue) depthValue  
+  #define KRescaleDepthValue4(depthValue) depthValue    
+  #define KCBBegin(bufferName) ConstantBuffer bufferName {
+  #define KCBEnd }
+  #define KUniform(type, name) type name; 
+  #define KUniformV(type, name, value) type name = value; 
+  
+  //////////////////// Handle input/output variables/structs ////////////////////  
+  #define KModifierFunction PS_DATA
+  #define KPSData PS_DATA
+  #define KInputVar input
+  #define KOutputVar output
+  
+  #define KVSData VS_DATA
+  #define KModifyData(func) KOutputVar = func(KInputVar) 
+  #define KModifyDataWithArgs(func, arg0, arg1) KOutputVar = func(KInputVar, arg0, arg1) 
+
+  #define KVDataBegin struct KVSData {
+  #define KVDataEnd };
+  #define KPDataBegin struct KPSData {
+  #define KPDataEnd };
+  
+  #define KInput(var) KInputVar.##var
+  #define KInstanceID KInputVar.instanceID
+  #define KPosInput(var) KInputVar.##var
+  #define KOutput(var) KOutputVar.##var
+  #define KOutputVPos(var) KOutputVar.##var
+  #define KDeclareOutput KPSData KOutputVar
+  #define KSemantic(var) : var
+  
+  #define KPDataPosition(x, y, z) x y KSemantic(S_POSITION);
+  #define KVDataInOut(x, y, z) x y KSemantic(z);
+  #define KPDataInOut(x, y, z) x y KSemantic(z);
+  #define KInstanceData uint instanceID : S_INSTANCE_ID;
+  #define KPDataOutColor
+  //////////////////// Main functions/returns ////////////////////
+  #define KPSMain(name) KFloat4 name(KPSData KInputVar) : S_TARGET_OUTPUT
+  #define KVSMain(name) KPSData name(KVSData KInputVar)
+  
+  #define KFragColor 
+  #define KPSOutput(var) return var
+  #define KVSOutput return KOutputVar
+  
+  #define KDeclareColorDepthData struct PS_C_D_DATA { float4 Color :  S_TARGET_OUTPUT; float Depth : S_DEPTH_OUTPUT; };
+  #define KPSColorDepthMain(name) PS_C_D_DATA name(KPSData KInputVar)
+  #define KDeclareColorDepthOutput PS_C_D_DATA KOutputVar
+  #define KPSColorDepthOutput(x, y) KOutputVar.Color = x; KOutputVar.Depth = y; return KOutputVar
+
+  #define KSetPosition(var, pos) KOutputVPos(var) = pos
+#else
+  //////////////////// GLSL ////////////////////  
+  //////////////////// Types and functions ////////////////////
+  #define KDiscard discard
+  #define KFloat float
+  #define KFloat2 vec2
+  #define KFloat3 vec3
+  #define KFloat4 vec4
+  #define KHalf float
+  #define KHalf2 vec2
+  #define KHalf3 vec3
+  #define KHalf4 vec4
+  #define KCross(x,y) cross(y,x)
+  #define KMat4 mat4
+  #define KMat3 mat3
+  #define KSat(x) clamp(x, 0.0, 1.0)
+  #define KLerp(x, y, z) mix(x, y, z)
+  // For non-commutative mults, ie. matrices
+  #define KMUL(x,y) (x * y) 
+  #define KFrac(x) fract(x)
+  #define KUpper3x3(x) KMat3(x)
+  #define KUVConvertDX(uv) uv
+  #define KSampleTexture(samplerName, texName, uvCoord) texture(samplerName, uvCoord)
+  #define KSampleTextureNoMip(samplerName, texName, uvCoord) textureLod(samplerName, uvCoord, 0.0)
+  #define KSampleCube(samplerName, texName, uvCoord) texture(samplerName, uvCoord)
+  //////////////////// Uniform variables ////////////////////  
+  #define KSampler(samplerName) uniform sampler2D samplerName;
+  #define KTexture(textureName)
+  #define KSamplerCube(samplerName) uniform samplerCube samplerName;
+  #define KTextureCube(textureName)
+  #define KRescaleDepthValue(depthValue) 2.0 * (depthValue) - 1.0
+  #define KRescaleDepthValue4(depthValue) 2.0 * (depthValue) - KFloat4(1.0,1.0,1.0,1.0)
+
+  #if (NVN_GLSL == 1)
+    #define KCBBegin(bufferName) layout(std140) uniform bufferName {
+    #define KCBEnd };
+    #define KUniform(type, name) type name;
+    // Can't initialize members in uniform blocks, value is ignored
+    #define KUniformV(type, name, value) type name;
+  #else
+  #define KCBBegin(bufferName)
+  #define KCBEnd
+  #define KUniform(type, name) uniform type name;
+    #define KUniformV(type, name, value) uniform type name = value;
+  #endif
+  
+  //////////////////// Handle input/output variables/structs ////////////////////  
+  #define KModifierFunction void 
+  #define KPSData 
+  #define KVSData
+  #define KInputVar 
+  #define KOutputVar 
+  //#define KModifyData(func, dataIn, dataOut) func(dataIn) 
+  #define KModifyData(func) func()
+  #define KModifyDataWithArgs(func, arg0, arg1) func(arg0, arg1)
+  
+  #if (ISVERTEXSHADER == 1)
+    #define KVDataBegin 
+    #define KVDataEnd 
+    #define KPDataBegin 
+    #define KPDataEnd 
+    
+    #define VDataInOut in
+    #define PDataInOut out
+  #else
+    #define KVDataBegin
+    #define KVDataEnd 
+    #define KPDataBegin 
+    #define KPDataEnd 
+    #define VDataInOut 
+    #define PDataInOut in
+  #endif
+  
+  #define KInput(var) var
+  #define KInstanceID gl_InstanceID
+  #define KPosInput(var) gl_FragCoord
+  #define KOutput(var) var
+  #define KOutputVPos(var) gl_Position
+  #define KDeclareOutput 
+  
+#if (NVN_GLSL == 1)
+  #define COLOR0 0
+  #define COLOR1 1
+  #define COLOR2 2
+  #define COLOR3 3
+  #define COLOR4 4
+  #define COLOR5 5
+  #define TEXCOORD0 6
+  #define TEXCOORD1 7
+  #define TEXCOORD2 8
+  #define TEXCOORD3 9
+  #define TEXCOORD4 10 
+  #define TEXCOORD5 11
+  #define TEXCOORD6 12 
+  #define TEXCOORD7 13
+  #define TEXCOORD8 14 
+  #define TEXCOORD9 15
+  #define KSemantic(var) layout(location = var)
+#else
+  #define KSemantic(var) 
+#endif
+  
+  // note - some drivers (ATI) don't like noop
+  // semicolons in the global scope-  ;_;
+  #define KPDataPosition(x, y, z)
+
+  // Semantics are only used to match variables between each stage
+  //#define KPDataInOut(x, y, z) KSemantic(z) PDataInOut x y;
+
+  #define KVDataInOut(x, y, z) VDataInOut x y;
+  // Semantics are only used to match variables between each stage
+  #define KPDataInOut(x, y, z) KSemantic(z) PDataInOut x y;
+  #define KInstanceData 
+  #define KPDataOutColor out vec4 OutFragColor;
+  
+  //////////////////// Main functions/returns ////////////////////
+  #define KPSMain(name) void name()
+  #define KVSMain(name) void name()
+  
+  #define KFragColor OutFragColor
+  #define KPSOutput(var) KFragColor = var; return
+  #define KVSOutput 
+  
+  #define KDeclareColorDepthData 
+  #define KPSColorDepthMain(name) void name()
+  #define KDeclareColorDepthOutput
+  #define KPSColorDepthOutput(x, y) KFragColor = x; gl_FragDepth = y; return
+  
+#if (ISVERTEXSHADER == 1)
+  void SetPosition(in vec4 pos) { gl_Position = pos;}
+  #define KSetPosition(var, pos) SetPosition(pos)
+#endif
+
+#endif
+

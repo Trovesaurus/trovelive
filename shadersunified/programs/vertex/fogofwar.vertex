@@ -1,0 +1,71 @@
+#ifndef KERNEL_SCALE
+  #define KERNEL_SCALE 1.0
+#endif
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION0)
+  KVDataInOut( KFloat2, in_TexCoord0, UV)
+  KVDataInOut( KFloat4, in_Color0, COLOR0)
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+KPDataEnd
+
+//KCBBegin(POST_CB)
+//  KUniformV(KFloat, invZoom, 1.0)
+//KCBEnd
+
+KCBBegin(INV_ZOOM_CB)
+  KUniformV(KFloat, invZoom, 1.0)
+KCBEnd
+
+KVSMain(FogOfWarWideVS) 
+{
+  KDeclareOutput;
+  
+  KSetPosition(Pos, KFloat4(KInput(in_Position), 1.0));
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  
+  KFloat2 offset = KERNEL_SCALE * 2.0 * invZoom * invTex0Size;
+  
+  KOutput(kernelCoords)[0] = KFloat2(-offset.x, -offset.y); // top left 0
+  KOutput(kernelCoords)[1] = KFloat2(0.0, -offset.y); // top 1
+  KOutput(kernelCoords)[2] = KFloat2(offset.x, -offset.y); // top right 2
+
+  KOutput(kernelCoords)[3] = KFloat2(-offset.x, 0.0); // left 3
+  KOutput(kernelCoords)[4] = KFloat2(0.0, 0.0); // center 4
+  KOutput(kernelCoords)[5] = KFloat2(offset.x, 0.0); // right 5
+
+  KOutput(kernelCoords)[6] = KFloat2(-offset.x, offset.y); // bottom left 6
+  KOutput(kernelCoords)[7] = KFloat2(0.0, offset.y); // right 7
+  KOutput(kernelCoords)[8] = KFloat2(offset.x, offset.y); // bottom right 8
+  
+  KVSOutput;
+}
+
+KVSMain(FogOfWarVS) 
+{
+  KDeclareOutput;
+  
+  KSetPosition(Pos, KFloat4(KInput(in_Position), 1.0));
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  
+  KFloat2 offset = KERNEL_SCALE * 1.0 * invTex0Size;
+  
+  KOutput(kernelCoords)[0] = KFloat2(-offset.x, -offset.y); // top left 0
+  KOutput(kernelCoords)[1] = KFloat2(0.0, -offset.y); // top 1
+  KOutput(kernelCoords)[2] = KFloat2(offset.x, -offset.y); // top right 2
+
+  KOutput(kernelCoords)[3] = KFloat2(-offset.x, 0.0); // left 3
+  KOutput(kernelCoords)[4] = KFloat2(0.0, 0.0); // center 4
+  KOutput(kernelCoords)[5] = KFloat2(offset.x, 0.0); // right 5
+
+  KOutput(kernelCoords)[6] = KFloat2(-offset.x, offset.y); // bottom left 6
+  KOutput(kernelCoords)[7] = KFloat2(0.0, offset.y); // right 7
+  KOutput(kernelCoords)[8] = KFloat2(offset.x, offset.y); // bottom right 8
+  
+  KVSOutput;
+}

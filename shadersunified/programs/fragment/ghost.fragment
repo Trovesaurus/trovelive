@@ -1,0 +1,16 @@
+
+KCBBegin(GHOST_CB)
+  KUniformV(KFloat4, ghostColor, KFloat4(1.0,1.0,1.0,0.5))
+KCBEnd
+
+KPSMain(ObjectGhostPS)
+{
+	KFloat4 terrainColor = CalcTerrainColor(KInputVar);
+  
+  KFloat ghostPulse = sin(gameTime*2)*0.5 + 0.5;
+  
+  terrainColor.r = KLerp(terrainColor.r*0.4, terrainColor.r, ghostPulse);
+  
+  terrainColor = ghostColor * terrainColor;
+  KPSOutput(terrainColor);
+}

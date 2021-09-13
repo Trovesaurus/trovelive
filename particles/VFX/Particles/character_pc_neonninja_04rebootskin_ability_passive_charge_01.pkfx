@@ -1,0 +1,177 @@
+Version = 1.13.1.45791;
+CParticleEffect	$LOCAL$/Resource
+{
+	OnSpawn = "$LOCAL$/Spawner";
+	CustomAttributes = "$LOCAL$/_GlobalAttributes";
+	Autostart = true;
+}
+CNEdEditorParticle_Data	$LOCAL$/EDITOR
+{
+	Position = float3(1.1501582e+000, 1.3705633e+000, 1.4548604e+000);
+	EulerOrientation = float3(-2.4331987e+001, 3.9193001e+001, 0.0000000e+000);
+	PostFx_EnableGlow = false;
+	Backdrops = "$LOCAL$/_BackdropList";
+}
+CActionFactoryWithChilds	$LOCAL$/Spawner
+{
+	ChildList = 
+	{
+		"$LOCAL$/BatteryIndicator",
+	};
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/BatteryIndicator
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_D370636A";
+	Infinite = true;
+	DurationInSeconds = 2.0000000e+000;
+	SpawnCount = 1.0000000e+002;
+}
+CParticleAttributeList	$LOCAL$/_GlobalAttributes
+{
+}
+CNEdEditorBackdrop_List	$LOCAL$/_BackdropList
+{
+	EditorInfosPosition = int2(-100, -365);
+	BackgroundLayers2D = 
+	{
+		"$LOCAL$/_Backdrop_Brush",
+	};
+}
+CNEdEditorBackdrop_Brush	$LOCAL$/_Backdrop_Brush
+{
+	EditorInfosPosition = int2(-253, -417);
+	LayerName = "Layer_Brush";
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_D370636A
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Billboard_B2C5B175";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_A58DC2DC",
+		"$LOCAL$/CParticleFieldDeclaration_8F3FECCF",
+		"$LOCAL$/CParticleFieldDeclaration_25BE943E",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_A9E888D9";
+	States = 
+	{
+		"$LOCAL$/CParticleState_7787FC10",
+	};
+}
+CParticleRenderer_Billboard	$LOCAL$/CParticleRenderer_Billboard_B2C5B175
+{
+	BillboardingMaterial = AlphaBlend;
+	Diffuse = "Textures/player/vfx_neonNinja_reboot_battery2x2.dds";
+	AtlasDefinition = "AtlasDefinitions/atlasDef_2x2.pkat";
+	BillboardMode = PlanarAlignedQuad;
+	AxisField = "AxisAlign";
+	Axis2Field = "AxisNormal";
+	AxisScale = 1.0000000e+000;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_A58DC2DC
+{
+	FieldName = "AxisAlign";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_8F3FECCF
+{
+	FieldName = "AxisNormal";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_25BE943E
+{
+	FieldName = "Color";
+	FieldType = float4;
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_A9E888D9
+{
+	Expression = "function void	Eval()
+{
+	Life = 0.01;
+	Size = 0.35;
+	AxisAlign = float3(0,1,0);
+	AxisNormal = float3(0,0,1);
+	Position = float3(0,0.5,-0.25);
+	TextureID = 1;
+}
+";
+}
+CParticleState	$LOCAL$/CParticleState_7787FC10
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_56E14413",
+		"$LOCAL$/CParticleEvolver_Field_39375AD2",
+		"$LOCAL$/LocalSpace_1",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_56E14413
+{
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_39375AD2
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_285AC8FD";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_285AC8FD
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		5.0000000e-001,
+		9.9999994e-002,
+		0.0000000e+000,
+		1.0000000e+000,
+		5.0000000e-001,
+		9.9999994e-002,
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Localspace	$LOCAL$/LocalSpace_1
+{
+	
+	ChildList = 
+	{
+		"$LOCAL$/Script_1",
+	};
+}
+CParticleEvolver_Script	$LOCAL$/Script_1
+{
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_4CB338F1";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_4CB338F1
+{
+	Expression = "function void	Eval()
+{
+	Position = float3(0,0.5,-0.25);
+}
+";
+}

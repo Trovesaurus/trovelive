@@ -1,0 +1,70 @@
+//--------------------------------------------------------------------------------------
+// File: Test.fx
+//--------------------------------------------------------------------------------------
+
+Texture2D texDiffuse;
+SamplerState diffuseSampler;
+
+Texture2D texNormal;
+SamplerState normalSampler;
+
+cbuffer GLOBAL_CONSTANT_BUFFER
+{
+  matrix gModelViewProjectionMatrix;
+}
+
+struct VS_INPUT
+{
+  float4 in_Position : POSITION;
+  float2 in_TexCoord0 : UV;
+  float2 in_Extra : EXTRA;
+  float4 in_Color0 : COLOR0;
+  float4 in_Color1 : COLOR1;
+  float4 in_Normal : NORMAL;
+  float4 in_Tangent : TANGENT;
+
+};
+
+struct PS_INPUT
+{
+  float4 Pos : SV_POSITION;
+  float2 texCoord0 : TEXCOORD0;
+  float2 texCoord1 : TEXCOORD1;
+  float4 tintColor : COLOR0;
+  float4 blockColor : COLOR1;
+};
+
+//--------------------------------------------------------------------------------------
+// Vertex Shader
+//--------------------------------------------------------------------------------------
+PS_INPUT VS(VS_INPUT input)
+{
+  PS_INPUT output = (PS_INPUT)0;
+  //input.in_Position.w = 1.0f;
+  output.Pos = mul(input.in_Position, gModelViewProjectionMatrix);
+  //output.Pos = input.in_Position;
+  output.texCoord0 = input.in_TexCoord0;
+  output.texCoord1 = input.in_Extra;
+  output.tintColor = input.in_Color0;
+  output.blockColor = input.in_Color1;
+  return output;
+}
+
+
+//--------------------------------------------------------------------------------------
+// Pixel Shader
+//--------------------------------------------------------------------------------------
+float4 PS(PS_INPUT input) : SV_Target
+{
+  half4 diffuseColor = texDiffuse.Sample(diffuseSampler, input.texCoord1);
+
+  float4 normalLookup = texNormal.Sample(normalSampler, input.texCoord0);
+  float4 diffuseLighting = float4(0.5, 0.5, 0.5, 0.0) * input.blockColor.a;
+
+  float4 combinedColor = input.tintColor * diffuseColor * (input.blockColor + diffuseLighting);
+  combinedColor.a = input.tintColor.a;
+
+  combinedColor = lerp(combinedColor, normalLookup, 0.15);
+
+  return combinedColor;
+}

@@ -1,0 +1,65 @@
+KCBBegin(SKY_CB)
+  KUniformV(KFloat4, skyColor, KFloat4(0.0,1.0,0.0,1.0))
+  KUniformV(KFloat, skyAlpha, 1.0)
+  KUniformV(KFloat, timeOfDay, 12.0)
+KCBEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataOutColor
+KPDataEnd
+
+KFloat eyeSpaceDepth(KFloat depthSample)
+{
+  const KFloat zFar = 1000.0;
+  const KFloat zNear = 0.25;
+  KFloat z_b = depthSample;//texture(depthSampler, texCoord0.st).x;
+  KFloat z_n = KRescaleDepthValue(z_b);
+  KFloat z_e = 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+
+	return z_e;
+}
+
+KFloat4 _SkyUnlitPS(KFloat2 NDC, KFloat depthValue, KFloat2 texCoord) {
+  
+  KFloat2 timeCoord = KFloat2(timeOfDay*(1.0/24.0), texCoord.y*0.5+0.65);
+  KFloat4 gradientColor = KSampleTexture(diffuseSampler, diffuseTexture, timeCoord);
+  KFloat4 starColor = KSampleTexture(effectSampler, effectTexture, texCoord*8.0);
+  
+  gradientColor.xyz = KLerp(gradientColor.xyz, starColor.xyz, gradientColor.w);
+
+  KFloat4 outputColor = gradientColor;
+  
+  KFloat fog = Lighting_DepthDistanceFadeFragment( depthValue, 2.0*(NDC.x-0.5), 2*(NDC.y-0.5));
+  
+  fog = clamp((fog-0.0)/(0.99-0.0), 0.0, 1.0);
+  float caveAlpha = 1.0 - skyColor.w;
+  
+  outputColor.w = fog*skyAlpha * caveAlpha;
+  
+  return outputColor;
+}
+
+KPSMain(SkyUnlitBackFillPS)
+{ 
+  KFloat2 NDC = KPosInput(Pos).xy;
+  KFloat4 outColor = _SkyUnlitPS(NDC, 1.0, KInput(texCoord0));
+  
+  KPSOutput(outColor);
+}
+
+KPSMain(SkyUnlitFrontFillPS)
+{ 
+  KFloat2 NDC = KPosInput(Pos).xy * invTex0Size;
+  KFloat depthValue = eyeSpaceDepth(KSampleTexture(depthSampler, depthTexture, NDC).x);
+  
+  KFloat4 outColor = _SkyUnlitPS(NDC, depthValue, KInput(texCoord0));
+  
+  KPSOutput(outColor);
+}
+
+KPSMain(SkyAlphaBlendPS)
+{ 
+  KPSOutput(skyColor);
+}

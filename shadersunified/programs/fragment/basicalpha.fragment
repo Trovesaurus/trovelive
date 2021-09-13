@@ -1,0 +1,71 @@
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat4, color, COLOR0)
+  KPDataOutColor
+KPDataEnd
+
+
+KPSMain(AlphaBlendPS)
+{ 
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KPSOutput(KInput(color) * colorSample);
+}
+
+KPSMain(AlphaBlendNoMIPPS)
+{ 
+  KFloat4 colorSample = KSampleTextureNoMip(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KPSOutput(KInput(color) * colorSample);
+}
+
+KPSMain(UIAlphaBlendPS)
+{ 
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KUVConvertDX(KInput(texCoord0)));
+
+  KPSOutput(KInput(color) * colorSample);
+}
+
+KPSMain(AlphaBlendUntexturedPS)
+{ 
+  KPSOutput(KInput(color));
+}
+
+KPSMain(AlphaAddPS)
+{ 
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KPSOutput(KInput(color) * colorSample * KInput(color).w * colorSample.w);
+}
+
+KPSMain(BasicColorPS)
+{
+  KFloat4 colorSample = KInput(color);
+  colorSample.w = 1.0;
+
+  KPSOutput(colorSample);
+}
+
+KPSMain(AlphaFromRedPS) 
+{
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KFloat4 outColor;
+  outColor.xyz = KInput(color).xyz;
+  outColor.w = colorSample.r * KInput(color).w;
+  
+  KPSOutput(outColor);
+}
+
+KPSMain(AlphaFromAlphaPS) 
+{
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KFloat4 outColor;
+  outColor.xyz = KInput(color).xyz;
+  outColor.w = colorSample.w * KInput(color).w;
+  
+  KPSOutput(outColor);
+}
+

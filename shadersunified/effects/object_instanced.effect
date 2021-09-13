@@ -1,0 +1,272 @@
+VertexShader "common/KDefines.common";
+FragmentShader "common/KDefines.common";
+VertexShader "common/KShaderGlobals.common";
+FragmentShader "common/KShaderGlobals.common";
+FragmentShader "common/KTextures.common";
+
+technique Object_Opaque_Instanced {
+	Phase = Opaque;
+	Instanced = 1;
+  
+	pass solidPass {
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    FragmentMain = TerrainPS;
+	}
+}
+
+technique Object_Opaque_Reflect_Instanced {
+	Phase = Opaque;
+	Instanced = 1;
+  
+	pass solidPass {
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Reflect_Instanced.vertex";
+    FragmentShader "fragment/Terrain_Reflect.fragment";
+    
+    VertexMain = ObjectReflectAreaColorInstancedVS;
+    FragmentMain = TerrainReflectPS;
+	}
+}
+
+technique Object_Alpha_Instanced {
+  Phase = Transparent_1;
+  Instanced = 1;
+  
+  pass p1 {
+  
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+  
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    FragmentMain = TerrainPS;
+  }
+  
+}
+
+technique Object_Stealth_Instanced {
+	
+	Instanced = 1;
+  
+  
+
+  pass zfill {
+    Phase = Transparent_1;
+    
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+  
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+	pass solidPass {
+    Phase = Transparent_1;
+
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+  
+		AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+		FragmentMain = ObjectStealthPS;
+	}
+}
+
+technique Object_Pulse_Instanced {
+	Phase = Transparent_1;
+	Instanced = 1;
+
+	pass solidPass {
+    AlphaBlendEnable = 1;
+    
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+    
+		VertexMain = ObjectPulseInstancedVS;
+		FragmentMain = TerrainPS;
+	}
+}
+
+technique Object_Waving_Small_Instanced {
+	Phase = Opaque;
+	Instanced = 1;
+
+	pass solidPass {
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Waving_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectWavingSmallInstancedVS;
+    FragmentMain = TerrainPS;
+	}
+}
+
+technique Object_Waving_Medium_Instanced {
+	Phase = Opaque;
+	Instanced = 1;
+
+	pass solidPass {
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Waving_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectWavingMediumInstancedVS;
+    FragmentMain = TerrainPS;
+	}
+}
+
+technique Object_Waving_Large_Instanced {
+	Phase = Opaque;
+	Instanced = 1;
+
+	pass solidPass {
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Waving_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectWavingLargeInstancedVS;
+    FragmentMain = TerrainPS;
+	}
+}
+
+technique Object_Waving_Alpha_Small_Instanced {
+	Phase = Transparent_1;
+	Instanced = 1;
+
+	pass solidPass {
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Waving_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectWavingSmallInstancedVS;
+    FragmentMain = TerrainPS;
+	}
+}
+
+technique Object_Waving_Alpha_Medium_Instanced {
+	Phase = Transparent_1;
+	Instanced = 1;
+
+	pass solidPass {
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Waving_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectWavingMediumInstancedVS;
+    FragmentMain = TerrainPS;
+	}
+}
+
+technique Object_Waving_Alpha_Large_Instanced {
+	Phase = Transparent_1;
+	Instanced = 1;
+
+	pass solidPass {
+    VertexShader "vertex/Library_Fog.vertex";
+    FragmentShader "fragment/Library_DiffuseLighting.fragment";
+    FragmentShader "fragment/Library_SpecularLighting.fragment";
+    FragmentShader "fragment/Library_NormalMap.fragment";
+    
+    VertexShader "vertex/Object_Waving_Instanced.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectWavingLargeInstancedVS;
+    FragmentMain = TerrainPS;
+	}
+}

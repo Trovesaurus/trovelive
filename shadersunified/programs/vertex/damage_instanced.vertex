@@ -1,0 +1,56 @@
+
+KCBBegin(INSTANCE_DATA)
+  KUniform(KMat4, _instanceMatrices[MAX_INSTANCES])
+  KUniform(KFloat4, _illumination[MAX_INSTANCES])
+KCBEnd
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat2, in_TexCoord0, UV)
+  KVDataInOut( KFloat2, in_Extra, EXTRA)
+  KVDataInOut( KFloat4, in_Color0, COLOR0)
+  KVDataInOut( KFloat4, in_Color1, COLOR1)
+  KVDataInOut( KFloat3, in_Normal, NORMAL)
+  KVDataInOut( KFloat3, in_Tangent, TANGENT)
+  KInstanceData
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat4, tintColor, COLOR0)
+KPDataEnd
+
+#ifndef DAMAGE_OFFSET
+  #define DAMAGE_OFFSET 0.001
+#endif
+
+KFloat4 CalcOffsetPosition(KFloat3 position, KFloat3 normal, int instanceId) {
+  //push the z value by a little epsilon
+  const KFloat zFar = 10000.0;
+  const KFloat zNear = 0.1;
+  
+  KMat4 modelViewMatrix = KMUL(gViewMatrix, _instanceMatrices[instanceId]);
+  KFloat3 n = normalize(normal);
+  KFloat4 tempPos = KMUL(KMUL(gProjectionMatrix, modelViewMatrix), KFloat4(position + n*DAMAGE_OFFSET, 1.0));
+  tempPos.z -= 0.001*(zFar + zNear)/(zFar - zNear); 
+  return tempPos;
+  
+}
+
+KVSMain(DamageInstancedVS)
+{
+  KDeclareOutput;
+  
+  KSetPosition(Pos, CalcOffsetPosition(KInput(in_Position), KInput(in_Normal), KInstanceID));
+  
+  KMat4 modelViewMatrix = KMUL(gViewMatrix, _instanceMatrices[KInstanceID]);
+  KFloat3 worldPos = KMUL(modelViewMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  KFloat fogStrength = Lighting_DepthFogVertex(length(worldPos));
+  
+  KFloat illumination = log( floor(_illumination[KInstanceID].x * 8.0 + 0.5) + 1.0 ) * 0.3;
+  
+  KFloat4 fogFadedTint = KFloat4(illumination, illumination, illumination, illumination)*(1.0-fogStrength);
+  KOutput(tintColor) = fogFadedTint;
+  
+  KVSOutput;
+}

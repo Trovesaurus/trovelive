@@ -1,0 +1,188 @@
+Version = 1.13.4.53415;
+Generator = EDITOR;
+CParticleEffect	$LOCAL$/Resource
+{
+	OnSpawn = "$LOCAL$/Spawner";
+	CustomAttributes = "$LOCAL$/_GlobalAttributes";
+}
+CNEdEditorParticle_Data	$LOCAL$/EDITOR
+{
+	Position = float3(2.8654923e+000, 2.1318502e+000, 1.1300319e+000);
+	EulerOrientation = float3(-2.5795898e+001, -6.4931891e+002, 0.0000000e+000);
+	Duration = 1.0000000e+000;
+	PostFx_EnableGlow = false;
+	Backdrops = "$LOCAL$/_BackdropList";
+}
+CActionFactoryWithChilds	$LOCAL$/Spawner
+{
+	ChildList = 
+	{
+		"$LOCAL$/Net",
+	};
+}
+CParticleAttributeList	$LOCAL$/_GlobalAttributes
+{
+	AttributeList = 
+	{
+		"$LOCAL$/CParticleAttributeDeclaration_A0D5AC2B",
+	};
+}
+CNEdEditorBackdrop_Brush	$LOCAL$/_Backdrop_Brush
+{
+	EditorInfosPosition = int2(-253, -417);
+	LayerName = "Layer_Brush";
+}
+CNEdEditorBackdrop_List	$LOCAL$/_BackdropList
+{
+	EditorInfosPosition = int2(-100, -365);
+	BackgroundLayers2D = 
+	{
+		"$LOCAL$/_Backdrop_Brush",
+	};
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_71DD54E5
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Mesh_8D93730C";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_3E0126EE",
+		"$LOCAL$/CParticleFieldDeclaration_22303949",
+		"$LOCAL$/CParticleFieldDeclaration_D34DBE8A",
+		"$LOCAL$/CParticleFieldDeclaration_37929B15",
+		"$LOCAL$/CParticleFieldDeclaration_CFA21CFC",
+	};
+	Samplers = 
+	{
+		"$LOCAL$/CParticleSamplerCurve_E5F7BFD6",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_A2483D40";
+	States = 
+	{
+		"$LOCAL$/CParticleState_CC090503",
+	};
+}
+CParticleRenderer_Mesh	$LOCAL$/CParticleRenderer_Mesh_8D93730C
+{
+	CustomName = "Mesh";
+	Meshes = 
+	{
+		"$LOCAL$/CParticleRenderer_Mesh_Descriptor_E25248BF",
+	};
+	Scale = float3(1.0000000e+001, 1.0000000e+001, 1.0000000e+001);
+	ScaleField = "Size";
+	EulerRotationField = "EulerRotation";
+	RotationAxisField = "AxisSpin";
+}
+CParticleRenderer_Mesh_Descriptor	$LOCAL$/CParticleRenderer_Mesh_Descriptor_E25248BF
+{
+	Mesh = "Meshes/vfx_dinotamer_shadow_net_thrown_01.pkmm";
+	Diffuse = "Textures/Meshes/vfx_dinoTamer_shadow_net_thrown_01.dds";
+	AmbientColor = float3(1.0000000e+000, 1.0000000e+000, 1.0000000e+000);
+	CustomName = "Mesh_Descriptor";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_3E0126EE
+{
+	FieldName = "Color";
+	FieldType = float4;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_22303949
+{
+	FieldName = "Size";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_A2483D40
+{
+	Expression = "function void	Eval()
+{
+	Life = 0.25;
+	Size = 0.25;
+	AxisSpin = float3(0,1,0);
+	Position = float3(0,0.15,0);
+}
+";
+}
+CParticleState	$LOCAL$/CParticleState_CC090503
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_89D8B682",
+		"$LOCAL$/Script_1",
+		"$LOCAL$/LocalSpace_1",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_89D8B682
+{
+	CustomName = "Physics";
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Net
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_71DD54E5";
+	Infinite = true;
+	DurationInSeconds = 2.0000000e+000;
+	SpawnCount = 4.0000000e+000;
+}
+CParticleEvolver_Script	$LOCAL$/Script_1
+{
+	CustomName = "Script";
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_2708EF34";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_2708EF34
+{
+	Expression = "function void	Eval()
+{
+	EulerRotation = RotationCurve.sample(LifeRatio) * -2;
+}
+";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_E5F7BFD6
+{
+	SamplerName = "RotationCurve";
+	ValueType = Float3;
+	Interpolator = Linear;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		1.5599999e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_D34DBE8A
+{
+	FieldName = "EulerRotation";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CParticleEvolver_Localspace	$LOCAL$/LocalSpace_1
+{
+	CustomName = "Localspace";
+	
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_37929B15
+{
+	FieldName = "Rotation";
+	TransformFilter = rotate;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_CFA21CFC
+{
+	FieldName = "AxisSpin";
+	FieldType = float3;
+	TransformFilter = full;
+}
+CParticleAttributeDeclaration	$LOCAL$/CParticleAttributeDeclaration_A0D5AC2B
+{
+	AttributeName = "KillAllOnDespawn";
+	AttributeType = int;
+	HasMin = true;
+	HasMax = true;
+	MaxValueF4 = float4(1.0000000e+000, 1.0000000e+000, 1.0000000e+000, 1.0000000e+000);
+	MaxValueI4 = int4(1, 10, 10, 10);
+}

@@ -1,0 +1,38 @@
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+
+KFloat4 GaussianBlur(  KFloat2 centerUV, KFloat2 pixelOffset )                                                                           
+{        
+#if (KIWI_HLSL == 1) || (KIWI_PSSL == 1)
+  const KFloat offsets[4] = {0.0, 1.3888888888888888, 3.277777777777778, 5.166666666666666};
+  const KFloat weights[4] = {0.371043072132849, 0.24286455630513754, 0.06538661131292164, 0.006227296315516347};
+#else
+  const KFloat offsets[4] = KFloat[](0.0, 1.3888888888888888, 3.277777777777778, 5.166666666666666);
+  const KFloat weights[4] = KFloat[](0.371043072132849, 0.24286455630513754, 0.06538661131292164, 0.006227296315516347);
+#endif
+  
+  KFloat4 blurredResult = KSampleTexture( diffuseSampler, diffuseTexture, centerUV )*weights[0];
+  for (int i=1; i < 4; i++)
+  {
+    blurredResult += KSampleTexture( diffuseSampler, diffuseTexture, centerUV+pixelOffset*offsets[i]) * weights[i];
+    blurredResult += KSampleTexture( diffuseSampler, diffuseTexture, centerUV-pixelOffset*offsets[i]) * weights[i];
+  }
+  return blurredResult;          
+}                       
+
+//separable gaussian kernel
+KPSMain(WorldMapHGaussianPS) 
+{
+  KFloat4 blurredColor = GaussianBlur( KInput(texCoord0), KInput(kernelCoords)[5]);
+  KPSOutput( blurredColor);
+}
+
+KPSMain(WorldMapVGaussianPS) {
+  KFloat4 blurredColor = GaussianBlur( KInput(texCoord0), KFloat2(0.0, KInput(kernelCoords)[0].y));
+  KPSOutput( blurredColor);
+}

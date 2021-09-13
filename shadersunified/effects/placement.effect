@@ -1,0 +1,63 @@
+VertexShader "common/KDefines.common";
+FragmentShader "common/KDefines.common";
+VertexShader "common/KShaderGlobals.common";
+FragmentShader "common/KShaderGlobals.common";
+FragmentShader "common/KTextures.common";
+
+FragmentShader "fragment/Placement.fragment";
+
+technique Placement {
+	Phase = Transparent_Final;
+
+	pass p1 {
+		ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+
+		VertexShader "vertex/Placement.vertex";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = PlacementVS;
+		FragmentMain = SolidWhitePS;
+	}
+
+	pass p2 {
+		ZFunc = Equal;
+		ZWriteEnable = 0;
+		AlphaBlendEnable = 1;
+
+		VertexShader "vertex/Placement.vertex";
+    
+    VertexMain = PlacementVS;
+		FragmentMain = PlacementPS;
+	}
+}
+
+technique PlacementTerraforming {
+	Phase = Transparent_Final;
+
+	pass p1 {
+		ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+
+		VertexShader "vertex/Placement.vertex";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = PlacementTerraformingVS;
+		FragmentMain = SolidWhitePS;
+	}
+
+	pass p2 {
+		ZFunc = Equal;
+		ZWriteEnable = 0;
+		AlphaBlendEnable = 1;
+
+		VertexShader "vertex/Placement.vertex";
+    
+    VertexMain = PlacementTerraformingVS;
+		FragmentMain = PlacementTerraformingPS;
+	}
+}

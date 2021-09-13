@@ -1,0 +1,44 @@
+//--------------------------------------------------------------------------------------
+// File: Test.fx
+//--------------------------------------------------------------------------------------
+
+Texture2D texDiffuse;
+SamplerState sampleDiffuse;
+
+struct VS_INPUT
+{
+    float4 in_Position : POSITION;
+    float2 in_TexCoord0 : UV;
+    float4 in_Color0 : COLOR0;
+};
+
+struct PS_INPUT
+{
+    float4 Pos : SV_POSITION;
+    float2 Tex : TEXCOORD0;
+    float4 Color : COLOR0;
+};
+
+//--------------------------------------------------------------------------------------
+// Vertex Shader
+//--------------------------------------------------------------------------------------
+PS_INPUT VS( VS_INPUT input )
+{
+  PS_INPUT output = (PS_INPUT)0;
+  
+  output.Pos = input.in_Position;
+  output.Tex = input.in_TexCoord0;
+  output.Color = input.in_Color0;
+  return output;
+  
+}
+
+
+//--------------------------------------------------------------------------------------
+// Pixel Shader
+//--------------------------------------------------------------------------------------
+float4 PS( PS_INPUT input ) : SV_Target
+{
+  
+  return lerp(input.Color,  texDiffuse.Sample( sampleDiffuse, input.Tex ), 0.5);
+}

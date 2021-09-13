@@ -1,0 +1,27 @@
+KTexture(normalTexture)
+KSampler(normalSampler)
+
+KFloat4 NormalMap_GetNormalWithSS(KFloat2 texCoord, KFloat3 normal, KFloat3 tangent)
+{
+  KFloat4 tex = KSampleTexture(normalSampler, normalTexture, texCoord.xy);
+	KFloat3 nm = normalize(tex.rgb * 2.0 - 1.0);
+
+  KFloat3 binormal = normalize(cross(normal, tangent));
+
+	KMat3 tbn = KMat3(tangent,
+			binormal,
+			normal);
+
+	return KFloat4(normalize(KMUL(tbn, nm)), tex.a);
+}
+
+KFloat3 NormalMap_ConvertToLocal(KFloat3 n, KFloat3 normal, KFloat3 tangent)
+{
+  KFloat3 binormal = cross(normal, tangent);
+
+	KMat3 tbn = KMat3(tangent,
+			binormal,
+			normal);
+
+	return normalize(KMUL(tbn, n));
+}

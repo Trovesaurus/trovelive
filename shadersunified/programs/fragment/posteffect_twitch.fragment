@@ -1,0 +1,14 @@
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+KPSMain(PostEffectTwitchPS)
+{ 
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KFloat2(KInput(texCoord0).x, 1.0 - KInput(texCoord0).y) );
+  colorSample.w = 1.0;
+  KPSOutput(colorSample);
+}

@@ -1,0 +1,22 @@
+KFloat Lighting_DepthFogFragment(KFloat depth, KFloat xDeviation, KFloat yDeviation)
+{
+  KFloat horiz = xDeviation*gFOVTangentAspect.x*depth*gFOVTangentAspect.y;
+  KFloat vert = yDeviation*gFOVTangentAspect.x*depth;
+  KFloat z = sqrt(depth*depth + horiz*horiz+ vert*vert);
+  
+  return clamp((z - gFogExtents.x) / (gFogExtents.y-gFogExtents.x), 0.0, 1.0);
+}
+
+KFloat Lighting_DepthDistanceFadeFragment(KFloat depth, KFloat xDeviation, KFloat yDeviation)
+{
+  KFloat horiz = (xDeviation) * gFOVTangentAspect.x*gFOVTangentAspect.y*depth;
+  KFloat vert = (yDeviation) * gFOVTangentAspect.x*depth;
+  
+  KFloat z = sqrt( horiz*horiz + vert*vert + depth*depth);
+  
+  KFloat distanceSqueeze = clamp((gViewDistance - 64.0)/(256.0 - 64.0), 0.0, 1.0);
+  KFloat minDist = gViewDistance*KLerp(2.0, 1.45, distanceSqueeze);
+  KFloat maxDist = gViewDistance*KLerp(2.3, 1.65, distanceSqueeze);
+  
+  return clamp((z - minDist) / (maxDist-minDist), 0.0, 1.0);
+}

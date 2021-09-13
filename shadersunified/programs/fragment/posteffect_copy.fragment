@@ -1,0 +1,34 @@
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+KPSMain(PostEffectCopyPS)
+{ 
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KFloat brightnessShift = brightness - 1.0;
+  KFloat4 brightnessShiftVec = KFloat4(brightnessShift, brightnessShift, brightnessShift, brightnessShift);
+  KFloat4 gammaVec = KFloat4(gamma, gamma, gamma, gamma);
+  
+  if(abs(brightness - 1.0) > 0.0001)
+  {
+    colorSample += brightnessShiftVec;
+    colorSample = max(colorSample, KFloat4(0.0, 0.0, 0.0, 0.0));
+  }
+  
+  if(abs(gamma - 1.0) > 0.0001)
+  {
+#if (KIWI_HLSL == 1)
+    colorSample = pow(abs(colorSample), gammaVec);
+#else
+    colorSample = pow(colorSample, gammaVec);
+#endif
+  }
+  
+  colorSample.w = 1.0;
+  KPSOutput(colorSample);
+}

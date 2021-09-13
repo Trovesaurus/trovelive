@@ -1,0 +1,47 @@
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+// //See gaussianweights.py
+//Pascal row
+//[1, 17, 136, 680, 2380, 6188, 12376, 19448, 24310, 24310, 19448, 12376, 6188, 2380, 680, 136, 17, 1]
+
+//Weights
+//[0.1855215360664245, 0.1484172288531396, 0.09444732745199792, 0.04722366372599896, 0.01816294758692268, 0.005189413596263622, 0.0010378827192527244]
+
+//Discrete weights and offsets
+//[[0.24286455630513754, 0.06538661131292164, 0.006227296315516347], [1.3888888888888888, 3.277777777777778, 5.166666666666666]]
+
+KFloat4 GaussianBlur(  KFloat2 centerUV, KFloat2 pixelOffset )                                                                           
+{        
+#if (KIWI_HLSL == 1) || (KIWI_PSSL == 1)
+  const KFloat offsets[4] = {0.0, 1.3888888888888888, 3.277777777777778, 5.166666666666666};
+  const KFloat weights[4] = {0.371043072132849, 0.24286455630513754, 0.06538661131292164, 0.006227296315516347};
+#else
+  const KFloat offsets[4] = KFloat[](0.0, 1.3888888888888888, 3.277777777777778, 5.166666666666666);
+  const KFloat weights[4] = KFloat[](0.371043072132849, 0.24286455630513754, 0.06538661131292164, 0.006227296315516347);
+#endif
+  
+  KFloat4 blurredResult = KSampleTexture( diffuseSampler, diffuseTexture, centerUV )*weights[0];
+  for (int i=1; i < 4; i++)
+  {
+    blurredResult += KSampleTexture( diffuseSampler, diffuseTexture, centerUV+pixelOffset*offsets[i]) * weights[i];
+    blurredResult += KSampleTexture( diffuseSampler, diffuseTexture, centerUV-pixelOffset*offsets[i]) * weights[i];
+  }
+  return blurredResult;                                                                                                                                                            
+}                       
+
+//separable gaussian kernel
+KPSMain(PostEffectBloomHGaussianPS) 
+{
+  KFloat4 blurredColor = GaussianBlur( KInput(texCoord0), KInput(kernelCoords)[5]);
+  KPSOutput( blurredColor);
+}
+
+KPSMain(PostEffectBloomVGaussianPS) {
+  KFloat4 blurredColor = GaussianBlur( KInput(texCoord0), KFloat2(0.0,  KInput(kernelCoords)[0].y));
+  KPSOutput( blurredColor);
+}

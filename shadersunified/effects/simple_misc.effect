@@ -1,0 +1,418 @@
+VertexShader "common/KDefines.common";
+FragmentShader "common/KDefines.common";
+VertexShader "common/KShaderGlobals.common";
+FragmentShader "common/KShaderGlobals.common";
+FragmentShader "common/KTextures.common";
+VertexShader "vertex/Library_Fog.vertex";
+
+technique Simple_ContactShadowEffect {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    ZFunc = LessEqual;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureOffsetVS;
+    FragmentMain = AlphaBlendPS;
+  }
+}
+
+technique Simple_NoRender {
+}
+
+technique Simple_UnlitAlphaBlendEffect {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = LessEqual;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = AlphaBlendPS;
+  }
+}
+
+technique Simple_WorldMapElementEffect {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/WorldMap.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = WorldMapElementPS;
+  }
+}
+
+technique Simple_HighlightedWorldMapElementEffect {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/WorldMap.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = HighlightedWorldMapElementPS;
+  }
+}
+
+technique Simple_UIEffect {
+  Phase = Transparent_Final;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = Always;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = UIAlphaBlendPS;
+    
+  }
+}
+
+technique Simple_UIEffect_ZCull {
+  Phase = Transparent_Final;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = LessEqual;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = UIAlphaBlendPS;
+    
+  }
+}
+
+technique Simple_UnlitUntexturedAlphaBlendEffect {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = LessEqual;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = AlphaBlendUntexturedPS;
+  }
+}
+
+technique Simple_UnlitUntexturedUIEffect {
+  Phase = Transparent_Final;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = LessEqual;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = AlphaBlendUntexturedPS;
+    
+  }
+}
+
+technique Simple_ThrownPathEffect {
+  
+  
+  pass p1 {
+    Phase = Transparent_1;
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = LessEqual;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = AlphaBlendNoMIPPS;
+    
+  }
+   pass p2 {
+    Phase = Transparent_Final;
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = LessEqual;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = AlphaBlendNoMIPPS;
+    
+  }
+  
+}
+
+technique Simple_UnlitUntexturedUIEffect_NoDepth {
+  Phase = Transparent_Final;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = Always;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = AlphaBlendUntexturedPS;
+    
+  }
+}
+
+technique Simple_UnlitAlphaAddEffect {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = LessEqual;
+    BlendFunc = Additive;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = AlphaAddPS;
+    
+  }
+}
+
+technique TextColor {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    ZEnable = 0;
+    CullMode = None;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = AlphaFromRedPS;
+  }
+}
+
+technique TextColorDX {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    ZEnable = 0;
+    CullMode = None;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = AlphaFromAlphaPS;
+  }
+}
+
+technique TextBackground {  
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    ZEnable = 0;
+    CullMode = None;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = BasicColorPS;
+    
+  }
+}
+
+technique WorldMapLensEffect {
+  Phase = Opaque;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    ZFunc = LessEqual;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/WorldMap.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = WorldMapLensPS;
+  }
+}
+
+technique FogOfWarSampleEffect {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/WorldMap.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = WorldMapElementPS;
+  }
+}
+
+technique FogOfWarCompositeEffect {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/WorldMap.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = WorldMapElementPS;
+  }
+}
+
+technique FogOfWarHGaussian {
+  Phase = Opaque;
+  
+  pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    VertexShader "vertex/FogOfWar.vertex";
+		FragmentShader "fragment/FogOfWar.fragment";
+
+		VertexMain = FogOfWarVS;
+		FragmentMain = WorldMapHGaussianPS;
+  }
+}
+
+technique FogOfWarVGaussian {
+  Phase = Opaque;
+  
+  pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    VertexShader "vertex/FogOfWar.vertex";
+		FragmentShader "fragment/FogOfWar.fragment";
+
+		VertexMain = FogOfWarVS;
+		FragmentMain = WorldMapVGaussianPS;
+  }
+}
+
+technique FogOfWarHGaussianPass2 {
+  Phase = Opaque;
+  
+  pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    VertexShader "vertex/FogOfWar.vertex";
+		FragmentShader "fragment/FogOfWar.fragment";
+
+		VertexMain = FogOfWarWideVS;
+		FragmentMain = WorldMapHGaussianPS;
+  }
+}
+
+technique FogOfWarVGaussianPass2 {
+  Phase = Opaque;
+  
+  pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    VertexShader "vertex/FogOfWar.vertex";
+		FragmentShader "fragment/FogOfWar.fragment";
+
+		VertexMain = FogOfWarWideVS;
+		FragmentMain = WorldMapVGaussianPS;
+  }
+}
+
+technique DebugLines {  
+  Phase = Transparent_Final;
+  
+  pass p1 {
+    ZEnable = 1;
+    ZWriteEnable = 0;
+    FillMode = Wireframe;
+    CullMode = None;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = BasicColorPS;
+    
+  }
+}
+
+technique DebugTris {  
+  Phase = Transparent_Final;
+  
+  pass p1 {
+    ZEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    FillMode = Solid;
+    
+    VertexShader "vertex/Simple_SingleTextured.vertex";
+    FragmentShader "fragment/BasicAlpha.fragment";
+    
+    VertexMain = Simple_FlatColorSingleTextureVS;
+    FragmentMain = BasicColorPS;
+
+    
+  }
+}

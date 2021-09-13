@@ -1,0 +1,73 @@
+VertexShader "common/KDefines.common";
+FragmentShader "common/KDefines.common";
+VertexShader "common/KShaderGlobals.common";
+FragmentShader "common/KShaderGlobals.common";
+FragmentShader "common/KTextures.common";
+
+technique Sky_Unlit {
+
+	pass p1 {
+    Phase = Sky;
+    AlphaBlendEnable = 0;
+    BlendFunc = Blend;
+	  ZWriteEnable = 0;
+    ZEnable = 0;
+
+	  VertexShader "vertex/Sky.vertex";
+    VertexMain = SkyBasicVS;
+  
+    FragmentShader "fragment/Library_Fog.fragment";
+    FragmentShader "fragment/Sky.fragment";
+    FragmentMain = SkyUnlitBackFillPS;
+	}
+}
+
+technique Sky_Unlit_Fade {
+
+	pass p1 {
+    Phase = Opaque;
+    AlphaBlendEnable = 1;
+    BlendFunc = Blend;
+    ZWriteEnable = 0;
+    ZEnable = 1;
+
+	VertexShader "vertex/Sky.vertex";
+    VertexMain = SkyBasicVS;
+  
+    FragmentShader "fragment/Library_Fog.fragment";
+    FragmentShader "fragment/Sky.fragment";
+    FragmentMain = SkyUnlitBackFillPS;
+	}
+}
+
+technique Sky_Cave {
+	Phase = Transparent_2;
+  
+  pass p1 {
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    CullMode = None;
+    
+    VertexShader "vertex/Sky.vertex";
+    FragmentShader "fragment/Library_Fog.fragment";
+    FragmentShader "fragment/Sky.fragment";
+    
+    VertexMain = SkyBasicVS;
+    FragmentMain = SkyAlphaBlendPS;
+  }
+}
+
+technique Sky_Underwater {
+  
+  pass p1 {
+    Phase = Sky;
+    AlphaBlendEnable = 0;
+    ZWriteEnable = 0;
+    
+    VertexShader "vertex/Sky_Underwater.vertex";
+    FragmentShader "fragment/Sky_Underwater.fragment";
+    
+    VertexMain = SkyUnderwaterVS;
+    FragmentMain = SkyUnderwaterPS;
+  }
+}

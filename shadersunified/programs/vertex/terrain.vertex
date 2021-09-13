@@ -1,0 +1,131 @@
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat2, in_TexCoord0, UV)
+  KVDataInOut( KFloat2, in_Extra, EXTRA)
+  KVDataInOut( KFloat4, in_Color0, COLOR0)
+  KVDataInOut( KFloat4, in_Color1, COLOR1)
+  KVDataInOut( KFloat3, in_Normal, NORMAL)
+  KVDataInOut( KFloat3, in_Tangent, TANGENT)
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, texCoord1, TEXCOORD1)
+  
+  KPDataInOut( KFloat4, tintColor, COLOR0)
+  KPDataInOut( KFloat4, blockColor, COLOR1)
+  KPDataInOut( KFloat2, fogBrdf, COLOR2)
+  
+  KPDataInOut( KFloat3, normal, TEXCOORD2)
+  KPDataInOut( KFloat3, tangent, TEXCOORD3)
+  KPDataInOut( KFloat3, worldPos, TEXCOORD4)
+  KPDataInOut( KFloat3, localPos, TEXCOORD5)
+KPDataEnd
+
+KFloat4 _TransformTerrain(KFloat3 position)
+{
+  return KMUL(gModelViewProjectionMatrix, KFloat4(position, 1.0));
+}
+
+KModifierFunction BasicTerrain(KVSData KInputVar)
+{
+  KDeclareOutput;
+  
+  KSetPosition(Pos, _TransformTerrain(KInput(in_Position)));
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  KOutput(texCoord1) = KInput(in_Extra);
+  
+  KOutput(tintColor) = KInput(in_Color0);
+  KOutput(blockColor) = KInput(in_Color1);
+  
+  KOutput(normal) = normalize(KMUL(gNormalMatrix, KInput(in_Normal)));
+  KOutput(tangent) = normalize(KMUL(gNormalMatrix, KInput(in_Tangent)));
+  
+  KOutput(worldPos) = KMUL(gModelViewMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  KOutput(fogBrdf).x = Lighting_DepthFogVertex(length(KOutput(worldPos)));
+  KOutput(fogBrdf).y = KInput(in_Extra).x;
+  
+  KOutput(localPos) = KInput(in_Position);
+  
+  KVSOutput;
+} 
+
+KVSMain(TerrainVS)
+{
+  KDeclareOutput;
+  KModifyData(BasicTerrain);
+  KVSOutput;
+}
+
+KVSMain(TerrainShrinkVS)
+{
+  KDeclareOutput;
+  KModifyData(BasicTerrain);
+  KVSOutput;
+}
+
+KVSMain(TerrainShrinkObjectVS)
+{
+  KDeclareOutput;
+  KModifyData(BasicTerrain);
+  KSetPosition(Pos, _TransformTerrain(KInput(in_Position)*distanceFade));
+  
+  KOutput(blockColor) = KInput(in_Color1)*illumination;
+  
+  KVSOutput;
+}
+
+KVSMain(TerrainAreaColorVS)
+{
+  KDeclareOutput;
+  KModifyData(BasicTerrain);
+  KOutput(blockColor).xyz = illumination.xyz;
+  KOutput(blockColor).w = illumination.w * KInput(in_Color1).w;
+  KVSOutput;
+}
+
+
+
+
+
+KFloat Gaussian(KFloat3 xbc)
+{
+  return exp(-((xbc.x - xbc.y)*(xbc.x - xbc.y))/(2*xbc.z*xbc.z));
+}
+
+KVSMain(TerrainTeleportVS) {
+  KDeclareOutput;
+  
+  KFloat3 localPos = KInput(in_Position);
+  
+  KFloat localLength = length(localPos - KFloat3(0.0, 20.0, 0.0) );
+  
+  KFloat dissolve = clamp((localLength/(20.0))*blendAmount, 0.0, 1.0);
+  dissolve = pow(dissolve, 2.0);
+  dissolve = 1.0-Gaussian( KFloat3(localLength*blendAmount, 0.0, 10.0));
+  
+  KFloat swirliness = shatterDirection.w;
+  KFloat theta = 1.570796326*dissolve*swirliness;
+  
+  KFloat3 up = KFloat3(0.0, 0.0, 1.0);
+  KFloat3 axis = shatterDirection.xyz;
+  KFloat3 right = KCross(axis, up);
+  up = KCross(right, axis);
+
+  // Rotate in the <right,up> plane, push in the <axis> direction
+  KFloat2 rotatedPos = KFloat2(localPos.x*cos(theta) - localPos.z*sin(theta), localPos.x * sin(theta) + localPos.z * cos(theta));
+  KFloat3 offset;
+  offset.xz = (rotatedPos - localPos.xz)*0.1;
+  offset.y = pow(blendAmount, 2.0)*5.0;
+  offset = axis * offset.y + right*(0.5+dissolve)*offset.x  + up*(0.5+dissolve)*offset.z;
+  
+  
+  KModifyData(BasicTerrain);
+  KSetPosition(Pos, _TransformTerrain(KInput(in_Position )) + KMUL(gViewProjectionMatrix, KFloat4(offset, 0.0)));
+  
+  KOutput(blockColor) *= illumination;
+  
+  KVSOutput;
+}

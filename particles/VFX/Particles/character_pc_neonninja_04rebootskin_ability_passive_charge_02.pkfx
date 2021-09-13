@@ -1,0 +1,177 @@
+Version = 1.13.1.45791;
+CParticleEffect	$LOCAL$/Resource
+{
+	OnSpawn = "$LOCAL$/Spawner";
+	CustomAttributes = "$LOCAL$/_GlobalAttributes";
+	Autostart = true;
+}
+CNEdEditorParticle_Data	$LOCAL$/EDITOR
+{
+	Position = float3(1.1501582e+000, 1.3705633e+000, 1.4548604e+000);
+	EulerOrientation = float3(-2.4331987e+001, 3.9193001e+001, 0.0000000e+000);
+	PostFx_EnableGlow = false;
+	Backdrops = "$LOCAL$/_BackdropList";
+}
+CActionFactoryWithChilds	$LOCAL$/Spawner
+{
+	ChildList = 
+	{
+		"$LOCAL$/BatteryIndicator",
+	};
+}
+CParticleEvolver_Field	$LOCAL$/Field_1
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_DA8260EC";
+}
+CParticleAttributeList	$LOCAL$/_GlobalAttributes
+{
+}
+CNEdEditorBackdrop_List	$LOCAL$/_BackdropList
+{
+	EditorInfosPosition = int2(-100, -365);
+	BackgroundLayers2D = 
+	{
+		"$LOCAL$/_Backdrop_Brush",
+	};
+}
+CNEdEditorBackdrop_Brush	$LOCAL$/_Backdrop_Brush
+{
+	EditorInfosPosition = int2(-253, -417);
+	LayerName = "Layer_Brush";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_D2549345
+{
+	FieldName = "AxisNormal";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_BDB2DC1F
+{
+	FieldName = "Color";
+	FieldType = float4;
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_DA8260EC
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		5.0000000e-001,
+		5.0000000e-001,
+		0.0000000e+000,
+		1.0000000e+000,
+		5.0000000e-001,
+		5.0000000e-001,
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/BatteryIndicator
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_5E0BB7D7";
+	Infinite = true;
+	DurationInSeconds = 2.0000000e+000;
+	SpawnCount = 1.0000000e+002;
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_5E0BB7D7
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Billboard_0D98A1A1";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_7A3E89FA",
+		"$LOCAL$/CParticleFieldDeclaration_D2549345",
+		"$LOCAL$/CParticleFieldDeclaration_BDB2DC1F",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_C2A937E6";
+	States = 
+	{
+		"$LOCAL$/CParticleState_10A22078",
+	};
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_C2A937E6
+{
+	Expression = "function void	Eval()
+{
+	Life = 0.01;
+	Size = 0.35;
+	AxisAlign = float3(0,1,0);
+	AxisNormal = float3(0,0,1);
+	Position = float3(0,0.5,-0.25);
+	TextureID = 2;
+}
+";
+}
+CParticleRenderer_Billboard	$LOCAL$/CParticleRenderer_Billboard_0D98A1A1
+{
+	BillboardingMaterial = AlphaBlend;
+	Diffuse = "Textures/player/vfx_neonNinja_reboot_battery2x2.dds";
+	AtlasDefinition = "AtlasDefinitions/atlasDef_2x2.pkat";
+	BillboardMode = PlanarAlignedQuad;
+	AxisField = "AxisAlign";
+	Axis2Field = "AxisNormal";
+	AxisScale = 1.0000000e+000;
+}
+CParticleState	$LOCAL$/CParticleState_10A22078
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_D4828C9B",
+		"$LOCAL$/Field_1",
+		"$LOCAL$/LocalSpace_1",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_D4828C9B
+{
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_7A3E89FA
+{
+	FieldName = "AxisAlign";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CParticleEvolver_Localspace	$LOCAL$/LocalSpace_1
+{
+	
+	ChildList = 
+	{
+		"$LOCAL$/Script_1",
+	};
+}
+CParticleEvolver_Script	$LOCAL$/Script_1
+{
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_E05CDDF6";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_E05CDDF6
+{
+	Expression = "function void	Eval()
+{
+	Position = float3(0,0.5,-0.25);
+}
+";
+}

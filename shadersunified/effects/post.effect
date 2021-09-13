@@ -1,0 +1,508 @@
+VertexShader "common/KDefines.common";
+FragmentShader "common/KDefines.common";
+VertexShader "common/KShaderGlobals.common";
+FragmentShader "common/KShaderGlobals.common";
+FragmentShader "common/KTextures.common";
+
+VertexShader "vertex/PostEffect.vertex";
+FragmentShader "fragment/Library_Fog.fragment";
+
+technique PostEffect_Copy {
+	pass p1 {
+    FragmentShader "fragment/PostEffect_Copy.fragment";
+
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectCopyPS;
+	}
+}
+
+technique PostEffect_Retro {
+	pass p1 {
+    FragmentShader "fragment/PostEffect_Retro.fragment";
+
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectRetroPS;
+	}
+}
+
+technique PostEffect_Despeckle {
+	pass p1 {
+    #define KERNEL_SCALE 1.00
+    
+    ZEnable = 1;
+    ZFunc = Always;
+		ZWriteEnable = 1;
+		CullMode = None;
+		
+    FragmentShader "fragment/PostEffect_Despeckle.fragment";
+    
+    VertexMain = PostEffectPreAddKernelVS;
+    FragmentMain = PostEffectDespecklePS;
+		
+	}
+}
+
+technique PostEffect_Despeckle_Depth {
+	pass p1 {
+    #define KERNEL_SCALE 1.00
+    
+    ZEnable = 1;
+    ZFunc = Always;
+		ZWriteEnable = 1;
+    ColorWriteEnable = 0;
+		CullMode = None;
+		
+    FragmentShader "fragment/PostEffect_Despeckle.fragment";
+    
+    VertexMain = PostEffectPreAddKernelVS;
+    FragmentMain = PostEffectDespecklePS;
+	}
+}
+
+technique PostEffect_BarrelDistort {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+		FragmentShader "fragment/PostEffect_FXAA_3_11.fragment";
+		FragmentMain = PostEffectBarrelDistortPS;
+		VertexMain = PostEffectVS;
+	}
+}
+
+technique PostEffect_FXAA {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+		FragmentShader "fragment/PostEffect_FXAA_3_11.fragment";
+		FragmentMain = PostEffectFXAAPS;
+		VertexMain = PostEffectVS;
+	}
+}
+
+technique PostEffect_FXAA_BarrelDistort {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+		FragmentShader "fragment/PostEffect_FXAA_3_11.fragment";
+		FragmentMain = PostEffectFXAABarrelDistortPS;
+		VertexMain = PostEffectVS;
+	}
+}
+
+technique PostEffect_PreviewOutline {
+	pass p1 {
+    #define KERNEL_SCALE 1.05
+    
+    ZEnable = 1;
+    ZFunc = Always;
+		ZWriteEnable = 0;
+		CullMode = None;
+		
+    VertexMain = PostEffectVS;
+    
+    FragmentShader "fragment/PostEffect_ToonEdge.fragment";
+		FragmentMain = PostEffectPreviewOutlinePS;
+	}
+}
+
+technique PostEffect_ToonEdge {
+	pass p1 {
+    #define KERNEL_SCALE 1.05
+    
+    ZEnable = 1;
+    ZFunc = Always;
+		ZWriteEnable = 0;
+		CullMode = None;
+		
+    VertexMain = PostEffectVS;
+    
+    FragmentShader "fragment/PostEffect_ToonEdge.fragment";
+		FragmentMain = PostEffectToonEdgePS;
+	}
+}
+
+technique PostEffect_ToonEdge_Xray_Stencil {
+  pass copyColors {
+    
+    ZEnable = 0;
+    ZWriteEnable = 0;
+    CullMode = None;
+
+    VertexMain = PostEffectVS;
+    
+    FragmentShader "fragment/PostEffect_ToonEdge.fragment";
+    FragmentMain = PostEffectToonEdgeWithXRayCopyPS;
+  }
+  
+  pass addStenciledEdges {
+    #define KERNEL_SCALE 1.05
+    
+    ZEnable = 0;
+    ZFunc = Always;
+    ZWriteEnable = 0;
+    CullMode = None;
+    StencilWriteEnable = 0;
+    StencilEnable = 1;
+
+    VertexMain = PostEffectVS;
+
+    FragmentShader "fragment/PostEffect_ToonEdge.fragment";
+    FragmentMain = PostEffectToonEdgeWithXRayPS;
+  }
+}
+
+technique PostEffect_ToonEdge_Xray {
+	pass p1 {
+    #define KERNEL_SCALE 1.05
+    ZEnable = 1;
+    ZFunc = Always;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+    VertexMain = PostEffectVS;
+
+    FragmentShader "fragment/PostEffect_ToonEdge.fragment";
+		FragmentMain = PostEffectToonEdgeWithXRayPS;
+	}
+}
+
+technique PostEffect_Xray {
+	pass p1 {
+    #define KERNEL_SCALE 2.05
+    
+    ZEnable = 0;
+    ZWriteEnable = 0;
+		CullMode = None;
+		
+    VertexMain = PostEffectPreAddKernelVS;
+    
+    FragmentShader "fragment/PostEffect_Xray.fragment";
+		FragmentMain = PostEffectXrayPS;
+	}
+}
+
+technique PostEffect_SSAODownsample {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+    FragmentShader "fragment/PostEffect_SSAO.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectSSAODownsamplePS;
+	}
+}
+
+technique PostEffect_SSAO {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+		FragmentShader "fragment/PostEffect_SSAO.fragment";
+		FragmentMain = PostEffectSSAOPS;
+		VertexMain = PostEffectVS;
+	}
+}
+
+technique PostEffect_SSAODilateH {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+    FragmentShader "fragment/PostEffect_SSAO.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectSSAODilateHPS;
+	}
+}
+
+technique PostEffect_SSAODilateV {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+    FragmentShader "fragment/PostEffect_SSAO.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectSSAODilateVPS;
+	}
+}
+
+technique PostEffect_SSAOHGaussian {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+    FragmentShader "fragment/PostEffect_SSAO.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectSSAOHGaussianPS;
+	}
+}
+
+technique PostEffect_SSAOVGaussian {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		FragmentShader "fragment/PostEffect_SSAO.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectSSAOVGaussianPS;
+	}
+}
+
+technique PostEffect_SSAOComposite {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+		FragmentShader "fragment/PostEffect_SSAO.fragment";
+		FragmentMain = PostEffectSSAOCompositePS;
+		VertexMain = PostEffectVS;
+	}
+}
+
+technique PostEffect_Bloom {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+		FragmentShader "fragment/PostEffect_Bloom.fragment";
+		FragmentMain = PostEffectBloomPS;
+		VertexMain = PostEffectVS;
+	}
+}
+
+technique PostEffect_BloomBox {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+    FragmentShader "fragment/PostEffect_BloomBox.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectBloomBoxPS;
+	}
+}
+
+technique PostEffect_BloomDepthCutoff {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+    FragmentShader "fragment/PostEffect_BloomDepthCutoff.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectBloomDepthCutoffPS;
+	}
+}
+
+technique PostEffect_BloomHGaussian {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+    
+    FragmentShader "fragment/PostEffect_BloomGaussian.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectBloomHGaussianPS;
+	}
+}
+
+technique PostEffect_BloomVGaussian {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		FragmentShader "fragment/PostEffect_BloomGaussian.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectBloomVGaussianPS;
+	}
+}
+
+technique PostEffect_Twitch {
+	pass p1 {
+    Phase = Transparent_Final;
+    
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    FragmentShader "fragment/PostEffect_Twitch.fragment";
+    
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectTwitchPS;
+	}
+}
+
+technique PostEffect_Desaturate {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		FragmentShader "fragment/PostEffect_Desaturate.fragment";
+
+    VertexMain = PostEffectVS;
+    FragmentMain = PostEffectDesaturatePS;
+	}
+}
+
+technique PostEffect_DOFBlurBox {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    FragmentShader "fragment/PostEffect_DOF.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectDOFBlurBoxPS;
+	}
+}
+
+technique PostEffect_DOFBlurGaussian {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    FragmentShader "fragment/PostEffect_DOF.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectDOFBlurGaussianPS;
+	}
+}
+
+technique PostEffect_DOF {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    FragmentShader "fragment/PostEffect_DOF.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectDOFPS;
+	}
+}
+
+technique PostEffect_DOFDownsample {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    FragmentShader "fragment/PostEffect_DOF.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectDOFDownsamplePS;
+	}
+}
+
+technique PostEffect_DOFNearCoc {
+	pass p1 {
+    ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+    FragmentShader "fragment/PostEffect_DOF.fragment";
+
+		VertexMain = PostEffectVS;
+		FragmentMain = PostEffectDOFNearCocPS;
+	}
+}
+
+
+technique PostEffect_Colorblind_Protanomaly {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		FragmentShader "fragment/PostEffect_Colorblind.fragment";
+
+    VertexMain = PostEffectVS;
+    FragmentMain = PostEffectProtanomalyPS;
+	}
+}
+
+technique PostEffect_Colorblind_Protanopia {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		FragmentShader "fragment/PostEffect_Colorblind.fragment";
+
+    VertexMain = PostEffectVS;
+    FragmentMain = PostEffectProtanopiaPS;
+	}
+}
+
+technique PostEffect_Colorblind_Deuteranomaly {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		FragmentShader "fragment/PostEffect_Colorblind.fragment";
+
+    VertexMain = PostEffectVS;
+    FragmentMain = PostEffectDeuteranomalyPS;
+	}
+}
+
+technique PostEffect_Colorblind_Deuteranopia {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		FragmentShader "fragment/PostEffect_Colorblind.fragment";
+
+    VertexMain = PostEffectVS;
+    FragmentMain = PostEffectDeuteranopiaPS;
+	}
+}
+
+technique PostEffect_Colorblind_Grayscale {
+	pass p1 {
+		ZEnable = 0;
+		ZWriteEnable = 0;
+		CullMode = None;
+
+		FragmentShader "fragment/PostEffect_Colorblind.fragment";
+
+    VertexMain = PostEffectVS;
+    FragmentMain = PostEffectGrayscalePS;
+	}
+}

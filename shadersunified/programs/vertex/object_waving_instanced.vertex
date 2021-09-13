@@ -1,0 +1,132 @@
+
+KCBBegin(INSTANCE_DATA)
+  KUniform(KMat4, _instanceMatrices[MAX_INSTANCES])
+KCBEnd
+  
+KCBBegin(INSTANCE_ILLUMINATION_DATA)
+  KUniform(KFloat4, _illumination[MAX_INSTANCES])
+KCBEnd
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat2, in_TexCoord0, UV)
+  KVDataInOut( KFloat2, in_Extra, EXTRA)
+  KVDataInOut( KFloat4, in_Color0, COLOR0)
+  KVDataInOut( KFloat4, in_Color1, COLOR1)
+  KVDataInOut( KFloat3, in_Normal, NORMAL)
+  KVDataInOut( KFloat3, in_Tangent, TANGENT)
+  KInstanceData
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, texCoord1, TEXCOORD1)
+  
+  KPDataInOut( KFloat4, tintColor, COLOR0)
+  KPDataInOut( KFloat4, blockColor, COLOR1)
+  KPDataInOut( KFloat2, fogBrdf, COLOR2)
+  
+  KPDataInOut( KFloat3, normal, TEXCOORD2)
+  KPDataInOut( KFloat3, tangent, TEXCOORD3)
+  KPDataInOut( KFloat3, worldPos, TEXCOORD4)
+  KPDataInOut( KFloat3, localPos, TEXCOORD5)
+KPDataEnd
+
+
+KFloat3 InstancedGenWave(KFloat3 position, KMat4 modelMatrix, KFloat wavingStrength, KFloat wavingPeriod)
+{
+  //// WAVE //////////////////////
+  KFloat timeScale = 100.0*wavingPeriod;
+  KFloat clampedTime = mod(gameTime, timeScale)/timeScale;
+  const KFloat PI = 3.14159265358979323846264;
+  KFloat waveAmplitude = pow( wavingStrength * position.y, 2.0);
+  const KFloat xFrequency = 20.0;
+  const KFloat zFrequency = 30.0;
+  
+  //multiply the 0-1 time by 2Pi so we have a seamless cycle, offsetting the period by the position
+  clampedTime *= 2.0*PI;
+  //x-wave has a 'strong' wind that strongly points in a direction, and a 'weak' wind that varies back and forth
+  KFloat waveX =  cos(clampedTime);
+  waveX = (smoothstep(-1.0,1.0, waveX)-0.5);
+  waveX *= sin(clampedTime*20.0)*.1;
+  waveX += sin(clampedTime*xFrequency + modelMatrix[3].x*0.5)*0.5;
+  KFloat waveZ = sin(clampedTime*zFrequency + modelMatrix[3].z*0.25);
+  
+  KFloat3 distortedPos = KFloat3( waveX,  0.0,  waveZ)*waveAmplitude;
+  
+  return distortedPos;
+}
+
+#if (KIWI_HLSL == 1) || (KIWI_PSSL == 1)
+KModifierFunction WavingObject(KVSData KInputVar, KFloat wavingStrength, KFloat wavingPeriod)
+#else
+KModifierFunction WavingObject(KFloat wavingStrength, KFloat wavingPeriod)
+#endif
+{
+  KDeclareOutput;
+  
+  KMat4 modelViewMatrix = KMUL(gViewMatrix, _instanceMatrices[KInstanceID]);
+  KMat3 normalMatrix = KUpper3x3(modelViewMatrix);
+
+  
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  KOutput(texCoord1) = KInput(in_Extra);
+  
+  KOutput(normal) = normalize(KMUL(normalMatrix, KInput(in_Normal)).xyz);
+  KOutput(tangent) = normalize(KMUL(normalMatrix, KInput(in_Tangent)).xyz);
+  
+  KOutput(worldPos) = KMUL(modelViewMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  KOutput(fogBrdf).x = Lighting_DepthFogVertex(length(KOutput(worldPos)));
+  KOutput(fogBrdf).y = KInput(in_Extra).x;
+  
+  KOutput(localPos) = KInput(in_Position);
+  
+  KFloat4 combinedPos = KMUL(_instanceMatrices[KInstanceID], KFloat4(KInput(in_Position), 1.0));
+  KFloat3 distortedPos = InstancedGenWave(KInput(in_Position), _instanceMatrices[KInstanceID], wavingStrength, wavingPeriod);
+  combinedPos.xyz += distortedPos;
+  
+  KSetPosition(Pos, KMUL(gViewProjectionMatrix, combinedPos));
+  
+  KVSOutput;
+} 
+
+
+KVSMain(ObjectWavingSmallInstancedVS)
+{
+  KDeclareOutput;
+  KModifyDataWithArgs(WavingObject, 0.05, 1.0);
+  
+  KOutput(blockColor) = _illumination[KInstanceID];
+  KOutput(blockColor).w *= KInput(in_Color1).w;
+  
+  KOutput(tintColor) = KInput(in_Color0);
+  
+  KVSOutput;
+}
+
+KVSMain(ObjectWavingMediumInstancedVS)
+{
+  KDeclareOutput;
+  KModifyDataWithArgs(WavingObject, 0.03, 2.0);
+  
+  KOutput(blockColor) = _illumination[KInstanceID];
+  KOutput(blockColor).w *= KInput(in_Color1).w;
+  
+  KOutput(tintColor) = KInput(in_Color0);
+  
+  KVSOutput;
+}
+
+KVSMain(ObjectWavingLargeInstancedVS)
+{
+  KDeclareOutput;
+  KModifyDataWithArgs(WavingObject, 0.001, 4.0);
+  
+  KOutput(blockColor) = _illumination[KInstanceID];
+  KOutput(blockColor).w *= KInput(in_Color1).w;
+  
+  KOutput(tintColor) = KInput(in_Color0);
+  
+  KVSOutput;
+}

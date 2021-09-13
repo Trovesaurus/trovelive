@@ -1,0 +1,39 @@
+VertexShader "common/KDefines.common";
+FragmentShader "common/KDefines.common";
+VertexShader "common/KShaderGlobals.common";
+FragmentShader "common/KShaderGlobals.common";
+FragmentShader "common/KTextures.common";
+
+VertexShader "vertex/Library_Fog.vertex";
+
+technique Damage {
+	Phase = Transparent_2;
+	Instanced = 1;
+
+	pass solidPass {
+    ZFunc = LessEqual;
+		AlphaBlendEnable = 1;
+		ZWriteEnable = 0;
+    VertexShader "vertex/Damage_Instanced.vertex";
+		VertexMain = DamageInstancedVS;
+
+		FragmentShader "fragment/Destruction.fragment";
+		FragmentMain = DestructionPS;
+	}
+}
+
+technique DamageAlpha {
+	Phase = Transparent_2;
+	Instanced = 1;
+
+	pass solidPass {
+    ZFunc = LessEqual;
+		AlphaBlendEnable = 1;
+		ZWriteEnable = 0;
+    VertexShader "vertex/Damage_Instanced.vertex";
+		VertexMain = DamageInstancedVS;
+
+		FragmentShader "fragment/Destruction.fragment";
+		FragmentMain = DestructionAlphaPS;
+	}
+}

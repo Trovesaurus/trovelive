@@ -1,0 +1,520 @@
+VertexShader "common/KDefines.common";
+FragmentShader "common/KDefines.common";
+VertexShader "common/KShaderGlobals.common";
+FragmentShader "common/KShaderGlobals.common";
+FragmentShader "common/KTextures.common";
+
+VertexShader "vertex/Library_Fog.vertex";
+FragmentShader "fragment/Library_DiffuseLighting.fragment";
+FragmentShader "fragment/Library_SpecularLighting.fragment";
+FragmentShader "fragment/Library_NormalMap.fragment";
+
+
+technique Object_Teleport {
+  Phase = Transparent_1;
+  
+  pass solidPass {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+    
+    AlphaBlendEnable = 1;
+    ZWriteEnable = 0;
+    
+    VertexMain = TerrainTeleportVS;
+    FragmentMain = ObjectTeleportPS;
+  }
+}
+
+technique Object_Flash {
+  Phase = Transparent_1;
+
+  pass solidPass {
+    AlphaBlendEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+    
+    VertexMain = TerrainAreaColorVS;
+    FragmentMain = ObjectFlashPS;
+  }
+}
+
+technique Object_Frozen {
+  Phase = Transparent_1;
+
+  pass solidPass {
+    AlphaBlendEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+    
+    VertexMain = TerrainAreaColorVS;
+    FragmentMain = ObjectFrozenPS;
+  }
+}
+
+technique Object_DistanceFade {
+  Phase = Transparent_1;
+
+  pass solidPass {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+    
+    AlphaBlendEnable = 1;
+    
+    VertexMain = TerrainShrinkObjectVS;
+    FragmentMain = ObjectDistanceFadePS;
+  }
+}
+
+
+technique Object_CameraGhost {
+  
+  pass p1 {
+    Phase = Transparent_1;
+    
+    
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    Phase = Transparent_2;
+    
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = ObjectAlphaBlendPS;
+  }
+  
+  pass zCrushPass {
+    Phase = Xray;
+    ColorWriteEnable = 0;
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/ZOnly.fragment";
+    
+    VertexMain = TerrainAreaColorVS;
+    FragmentMain = ZCrushPS;
+  }
+}
+
+technique Object_CameraGhostAlpha {
+  
+  pass p1 {
+    Phase = Transparent_2;
+    
+    
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    Phase = Transparent_Final;
+    
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = ObjectAlphaBlendPS;
+  }
+  
+  pass zCrushPass {
+    Phase = Xray;
+    ColorWriteEnable = 0;
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/ZOnly.fragment";
+    
+    VertexMain = TerrainAreaColorVS;
+    FragmentMain = ZCrushPS;
+  }
+}
+
+technique Object_Ghost {
+  
+  pass p1 {
+    Phase = Transparent_1;
+    
+    
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    Phase = Transparent_2;
+    
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Ghost.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = ObjectGhostPS;
+  }
+}
+
+technique Object_Ghost_Xray {
+  
+  pass p1 {
+    Phase = Transparent_1;
+    
+    
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    Phase = Transparent_2;
+    
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Ghost.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = ObjectGhostPS;
+  }
+  
+  pass xrayPass {
+    Phase = Xray;
+    ColorWriteEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+		FragmentMain = IDColorPlayerPS;
+  }
+}
+
+technique Object_Ghost_ZCrush {
+  
+  pass p1 {
+    Phase = Transparent_1;
+    
+    
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    Phase = Transparent_2;
+    
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Ghost.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = ObjectGhostPS;
+  }
+  
+  pass zCrushPass {
+    Phase = Xray;
+    ColorWriteEnable = 0;
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/ZOnly.fragment";
+    
+    VertexMain = TerrainAreaColorVS;
+    FragmentMain = ZCrushPS;
+  }
+}
+
+technique Object_Opaque {
+	Phase = Opaque;
+
+	pass solidPass {
+    VertexShader "vertex/Terrain_Reflect.vertex";
+    FragmentShader "fragment/Terrain_Reflect.fragment";
+    
+    VertexMain = TerrainReflectVS;
+    FragmentMain = TerrainReflectPS;
+	}
+}
+
+technique Object_Xray_Opaque {
+	Phase = Opaque;
+
+	pass solidPass {
+    VertexShader "vertex/Terrain_Reflect.vertex";
+    FragmentShader "fragment/Terrain_Reflect.fragment";
+    
+    VertexMain = TerrainReflectVS;
+    FragmentMain = TerrainReflectPS;
+	}
+  
+  pass xrayPass {
+    Phase = Xray;
+    ColorWriteEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+		FragmentMain = IDColorPlayerPS;
+  }
+}
+
+technique Object_Xray_Rarity_Opaque {
+  Phase = Opaque;
+
+  pass solidPass {
+    VertexShader "vertex/Terrain_Reflect.vertex";
+    FragmentShader "fragment/Terrain_Reflect.fragment";
+    
+    VertexMain = TerrainReflectVS;
+    FragmentMain = TerrainReflectPS;
+  }
+  
+  pass xrayPass {
+    Phase = Xray;
+    ColorWriteEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    FragmentMain = ColorRarityPS;
+  }
+}
+
+technique Object_ZCrush_Opaque {
+	Phase = Opaque;
+
+	pass solidPass {
+    VertexShader "vertex/Terrain_Reflect.vertex";
+    FragmentShader "fragment/Terrain_Reflect.fragment";
+    
+    VertexMain = TerrainReflectVS;
+    FragmentMain = TerrainReflectPS;
+	}
+  
+  pass zCrushPass {
+    Phase = Xray;
+    ColorWriteEnable = 0;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/ZOnly.fragment";
+		FragmentMain = ZCrushPS;
+  }
+}
+
+technique Object_AlphaBlend {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = TerrainAreaColorVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentMain = TerrainPS;
+  }
+}
+
+technique Object_Xray_Alpha {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    VertexMain = TerrainAreaColorVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    VertexMain = TerrainAreaColorVS;
+    FragmentMain = TerrainPS;
+  }
+  
+  pass xrayPass {
+    Phase = Xray;
+    ColorWriteEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+		FragmentMain = IDColorPlayerPS;
+  }
+}
+
+technique Object_ZCrush_Alpha {
+  Phase = Transparent_1;
+  
+  pass p1 {
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = TerrainAreaColorVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentMain = TerrainPS;
+  }
+  
+  pass zCrushPass {
+    Phase = Xray;
+    ColorWriteEnable = 0;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/ZOnly.fragment";
+    
+		FragmentMain = ZCrushPS;
+  }
+}
+
+technique Object_Xray_Target_Opaque {
+	Phase = Opaque;
+
+	pass solidPass {
+    VertexShader "vertex/Terrain_Reflect.vertex";
+    FragmentShader "fragment/Terrain_Reflect.fragment";
+    
+    VertexMain = TerrainReflectVS;
+    FragmentMain = TerrainReflectPS;
+	}
+  
+  pass xrayPass {
+    Phase = Xray;
+    ColorWriteEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+		FragmentMain = IDColorTargetPS;
+  }
+}
+
+technique Object_Xray_Friend_Opaque {
+	Phase = Opaque;
+
+	pass solidPass {
+    VertexShader "vertex/Terrain_Reflect.vertex";
+    FragmentShader "fragment/Terrain_Reflect.fragment";
+    
+    VertexMain = TerrainReflectVS;
+    FragmentMain = TerrainReflectPS;
+	}
+  
+  pass xrayPass {
+    Phase = Xray;
+    ColorWriteEnable = 1;
+    VertexShader "vertex/Terrain.vertex";
+    VertexMain = TerrainAreaColorVS;
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+		FragmentMain = IDColorPlayerFriendPS;
+  }
+}

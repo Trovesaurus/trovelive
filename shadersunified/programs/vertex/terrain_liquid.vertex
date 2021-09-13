@@ -1,0 +1,120 @@
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat2, in_TexCoord0, UV)
+  KVDataInOut( KFloat2, in_Extra, EXTRA)
+  KVDataInOut( KFloat4, in_Color0, COLOR0)
+  KVDataInOut( KFloat4, in_Color1, COLOR1)
+  KVDataInOut( KFloat3, in_Normal, NORMAL)
+  KVDataInOut( KFloat3, in_Tangent, TANGENT)
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, texCoord1, TEXCOORD1)
+  
+  KPDataInOut( KFloat4, tintColor, COLOR0)
+  KPDataInOut( KFloat4, blockColor, COLOR1)
+  
+  KPDataInOut( KFloat4, STAndScroll, TEXCOORD2)
+  
+  KPDataInOut( KFloat, fogStrength, TEXCOORD3)
+  KPDataInOut( KFloat3, normal, TEXCOORD4)
+  KPDataInOut( KFloat3, tangent, TEXCOORD5)
+  KPDataInOut( KFloat3, localPos, TEXCOORD6)
+  
+KPDataEnd
+
+KFloat GetXAlign(KFloat3 v)
+{
+  return dot(KFloat3(1.0, 0.0, 0.0), v);
+}
+
+KFloat GetYAlign(KFloat3 v)
+{
+  return dot(KFloat3(0.0, 1.0, 0.0), v);
+}
+
+KFloat GetZAlign(KFloat3 v)
+{
+  return dot(KFloat3(0.0, 0.0, 1.0), v);
+}
+
+KFloat4 CalcAlignedSTAndScroll(KFloat3 pos, KFloat3 normalVec, KFloat3 worldTangent)
+{
+  KFloat4 result;
+  KFloat3 dim = abs(normalVec);
+  
+  KFloat3 xyzAlign = KFloat3(GetXAlign(worldTangent),GetYAlign(worldTangent),GetZAlign(worldTangent));
+  
+  if (dim.x > dim.y) // y is ruled out
+  {
+    if (dim.x > dim.z)
+    {
+      result.xy = pos.zy;
+      result.zw = xyzAlign.zy;//KFloat2(GetZAlign(worldTangent), GetYAlign(worldTangent));
+      return result;
+    }
+    else
+    {
+      result.xy = pos.xy;
+      result.zw = xyzAlign.xy;//KFloat2(GetXAlign(worldTangent), GetYAlign(worldTangent));
+      return result;
+    }
+  }
+  else //x is ruled out
+  {
+    if (dim.y > dim.z)
+    {
+      result.xy = pos.xz;
+      result.zw = xyzAlign.xz;//KFloat2(GetXAlign(worldTangent), GetZAlign(worldTangent));
+      return result;
+    }
+    else
+    {
+      result.xy = pos.xy;
+      result.zw = xyzAlign.xy;//KFloat2(GetXAlign(worldTangent), GetYAlign(worldTangent));
+      return result;
+    }
+  }
+}
+
+KFloat4 _TransformTerrainLiquid(KFloat3 position)
+{
+  return KMUL(gModelViewProjectionMatrix, KFloat4(position, 1.0));
+}
+
+KModifierFunction _TerrainLiquid(KVSData KInputVar) 
+{
+  KDeclareOutput;
+  
+  KOutput(normal) = normalize(KMUL(gNormalMatrix, KInput(in_Normal)).xyz);
+  KOutput(tangent) = normalize(KMUL(gNormalMatrix, KInput(in_Tangent)).xyz);
+  
+  KFloat3 worldPos = KMUL(gModelViewMatrix, KFloat4(KInput(in_Position),1.0)).xyz;
+
+  KOutput(tintColor) = KInput(in_Color0);
+  KOutput(blockColor) = KInput(in_Color1);
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  KOutput(texCoord1) = KInput(in_Extra);
+
+  KSetPosition(Pos, _TransformTerrainLiquid(KInput(in_Position) ));
+
+  KOutput(fogStrength) = Lighting_DepthFogVertex(length(worldPos));
+  
+  KFloat3 modelPos = KMUL(gModelMatrix, KFloat4(KInput(in_Position),1.0)).xyz;
+  KFloat3 worldNormal = (KMUL(gModelMatrix, KFloat4(KInput(in_Normal), 1.0)) - KMUL(gModelMatrix, KFloat4(KFloat3(0.0, 0.0, 0.0), 1.0))).xyz;
+  KOutput(STAndScroll) = CalcAlignedSTAndScroll(modelPos, worldNormal, KInput(in_Tangent));
+  //KOutput(STAndScroll) = KFloat4(modelPos.xy, 0.0, 0.0);
+  KOutput(localPos) = KInput(in_Position);
+  KVSOutput;
+}
+
+KVSMain(TerrainLiquidVS)
+{
+  KDeclareOutput;
+  KModifyData(_TerrainLiquid);
+  
+  KVSOutput;
+}

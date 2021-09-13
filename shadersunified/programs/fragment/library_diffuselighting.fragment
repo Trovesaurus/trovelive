@@ -1,0 +1,103 @@
+
+#ifndef NUMPOINTLIGHTS
+  #define NUMPOINTLIGHTS 8
+#endif
+
+KCBBegin(POINTLIGHTS_CB)
+  KUniform(KFloat4, gPointLights[NUMPOINTLIGHTS])
+  KUniform(KFloat4, gPointLightsColors[NUMPOINTLIGHTS])
+KCBEnd
+
+KFloat4 Lighting_LightingSS(KFloat3 viewNormal, KFloat3 lightDir, KFloat4 lightColor, KFloat density)
+{
+  KFloat nDotL = dot(viewNormal, lightDir) * 0.7 + 0.3;
+  nDotL = max(nDotL, 0.0);
+  
+  KFloat VDotNegL = clamp(dot(KFloat3(0.0,0.0,1.0), -lightDir), 0.0, 1.0);
+  
+  KFloat SSIllumination = clamp(VDotNegL*density*.2, 0.0, 1.0);
+  
+  return lightColor * pow( nDotL + SSIllumination, 0.65);
+}
+
+KFloat Lighting_DiffuseStrength(KFloat3 viewNormal, KFloat3 lightDir)
+{
+  return max(dot(viewNormal, lightDir) * 0.7 + 0.3, 0.0);
+}
+
+KFloat3 _CalcPointLightSS(KFloat3 viewNormal, KFloat4 pointLight, KFloat3 lightColor, KFloat falloffPower, KFloat density)
+{
+  KFloat3 light = KFloat3(0.0, 0.0, 0.0);
+  if (pointLight.w >= 0.000001)
+  {
+    KFloat3 L = pointLight.xyz;
+    KFloat distance = length(L);
+  
+    KFloat denom = distance/pointLight.w + 1.0;
+    KFloat attenuation =  1.0 / (pow(abs(denom), falloffPower)); 
+  
+    attenuation = (attenuation - 0.05) / (1.0 - 0.05);
+    attenuation = max(attenuation,0.0);
+  
+    L /= distance;
+    KFloat nDotL = clamp(dot(viewNormal, L), 0.0, 1.0);
+  
+    KFloat VDotNegL = clamp(dot(KFloat3(0.0,0.0,1.0), -L), 0.0, 1.0);
+    KFloat SSIllumination = clamp(VDotNegL , 0.0, 1.0)*density*.25;
+  
+    light = lightColor * (nDotL + SSIllumination) * attenuation;
+  }
+  return light;
+}
+
+KFloat3 _CalcPointLight(KFloat3 viewNormal, KFloat4 pointLight, KFloat3 lightColor, KFloat falloffPower)
+{
+  KFloat3 light = KFloat3(0.0, 0.0, 0.0);
+  if (pointLight.w >= 0.000001)
+  {
+    KFloat3 L = pointLight.xyz;
+    KFloat distance = length(L);
+  
+    KFloat denom = distance/pointLight.w + 1.0;
+    KFloat attenuation =  1.0 / (pow(abs(denom), falloffPower)); 
+  
+    attenuation = (attenuation - 0.05) / (1.0 - 0.05);
+    attenuation = max(attenuation,0.0);
+  
+    L /= distance;
+    KFloat nDotL = clamp(dot(viewNormal, L), 0.0, 1.0);
+  
+    light = lightColor * nDotL * attenuation;
+  }
+  return light;
+}
+
+KFloat3 Lighting_PointLightingSS(KFloat3 viewNormal, KFloat3 viewPos, KFloat3 lightColor, KFloat density)
+{
+  KFloat4 vPLight;
+  
+  KFloat3 pointLightColor = KFloat3(0.0, 0.0, 0.0);
+  for (int i=0; i < NUMPOINTLIGHTS; i++)
+  {
+    vPLight = KFloat4( gPointLights[i].xyz - viewPos, gPointLights[i].w);
+    
+    pointLightColor.xyz += _CalcPointLightSS(viewNormal, vPLight, gPointLightsColors[i].xyz, gPointLightsColors[i].w, density );
+  }
+  
+  return pointLightColor;
+}
+
+KFloat3 Lighting_PointLighting(KFloat3 viewNormal, KFloat3 viewPos, KFloat3 lightColor)
+{
+  KFloat4 vPLight;
+  
+  KFloat3 pointLightColor = KFloat3(0.0, 0.0, 0.0);
+  for (int i=0; i < NUMPOINTLIGHTS; i++)
+  {
+    vPLight = KFloat4( gPointLights[i].xyz - viewPos, gPointLights[i].w);
+    
+    pointLightColor.xyz += _CalcPointLight(viewNormal, vPLight, gPointLightsColors[i].xyz, gPointLightsColors[i].w);
+  }
+  
+  return pointLightColor;
+}

@@ -1,0 +1,26 @@
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat3, in_Normal, NORMAL)
+  KVDataInOut( KFloat2, in_TexCoord0, UV0)
+  KVDataInOut( KFloat2, in_TexCoord1, UV1)
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat, fogDarkCoeff, TEXCOORD1)
+KPDataEnd
+           
+KVSMain(SkyUnderwaterVS) 
+{
+  KDeclareOutput;
+  
+	KOutput(texCoord0) = KInput(in_TexCoord0);
+  KSetPosition(Pos, KMUL(gModelViewProjectionMatrix, KFloat4(KInput(in_Position), 1.0)));
+  
+  KFloat3 worldPos = KMUL(gModelViewMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  KOutput(fogDarkCoeff) = clamp(dot(normalize(worldPos), sunLightPosition)*2.0 - 1.0, 0.0, 1.0);
+  
+  KVSOutput;
+}

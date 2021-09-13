@@ -1,0 +1,126 @@
+VertexShader "common/KDefines.common";
+FragmentShader "common/KDefines.common";
+VertexShader "common/KShaderGlobals.common";
+FragmentShader "common/KShaderGlobals.common";
+FragmentShader "common/KTextures.common";
+
+VertexShader "vertex/Library_Fog.vertex";
+VertexShader "vertex/Object_Instanced.vertex";
+
+FragmentShader "fragment/Library_DiffuseLighting.fragment";
+FragmentShader "fragment/Library_SpecularLighting.fragment";
+FragmentShader "fragment/Library_NormalMap.fragment";
+FragmentShader "fragment/Terrain.fragment";
+
+
+technique Object_Xray_Opaque_Instanced {
+	Phase = Opaque;
+	Instanced = 1;
+
+	pass solidPass {
+    VertexMain = ObjectAreaColorInstancedVS;
+		FragmentMain = TerrainPS;
+	}
+  
+  pass xrayPass {
+    Phase = Xray;
+    ColorWriteEnable = 0;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    
+    FragmentShader "fragment/SolidColors.fragment";
+		FragmentMain = SolidWhitePS;
+  }
+}
+
+technique Object_ZCrush_Opaque_Instanced {
+	Phase = Opaque;
+	Instanced = 1;
+
+	pass solidPass {
+    VertexMain = ObjectAreaColorInstancedVS;
+		FragmentMain = TerrainPS;
+	}
+  
+  pass zCrushPass {
+    Phase = Xray;
+    ColorWriteEnable = 0;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    
+    FragmentShader "fragment/ZOnly.fragment";
+		FragmentMain = ZCrushPS;
+  }
+}
+
+technique Object_Xray_Alpha_Instanced {
+  Phase = Transparent_1;
+  Instanced = 1;
+  
+  pass p1 {
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    
+    FragmentShader "fragment/SolidColors.fragment";
+    VertexMain = ObjectAreaColorInstancedVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    FragmentMain = TerrainPS;
+  }
+  
+  pass xrayPass {
+    Phase = Xray;
+    ColorWriteEnable = 0;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    
+    FragmentShader "fragment/SolidColors.fragment";
+		FragmentMain = SolidWhitePS;
+  }
+}
+
+technique Object_ZCrush_Alpha_Instanced {
+  Phase = Transparent_1;
+  Instanced = 1;
+  
+  pass p1 {
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    FragmentMain = TerrainPS;
+  }
+  
+  pass zCrushPass {
+    Phase = Xray;
+    ColorWriteEnable = 0;
+    
+    VertexMain = ObjectAreaColorInstancedVS;
+    
+    FragmentShader "fragment/ZOnly.fragment";
+    
+		FragmentMain = ZCrushPS;
+  }
+}

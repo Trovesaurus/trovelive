@@ -1,0 +1,104 @@
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+KFloat eyeSpaceDepth(KFloat sampleValue)
+{
+  KFloat z_b = sampleValue;//texture(depth, texCoord0.st).x;
+  KFloat z_n = KRescaleDepthValue(z_b);//2.0 * z_b - 1.0;
+  KFloat z_e = 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+
+	return z_e;
+}
+
+KFloat4 eyeSpaceDepth(KFloat4 sampleValue)
+{
+    KFloat4 z_b = sampleValue;//texture(depth, texCoord0.st).x;
+    KFloat4 z_n = KRescaleDepthValue4(z_b);//2.0 * z_b - KFloat4(1.0,1.0,1.0,1.0);
+    KFloat4 z_e = 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+
+	return z_e;
+}
+
+KFloat GetMin(KFloat4 a, KFloat4 b)
+{
+  KFloat4 min4 = min(a,b);
+  return min( min(min4.x, min4.y), min(min4.z, min4.w));
+}
+
+KFloat sobelFilter(KFloat4 first, KFloat4 second)
+{
+  KFloat Gx = dot(first, KFloat4(1.0,-1.0,1.0,-1.0)) + dot(second, KFloat4(0.0, 2.0, -2.0, 0.0));
+  KFloat Gy = dot(first, KFloat4(1.0,1.0,-1.0,-1.0)) + dot(second, KFloat4(2.0, 0.0, 0.0, -2.0));
+  return (Gx*Gx+Gy*Gy);
+}
+
+KFloat basicFilter(KFloat4 first, KFloat4 second, KFloat center)
+{
+  return dot(first, KFloat4(-1.0,-1.0,-1.0,-1.0)) + dot(second, KFloat4(-1.0,-1.0,-1.0,-1.0)) + center*8.0;
+}
+
+
+KFloat simpleFilter(KFloat4 first,  KFloat center)
+{
+  return dot(first, KFloat4(-1.0, -1.0, -1.0, -1.0)) + center*4.0;
+}
+
+KFloat smoothRamp(KFloat value)
+{
+  const KFloat low_threshold = 0.2;
+  const KFloat high_threshold = 0.5;
+  if(value > low_threshold)
+  {
+    KFloat ramp = (value - low_threshold) / (high_threshold - low_threshold);
+    return clamp(KLerp(0.6, 0.0, ramp), 0.0, 1.0);
+  }
+  else
+  {
+    return 1.0;
+  }
+}
+
+KPSMain(PostEffectXrayPS)
+{
+
+  KFloat4 outColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KFloat4 depthAxial;
+  
+  KFloat centerDepth = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0)).x;
+  KFloat sceneDepth = KSampleTexture(effectSampler, effectTexture, KInput(texCoord0)).x;
+  
+  // texCoord0 is pre-added in vertex shader
+  depthAxial.x = KSampleTexture(depthSampler, depthTexture, KInput(kernelCoords)[1]).x;
+  depthAxial.y = KSampleTexture(depthSampler, depthTexture, KInput(kernelCoords)[3]).x;
+  depthAxial.z = KSampleTexture(depthSampler, depthTexture, KInput(kernelCoords)[5]).x;
+  depthAxial.w = KSampleTexture(depthSampler, depthTexture, KInput(kernelCoords)[7]).x;
+  
+  KFloat worldCenterDepth = eyeSpaceDepth(centerDepth);
+  sceneDepth = eyeSpaceDepth(sceneDepth);
+  
+  if (worldCenterDepth < sceneDepth+0.1)
+  {
+    discard;
+  }
+  
+  if (worldCenterDepth > 1000.0)
+  {
+    discard;
+  }
+  
+  KFloat sum = simpleFilter( eyeSpaceDepth(depthAxial), worldCenterDepth);
+  sum = clamp(abs(sum), 0.0, 1.0);
+  
+  KFloat decreaseRate = KLerp(40.0, 80.0, outColor.a);
+  
+  KFloat decrease = 1.0-clamp(worldCenterDepth / decreaseRate, 0.0, 1.0);
+  sum *= decrease;
+  
+  outColor.a = sum;
+  KPSOutput(outColor);
+}

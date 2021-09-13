@@ -1,0 +1,221 @@
+
+//Adapted from code in GPU Gems 3 http://http.developer.nvidia.com/GPUGems3/gpugems3_ch28.html
+
+KTexture(secondaryTexture)
+KSampler(secondarySampler)
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+KFloat eyeSpaceDepth(KFloat val)
+{
+    KFloat z_b = val;
+    KFloat z_n = KRescaleDepthValue(z_b);
+    
+    KFloat z_e = 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+
+	return z_e;
+}
+
+KFloat zSpaceDepth(KFloat sampleValue)
+{
+  KFloat z_a = zNear+zFar - (2.0*zNear*zFar)/sampleValue;
+  KFloat z_b = (zFar - zNear);
+#if (KIWI_HLSL == 1) || (KIWI_PSSL == 1)
+  return (z_a/z_b);
+#else  
+  return 0.5*(z_a/z_b +1.0);
+#endif
+}
+
+KPSMain(PostEffectDOFDownsamplePS)
+{
+  KFloat viewLerp = 0.25 + 0.75*gViewDistance / 256.0;
+  KFloat dofNear = zSpaceDepth(55.0*viewLerp);
+  KFloat dofNearToFar = 1.0/(zSpaceDepth(256.0*viewLerp) - dofNear);
+  KFloat4 dofNear4 = KFloat4(dofNear,dofNear,dofNear,dofNear);
+  KFloat4 dofNearToFar4 = KFloat4(dofNearToFar,dofNearToFar,dofNearToFar,dofNearToFar);
+  
+
+  KFloat2 kernelOffsets[4];
+  kernelOffsets[0] = KFloat2(KInput(kernelCoords)[5].x*-1.5, KInput(kernelCoords)[6].y*1.5);
+  kernelOffsets[1] = KFloat2(KInput(kernelCoords)[5].x*-0.5, KInput(kernelCoords)[6].y*1.5);
+  kernelOffsets[2] = KFloat2(KInput(kernelCoords)[5].x*0.5, KInput(kernelCoords)[6].y*1.5);
+  kernelOffsets[3] = KFloat2(KInput(kernelCoords)[5].x*1.5, KInput(kernelCoords)[6].y*1.5);
+  
+  KFloat2 rowOffs[4];
+  rowOffs[0] = KFloat2(0.0, 0.0);
+  rowOffs[1] = KFloat2(0.0,  KInput(kernelCoords)[0].y); //actually kernelCoords[1] but avoiding a nvidia bug
+  rowOffs[2] = rowOffs[1]*2.0;
+  rowOffs[3] = rowOffs[1]*3.0;
+  
+  KFloat4 sampledColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[0]);
+  sampledColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[2]);
+  sampledColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[6]);
+  sampledColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[8]);
+  sampledColor.xyz *= 0.25;
+  
+  KFloat4 sceneCoc;
+  KFloat4 coc;
+  KFloat4 depthTaps;
+  depthTaps.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[0] + rowOffs[0]).r;
+  depthTaps.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[1] + rowOffs[0]).r;
+  depthTaps.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[2] + rowOffs[0]).r;
+  depthTaps.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[3] + rowOffs[0]).r;
+  sceneCoc = clamp( (depthTaps- dofNear4)*dofNearToFar4, KFloat4(0,0,0,0), KFloat4(1,1,1,1));  
+  coc = sceneCoc;
+  
+  depthTaps.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[0] + rowOffs[1]).r;
+  depthTaps.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[1] + rowOffs[1]).r;
+  depthTaps.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[2] + rowOffs[1]).r;
+  depthTaps.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[3] + rowOffs[1]).r;
+  sceneCoc = clamp( (depthTaps- dofNear4)*dofNearToFar4, KFloat4(0,0,0,0), KFloat4(1,1,1,1));  
+  coc = max(coc, sceneCoc);
+  
+  depthTaps.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[0] + rowOffs[2]).r;
+  depthTaps.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[1] + rowOffs[2]).r;
+  depthTaps.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[2] + rowOffs[2]).r;
+  depthTaps.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[3] + rowOffs[2]).r;
+  sceneCoc = clamp( (depthTaps- dofNear4)*dofNearToFar4, KFloat4(0,0,0,0), KFloat4(1,1,1,1));  
+  coc = max(coc, sceneCoc);
+  
+  depthTaps.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[0] + rowOffs[3]).r;
+  depthTaps.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[1] + rowOffs[3]).r;
+  depthTaps.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[2] + rowOffs[3]).r;
+  depthTaps.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + kernelOffsets[3] + rowOffs[3]).r;
+  sceneCoc = clamp( (depthTaps- dofNear4)*dofNearToFar4, KFloat4(0,0,0,0), KFloat4(1,1,1,1));  
+  coc = max(coc, sceneCoc);
+  
+  KFloat maxCoc = max( max(coc.x, coc.y), max(coc.z, coc.w));
+  
+  KPSOutput(KFloat4(sampledColor.xyz, maxCoc));
+}
+
+KPSMain(PostEffectDOFBlurGaussianPS) {
+  KFloat kernel[9];
+  kernel[0] = 1.0/16.0;   kernel[1] = 2.0/16.0;   kernel[2] = 1.0/16.0;
+  kernel[3] = 2.0/16.0;   kernel[4] = 4.0/16.0;   kernel[5] = 2.0/16.0;
+  kernel[6] = 1.0/16.0;   kernel[7] = 2.0/16.0;   kernel[8] = 1.0/16.0;
+  
+  KFloat4 blurColor = KFloat4(0.0, 0.0, 0.0, 0.0);
+  
+  for(int i = 0; i < 9; i++) {
+      blurColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[i])*kernel[i];
+  }
+  KPSOutput(blurColor);
+}
+
+KPSMain(PostEffectDOFNearCocPS) {
+  KFloat4 combined;
+  
+  //diffuse is downsampled
+  //effect is downsampled+blur
+  KFloat4 shrunk = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  KFloat4 blurredShrunk = KSampleTexture(effectSampler, effectTexture, KInput(texCoord0));
+  
+  KFloat4 outColor;
+  outColor.xyz = shrunk.xyz;
+  outColor.w = 2.0*max(shrunk.w, blurredShrunk.w) - shrunk.w;
+  
+  KPSOutput(outColor);
+}
+
+KPSMain(PostEffectDOFBlurBoxPS) 
+{
+  KFloat4 blurColor = KFloat4(0.0, 0.0, 0.0, 0.0);
+  
+  blurColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[0]/2.0);
+  blurColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[2]/2.0);
+  blurColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[6]/2.0);
+  blurColor += KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[8]/2.0);
+  blurColor *= 0.25;
+  
+	KPSOutput(blurColor);
+}
+
+KFloat4 GetSmallBlurSample(KFloat2 texCoords, KFloat2 upperRightOffset)
+{
+  KFloat4 totalColor = KFloat4(0.0,0.0,0.0,0.0);
+  const KFloat weight = 4.0 / 16.0;
+  
+  totalColor += weight*KSampleTexture(diffuseSampler, diffuseTexture, texCoords + upperRightOffset);
+  totalColor += weight*KSampleTexture(diffuseSampler, diffuseTexture, texCoords - upperRightOffset);
+  totalColor += weight*KSampleTexture(diffuseSampler, diffuseTexture, texCoords + KFloat2(upperRightOffset.x, -upperRightOffset.y));
+  totalColor += weight*KSampleTexture(diffuseSampler, diffuseTexture, texCoords + KFloat2(-upperRightOffset.x, upperRightOffset.y));
+  
+  return totalColor;
+}
+
+KFloat4 InterpolateDOF(KFloat4 exact, KFloat4 small, KFloat4 med, KFloat4 large, KFloat t)
+{
+  // Efficiently calculate the cross-blend weights for each sample.  
+  // Let the unblurred sample to small blur fade happen over distance  
+  // d0, the small to medium blur over distance d1, and the medium to  
+  // large blur over distance d2, where d0 + d1 + d2 = 1.  
+  // dofLerpScale = float4( -1 / d0, -1 / d1, -1 / d2, 1 / d2 );  
+  // dofLerpBias = float4( 1, (1 – d2) / d1, 1 / d2, (d2 – 1) / d2 );  
+  // d0 = 0.3
+  // d1 = 0.3
+  // d2 = 0.4
+  // dofLerpScale = ( -3.33333333333, -3.33333333333, -2.5, 2.5 )
+  // dofLerpBias =  (1, 2, 2.5, -1.5)
+  
+  // Not precomputed - relies on the compiler being smart to precalculate these values
+  KFloat3 dValues = KFloat3(0.65, 0.3, 0.05);
+  KFloat4 dofLerpScale = KFloat4(-1 / dValues.x, -1 / dValues.y, -1 / dValues.z, 1 / dValues.z);
+  KFloat4 dofLerpBias = KFloat4(1.0,
+                                (1.0 - dValues.z) / dValues.y,
+                                1.0 / dValues.z,
+                                (dValues.z - 1.0) / dValues.z);
+  
+  //const KFloat4 dofLerpScale = KFloat4(-1.5384615384615383, -3.3333333333333335, -20.0, 20.0);
+  //const KFloat4 dofLerpBias = KFloat4(1.0, 3.1666666666666665, 20.0, -18.999999999999996);
+  
+  
+  KFloat4 weights = clamp(t*dofLerpScale + dofLerpBias, 0.0, 1.0);
+  weights.yz = min(weights.yz, 1.0 - weights.xy);
+  
+  KFloat4 outColor = weights.x*exact + weights.y * small + weights.z*med + weights.w * large;
+  outColor.a = dot( weights.yzw, KFloat3( 16.0 / 17, 1.0, 1.0 )); 
+  
+  return outColor;
+}
+
+
+KPSMain(PostEffectDOFPS)
+{
+  KFloat4 dofColor;
+  
+  //effectsampler = largeblursampler
+  //secondarySampler = smallblursampler
+  
+  KFloat4 exact = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  KFloat4 small = GetSmallBlurSample(KInput(texCoord0), KInput(kernelCoords)[2]*0.5);
+  KFloat4 medium = KSampleTexture(secondarySampler, secondaryTexture, KInput(texCoord0));
+  KFloat4 large = KSampleTexture(effectSampler, effectTexture, KInput(texCoord0));
+  KFloat nearCoc = large.a;
+  KFloat coc;
+  
+  KFloat depth = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0)).r;
+  
+  if (depth > 0.999999)
+  {
+    KPSOutput(exact);
+  }
+  else
+  {
+    KFloat dofFar = zSpaceDepth(205.0);
+    KFloat dofFarToInf = 1.0/(zSpaceDepth(300.0) - dofFar);
+    
+    KFloat farCoc = clamp((depth - dofFar)*dofFarToInf, 0.0, 1.0);
+    coc = max(nearCoc, farCoc*2.0);
+    coc = nearCoc;
+    
+    KPSOutput(InterpolateDOF(exact, small, medium, large, coc));
+  }
+}
+

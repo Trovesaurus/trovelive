@@ -1,0 +1,994 @@
+Version = 1.13.1.45791;
+CParticleEffect	$LOCAL$/Resource
+{
+	OnSpawn = "$LOCAL$/Spawner";
+	CustomAttributes = "$LOCAL$/_GlobalAttributes";
+	Autostart = true;
+}
+CNEdEditorParticle_Data	$LOCAL$/EDITOR
+{
+	Position = float3(7.4929786e-001, 7.0780039e-002, 2.7128894e+000);
+	EulerOrientation = float3(9.2399895e-001, 1.6939972e+001, 0.0000000e+000);
+	PostFx_EnableGlow = false;
+	Backdrops = "$LOCAL$/_BackdropList";
+	IsLooping = true;
+	Duration = 1.0000000e+000;
+}
+CActionFactoryWithChilds	$LOCAL$/Spawner
+{
+	ChildList = 
+	{
+		"$LOCAL$/Gradient",
+		"$LOCAL$/Ring_1",
+		"$LOCAL$/Burst_Out",
+		"$LOCAL$/Sparks_1",
+		"$LOCAL$/SoundLayer_1",
+	};
+}
+CNEdEditorBackdrop_Brush	$LOCAL$/_Backdrop_Brush
+{
+	EditorInfosPosition = int2(-253, -417);
+	LayerName = "Layer_Brush";
+}
+CParticleAttributeList	$LOCAL$/_GlobalAttributes
+{
+}
+CParticleEvolver_Localspace	$LOCAL$/CParticleEvolver_Localspace_211F1EE6
+{
+	
+}
+CShapeDescriptor	$LOCAL$/CShapeDescriptor_6A92B9D0
+{
+	Position = float3(0.0000000e+000, 6.9999999e-001, 0.0000000e+000);
+	EulerOrientation = float3(9.0000000e+001, 0.0000000e+000, 0.0000000e+000);
+	ShapeType = SPHERE;
+	Radius = 5.0000001e-002;
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_9CA58BA2
+{
+	Name = "Size";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_C63303DD";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_0FFFF4D3
+{
+	Expression = "function void	Eval()
+{
+	Life = rand(0.25, 0.3);
+	Size = rand(0.05,0.1);
+	Position = Sampler_0.samplePosition();
+	Velocity = Position + float3(rand(-8,8), rand(-3,9), rand(-8,8));
+	ColorCoeff = 1.5;
+}
+";
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_B36183BD
+{
+	ConstantAcceleration = float3(0.0000000e+000, -1.5000000e+001, 0.0000000e+000);
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Sparks_1
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_75126435";
+	SpawnCount = 1.0000000e+001;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_C76DDFFE
+{
+	FieldName = "ColorCoeff";
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_CF395EC4
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_C90C42D7";
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Ring_1
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_700A51BA";
+}
+CParticleRenderer_Billboard	$LOCAL$/CParticleRenderer_Billboard_4E6B0C9C
+{
+	DrawOrder = 6;
+	Diffuse = "Textures/vfx_circle_03.dds";
+	BillboardMode = VelocityAxisAligned;
+	AxisScale = 5.0000001e-002;
+}
+CParticleEvolver_Script	$LOCAL$/CParticleEvolver_Script_7CA3E415
+{
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_BAF899FC";
+}
+CParticleEvolver_Script	$LOCAL$/CParticleEvolver_Script_ABC114A1
+{
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_53EA0F78";
+}
+CParticleState	$LOCAL$/CParticleState_CE0D4DE8
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_0868550B",
+		"$LOCAL$/CParticleEvolver_Field_9CA58BA2",
+		"$LOCAL$/CParticleEvolver_Field_462B472C",
+		"$LOCAL$/CParticleEvolver_Field_45E6EF06",
+		"$LOCAL$/CParticleEvolver_Script_A44865B0",
+	};
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_17AE40FA
+{
+	Times = 
+	{
+		0.0000000e+000,
+		8.8716485e-002,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		5.0000000e-001,
+		1.2889732e-001,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		-1.9520747e-002,
+		-2.0051442e-001,
+		-5.3786136e-002,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_75126435
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Billboard_4E6B0C9C";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_8E1E198F",
+		"$LOCAL$/CParticleFieldDeclaration_C76DDFFE",
+	};
+	Samplers = 
+	{
+		"$LOCAL$/CParticleSamplerShape_E31FDF99",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_0FFFF4D3";
+	States = 
+	{
+		"$LOCAL$/CParticleState_BE2F7A92",
+	};
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_BAF899FC
+{
+	Expression = "function void	Eval()
+{
+	Color *= ColorCoeff;
+}
+";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_C90C42D7
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		5.8194727e-001,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		8.6424053e-001,
+		1.0000000e+000,
+		5.9793162e-001,
+		-3.7973821e-003,
+		1.2826604e-001,
+		5.0000000e-001,
+		2.9896581e-001,
+		9.9860728e-001,
+		1.2658328e-002,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-1.4440831e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		8.4964794e-001,
+		-3.8347566e-001,
+		-8.7001121e-001,
+		-5.2020741e-001,
+		-5.6284004e-001,
+		-2.7547693e-001,
+		-6.2498891e-001,
+		-3.7370074e-001,
+		-4.0432668e-001,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_53EA0F78
+{
+	Expression = "function void	Eval()
+{
+	Color *= ColorCoeff;
+}
+";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_8E1E198F
+{
+	FieldName = "Color";
+	FieldType = float4;
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_5761A79B
+{
+	Name = "Size";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_17AE40FA";
+}
+CParticleSamplerShape	$LOCAL$/CParticleSamplerShape_E31FDF99
+{
+	SamplerName = "Sampler_0";
+	Shape = "$LOCAL$/CShapeDescriptor_6A92B9D0";
+}
+CParticleState	$LOCAL$/CParticleState_BE2F7A92
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_B36183BD",
+		"$LOCAL$/CParticleEvolver_Field_CF395EC4",
+		"$LOCAL$/CParticleEvolver_Localspace_211F1EE6",
+		"$LOCAL$/CParticleEvolver_Script_ABC114A1",
+		"$LOCAL$/CParticleEvolver_Field_5761A79B",
+	};
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_B8FD3C49
+{
+	Expression = "function void	Eval()
+
+
+{
+
+
+	Life = 0.15;
+
+
+	Position = float3(0,0.7,0);
+
+
+}
+
+
+";
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_700A51BA
+{
+	EnableSpawnerIDs = true;
+	Renderer = "$LOCAL$/CParticleRenderer_Billboard_F7641605";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_F8F2BAAC",
+		"$LOCAL$/CParticleFieldDeclaration_991958DF",
+		"$LOCAL$/CParticleFieldDeclaration_1B6F698E",
+		"$LOCAL$/CParticleFieldDeclaration_DB646069",
+		"$LOCAL$/CParticleFieldDeclaration_788DE2E0",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_0066CB23";
+	States = 
+	{
+		"$LOCAL$/CParticleState_92A8E722",
+	};
+}
+CParticleRenderer_Billboard	$LOCAL$/CParticleRenderer_Billboard_F7641605
+{
+	DrawOrder = 3;
+	Diffuse = "Textures/vfx_circle_05.dds";
+	SoftAnimationBlending = true;
+	AxisField = "AxisAlign";
+	Axis2Field = "AxisNormal";
+	AxisScale = 1.0000000e+000;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_F8F2BAAC
+{
+	FieldName = "AxisAlign";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_991958DF
+{
+	FieldName = "AxisNormal";
+	FieldType = float3;
+	TransformFilter = rotate;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_1B6F698E
+{
+	FieldName = "Color";
+	FieldType = float4;
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_8210793F
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		8.6424053e-001,
+		1.0000000e+000,
+		7.8305817e-001,
+		1.0000000e+000,
+		1.2658328e-002,
+		5.2658224e-001,
+		3.6202532e-001,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-2.4814672e+000,
+		0.0000000e+000,
+		-1.3782498e+000,
+		-2.1326609e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_DB646069
+{
+	FieldName = "SizeCoeff";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_788DE2E0
+{
+	FieldName = "ColorCoeff";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_0066CB23
+{
+	Expression = "function void	Eval()
+
+{
+	Life = 0.2;
+	Size = 0.25;
+	AxisAlign = float3(0,1,0);
+	AxisNormal = float3(0,0,1);
+	Position = float3(0,0.75,0);
+	Rotation = rand(-pi,pi);
+	ColorCoeff = 2.5;
+}";
+}
+CParticleState	$LOCAL$/CParticleState_92A8E722
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_FEBA238D",
+		"$LOCAL$/CParticleEvolver_Field_F8BB92D4",
+		"$LOCAL$/CParticleEvolver_Field_52F37E76",
+		"$LOCAL$/CParticleEvolver_Localspace_69C9DE88",
+		"$LOCAL$/CParticleEvolver_FlipBook_B3971BEB",
+		"$LOCAL$/CParticleEvolver_Rotation_CCABA38A",
+		"$LOCAL$/CParticleEvolver_Script_7CA3E415",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_FEBA238D
+{
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_F8BB92D4
+{
+	Name = "Size";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_37B18027";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_37B18027
+{
+	Interpolator = Linear;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		9.8859072e-003,
+		6.6387832e-001,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_52F37E76
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_F8462371";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_F8462371
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		2.4918863e-001,
+		7.4107510e-001,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		8.6424053e-001,
+		1.0000000e+000,
+		5.4856455e-001,
+		-7.9113394e-003,
+		3.8234612e-001,
+		8.4343749e-001,
+		4.6267992e-001,
+		4.6981463e-001,
+		2.9277645e-002,
+		1.5656249e-001,
+		8.5884646e-002,
+		4.0183035e-001,
+		1.2658328e-002,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-6.1835343e-001,
+		0.0000000e+000,
+		0.0000000e+000,
+		-5.3143483e-001,
+		-3.5467267e-001,
+		-2.8033352e-001,
+		-1.5378128e-001,
+		2.6685175e-002,
+		-7.0010692e-001,
+		-5.5336499e-001,
+		-3.0355692e-001,
+		5.2675262e-002,
+		-8.9806788e-002,
+		-5.5336618e-001,
+		-3.0355707e-001,
+		-2.2555168e-001,
+		-4.7273539e-002,
+		-2.9128730e-001,
+		-1.5978989e-001,
+		-1.1872851e-001,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Localspace	$LOCAL$/CParticleEvolver_Localspace_69C9DE88
+{
+	
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_462B472C
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_8210793F";
+}
+CNEdEditorBackdrop_List	$LOCAL$/_BackdropList
+{
+	EditorInfosPosition = int2(-100, -365);
+	BackgroundLayers2D = 
+	{
+		"$LOCAL$/_Backdrop_Brush",
+	};
+}
+CParticleEvolver_FlipBook	$LOCAL$/CParticleEvolver_FlipBook_B3971BEB
+{
+	LastFrameID = 3;
+}
+CParticleEvolver_Rotation	$LOCAL$/CParticleEvolver_Rotation_CCABA38A
+{
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_45E6EF06
+{
+	Name = "ColorCoeff";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_530169B1";
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Gradient
+{
+	Delay = 5.0000001e-002;
+	Descriptor = "$LOCAL$/CParticleDescriptor_8498E29A";
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_C8EF27D3
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Billboard_A366334A";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_D571ACE5",
+		"$LOCAL$/CParticleFieldDeclaration_B86D6C14",
+		"$LOCAL$/CParticleFieldDeclaration_2BCFAA87",
+		"$LOCAL$/CParticleFieldDeclaration_A5987B2E",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_81D69318";
+	States = 
+	{
+		"$LOCAL$/CParticleState_32FD457B",
+	};
+}
+CParticleRenderer_Billboard	$LOCAL$/CParticleRenderer_Billboard_A366334A
+{
+	DrawOrder = 4;
+	BillboardingMaterial = AlphaBlend;
+	Diffuse = "Textures/vfx_burst_fb4x1_01.dds";
+	AtlasDefinition = "AtlasDefinitions/atlasDef_4x1.pkat";
+	BillboardMode = VelocityAxisAligned;
+	Axis2Field = "NormalAxis";
+	AxisScale = 1.0000000e+000;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_D571ACE5
+{
+	FieldName = "AlignAxis";
+	FieldType = float3;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_B86D6C14
+{
+	FieldName = "NormalAxis";
+	FieldType = float3;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_2BCFAA87
+{
+	FieldName = "Color";
+	FieldType = float4;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_A5987B2E
+{
+	FieldName = "ColorCoeff";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_7F602DB3
+{
+	Expression = "function void	Eval()
+{
+	Color *= ColorCoeff;
+}
+";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_81D69318
+{
+	Expression = "function void	Eval()
+
+{
+	Life = rand(0.15,0.2);
+	Position = float3(0,0.7,0);
+	AlignAxis = float3(0,0,1);
+	NormalAxis = float3(0,1,0);
+	Velocity = float3(rand(-1,1),rand(-1,1),rand(0,1)) * 2.5;
+	ColorCoeff = 2.5;
+}";
+}
+CParticleState	$LOCAL$/CParticleState_32FD457B
+{
+	StateName = "State_0";
+	Evolvers = 
+	{
+		"$LOCAL$/CParticleEvolver_Physics_7E147A52",
+		"$LOCAL$/CParticleEvolver_FlipBook_655CF7CD",
+		"$LOCAL$/CParticleEvolver_Field_69492B5C",
+		"$LOCAL$/CParticleEvolver_Field_F5E774B6",
+		"$LOCAL$/CParticleEvolver_Script_8B83EE5A",
+	};
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_7E147A52
+{
+}
+CParticleEvolver_FlipBook	$LOCAL$/CParticleEvolver_FlipBook_655CF7CD
+{
+	AnimationCursor = "";
+	LastFrameID = 3;
+	LoopCount = 1.0000000e+000;
+	RandomizeFirstFrame = true;
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_69492B5C
+{
+	Name = "Size";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_B5E38CAF";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_B5E38CAF
+{
+	Interpolator = Linear;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		6.4116962e-002,
+		3.2311752e-001,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_F5E774B6
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_F79298A1";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_F79298A1
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		2.2890466e-001,
+		5.9989858e-001,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		8.6424053e-001,
+		1.0000000e+000,
+		6.5141273e-001,
+		-7.9113394e-003,
+		3.8234612e-001,
+		9.0926021e-001,
+		4.0097100e-001,
+		9.7582734e-001,
+		2.9277645e-002,
+		8.3947384e-001,
+		3.4917569e-001,
+		7.8853917e-001,
+		1.6772211e-002,
+		3.3322766e-001,
+		5.1424050e-001,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-5.6801945e-001,
+		0.0000000e+000,
+		-4.0782449e-001,
+		-4.8817602e-001,
+		-3.2580230e-001,
+		-8.0352031e-002,
+		-1.4126348e-001,
+		2.4513001e-002,
+		-5.2803934e-001,
+		-1.3022940e-001,
+		-2.2895074e-001,
+		3.9729089e-002,
+		-6.7734681e-002,
+		-8.0497332e-002,
+		1.7852644e-002,
+		-6.4812899e-001,
+		-7.3049016e-002,
+		-8.6813003e-002,
+		1.9253328e-002,
+		-6.9897997e-001,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_0868550B
+{
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_C63303DD
+{
+	Interpolator = Linear;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		1.0672420e-001,
+		1.4300381e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Script	$LOCAL$/CParticleEvolver_Script_8B83EE5A
+{
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_33F8BBB5";
+}
+CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_33F8BBB5
+{
+	Expression = "function void	Eval()
+{
+	Color *= ColorCoeff;
+}
+";
+}
+CActionFactoryParticleSpawnerBase	$LOCAL$/Burst_Out
+{
+	Descriptor = "$LOCAL$/CParticleDescriptor_C8EF27D3";
+	SpawnCount = 5.0000000e+000;
+}
+CParticleEvolver_Script	$LOCAL$/CParticleEvolver_Script_A44865B0
+{
+	Expression = "$LOCAL$/CCompilerSyntaxNodeExpression_7F602DB3";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_530169B1
+{
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		3.0000000e+000,
+		3.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleDescriptor	$LOCAL$/CParticleDescriptor_8498E29A
+{
+	Renderer = "$LOCAL$/CParticleRenderer_Billboard_B65ADEF5";
+	CustomFields = 
+	{
+		"$LOCAL$/CParticleFieldDeclaration_9D2E15E4",
+		"$LOCAL$/CParticleFieldDeclaration_A818ED17",
+	};
+	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_B8FD3C49";
+	States = 
+	{
+		"$LOCAL$/CParticleState_CE0D4DE8",
+	};
+}
+CParticleRenderer_Billboard	$LOCAL$/CParticleRenderer_Billboard_B65ADEF5
+{
+	Diffuse = "Textures/vfx_circle_03.dds";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_9D2E15E4
+{
+	FieldName = "Color";
+	FieldType = float4;
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_A818ED17
+{
+	FieldName = "ColorCoeff";
+}
+CActionFactorySound	$LOCAL$/SoundLayer_1
+{
+	EventStart = "Play_ablty_pirate_blunderbust_hit";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_0D6E3582
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		8.6424053e-001,
+		1.0000000e+000,
+		3.5932404e-001,
+		1.0000000e+000,
+		1.2658328e-002,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-2.4814672e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-2.1326609e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_FE08616D
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_0D6E3582";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_10778ED6
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		8.6424053e-001,
+		1.0000000e+000,
+		5.4856455e-001,
+		1.0000000e+000,
+		1.2658328e-002,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-2.4814672e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-2.1326609e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_D7F94B51
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_10778ED6";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_7A8DD5EA
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		2.4918863e-001,
+		7.4107510e-001,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		8.6424053e-001,
+		1.0000000e+000,
+		5.4856455e-001,
+		-7.9113394e-003,
+		3.8234612e-001,
+		8.4343749e-001,
+		4.6267992e-001,
+		4.6981463e-001,
+		2.9277645e-002,
+		1.5656249e-001,
+		8.5884646e-002,
+		4.0183035e-001,
+		1.2658328e-002,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-6.1835343e-001,
+		0.0000000e+000,
+		0.0000000e+000,
+		-5.3143483e-001,
+		-3.5467267e-001,
+		-2.8033352e-001,
+		-1.5378128e-001,
+		2.6685175e-002,
+		-7.0010692e-001,
+		-5.5336499e-001,
+		-3.0355692e-001,
+		5.2675262e-002,
+		-8.9806788e-002,
+		-5.5336618e-001,
+		-3.0355707e-001,
+		-2.2555168e-001,
+		-4.7273539e-002,
+		-2.9128730e-001,
+		-1.5978989e-001,
+		-1.1872851e-001,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_811ED5F5
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_7A8DD5EA";
+}
+CParticleSamplerCurve	$LOCAL$/CParticleSamplerCurve_81333EBE
+{
+	ValueType = Float4;
+	Times = 
+	{
+		0.0000000e+000,
+		1.0000000e+000,
+	};
+	FloatValues = 
+	{
+		8.6424053e-001,
+		1.0000000e+000,
+		5.9793162e-001,
+		1.0000000e+000,
+		1.2658328e-002,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	FloatTangents = 
+	{
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-2.4814672e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		-2.1326609e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+		0.0000000e+000,
+	};
+	MinLimits = float4(0.0000000e+000, 0.0000000e+000, 0.0000000e+000, 0.0000000e+000);
+}
+CParticleEvolver_Field	$LOCAL$/CParticleEvolver_Field_634D4559
+{
+	Name = "Color";
+	Evaluator = "$LOCAL$/CParticleSamplerCurve_81333EBE";
+}

@@ -1,0 +1,39 @@
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+KFloat eyeSpaceDepth(KFloat sampleValue)
+{
+#if (KIWI_HLSL == 1) || (KIWI_PSSL == 1)
+  KFloat z_e = (-zNear * zFar) / (sampleValue * (zFar - zNear) - zFar);
+#else
+  KFloat z_e = 2.0 * zNear * zFar / (zFar + zNear - sampleValue * (zFar - zNear));
+#endif
+
+	return z_e;
+}
+
+
+KPSMain(PostEffectBloomDepthCutoffPS)
+{
+  KFloat centerDepth = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0)).x;
+  
+  KFloat4 blurColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0) + KFloat2(0.0,  KInput(kernelCoords)[0].y));    
+  
+  if ( eyeSpaceDepth(centerDepth) > 500)                              
+  {
+    blurColor.w = 1.0;
+  }
+  else
+  {
+    blurColor.w = 0.0;
+  }
+  
+  KPSOutput(blurColor);  
+  
+}
+

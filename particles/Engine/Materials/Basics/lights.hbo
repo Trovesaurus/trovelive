@@ -1,0 +1,1769 @@
+CMaterial	$LOCAL$/_Internal_LightBuffer_VolumeStencilPass_BACK
+{
+	EditorInfosPosition = int2(1878, 47);
+	GraphicsObject = $LOCAL$/CMaterialGraphics_00004AE1;
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_00004AE1
+{
+	EditorInfosPosition = int2(1695, 49);
+	Color = $LOCAL$/CMaterialMathsConstant3_00006952.Result;
+	CullMode = Front;
+	DepthTest = false;
+	DepthWrite = false;
+	CastShadows = false;
+	StencilFunc = None;
+}
+CMaterialMathsConstant3	$LOCAL$/CMaterialMathsConstant3_00006952
+{
+	EditorInfosPosition = int2(1461, 83);
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_8E413266
+{
+	EditorInfosPosition = int2(72, -21);
+	Input0 = $LOCAL$/CMaterialMathsAdd_EA94878C.Result;
+	Input1 = $LOCAL$/CMaterialMathsAdd_EA94878C.Result;
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_0000390C
+{
+	EditorInfosPosition = int2(1694, 159);
+	Color = $LOCAL$/CMaterialMathsConstant3_00006952.Result;
+	DepthTest = false;
+	DepthWrite = false;
+	CastShadows = false;
+	StencilFunc = None;
+}
+CMaterial	$LOCAL$/_Internal_LightBuffer_VolumeStencilPass_FRONT
+{
+	EditorInfosPosition = int2(1872, 158);
+	GraphicsObject = $LOCAL$/CMaterialGraphics_0000390C;
+}
+CMaterialMathsConstant3	$LOCAL$/LightColor_RGB
+{
+	EditorInfosPosition = int2(189, 442);
+	FloatValue = float3(1.0000000e-001, 0.0000000e+000, 1.0000000e-001);
+	GetFromParameter = "LightColor";
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_00003D6C
+{
+	EditorInfosPosition = int2(1519, 442);
+	CustomRenderTargets = 
+	{
+		$LOCAL$/CMaterialGraphicsRTChooser_0032B3FB,
+	};
+	CullMode = Front;
+	AlphaBlendMode = Additive;
+	DepthTest = false;
+	DepthWrite = false;
+	CastShadows = false;
+	StencilFunc = None;
+}
+CMaterial	$LOCAL$/_Internal_LightBuffer_VolumeStencilPass_LIGHTSHADOW
+{
+	EditorInfosPosition = int2(1679, 432);
+	GraphicsObject = $LOCAL$/CMaterialGraphics_00003D6C;
+}
+CMaterialTexture	$LOCAL$/_Z
+{
+	EditorInfosPosition = int2(-1786, 747);
+	Filtering = Point;
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	UseHalfPixelOffset = true;
+	TextureOverride = $LOCAL$/SceneDepthBuffer;
+	Texcoords = $LOCAL$/NormalizedScreenspacePos_0_1.Result;
+}
+CMaterialParameterExporter	$LOCAL$/SceneDepthBuffer
+{
+	EditorInfosPosition = int2(-1965, 751);
+	ParameterName = "SceneDepthBuffer";
+}
+CMaterialVertexStreamPositions	$LOCAL$/CMaterialVertexStreamPositions_00005F90
+{
+	EditorInfosPosition = int2(-2206, 540);
+}
+CMaterialMathsCoordinateSpaceConverter	$LOCAL$/CMaterialMathsCoordinateSpaceConverter_00006DF1
+{
+	EditorInfosPosition = int2(-2062, 541);
+	Input = $LOCAL$/CMaterialVertexStreamPositions_00005F90.Positions;
+	TargetSpace = ViewSpace;
+	RotationsOnly = false;
+}
+CMaterialMathsMadd	$LOCAL$/NormalizedScreenspacePos_0_1
+{
+	EditorInfosPosition = int2(-2040, 876);
+	Input = $LOCAL$/ClipSpace_XY_M1_P1.Result;
+	AddOperand = $LOCAL$/CMaterialMathsConstant2_2FD064E8.Result;
+	MulOperand = $LOCAL$/CMaterialMathsConstant2_F1D95AA2.Result;
+	AddCoeff = 1.0000000e+000;
+	MulCoeff = 5.0000000e-001;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_00007E87
+{
+	EditorInfosPosition = int2(-1906, 540);
+	Input = $LOCAL$/CMaterialMathsCoordinateSpaceConverter_00006DF1.Result;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/ReconstructedViewspacePosition
+{
+	EditorInfosPosition = int2(-1536, 555);
+	x = $LOCAL$/CMaterialMathsDiv_00006784.Result;
+	y = $LOCAL$/CMaterialMathsDiv_00004AE1.Result;
+	z = $LOCAL$/CMaterialMathsConstant_00000099.Result;
+}
+CMaterialMathsSub	$LOCAL$/FragmentToLight
+{
+	EditorInfosPosition = int2(-893, 691);
+	Input0 = $LOCAL$/LightPositionInViewSpace.Result;
+	Input1 = $LOCAL$/FragmentPositionInViewSpace.Result;
+}
+CMaterialMathsDot	$LOCAL$/_Dist_To_Light_SQ
+{
+	EditorInfosPosition = int2(-712, 645);
+	Input0 = $LOCAL$/FragmentToLight.Result;
+	Input1 = $LOCAL$/FragmentToLight.Result;
+}
+CMaterialMathsMul	$LOCAL$/_RGB_x_N_Dot_L_x_Att
+{
+	EditorInfosPosition = int2(481, 342);
+	Input0 = $LOCAL$/_Att.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_23CAC3E9.Result;
+}
+CMaterialVertexStreamPositions	$LOCAL$/CMaterialVertexStreamPositions_00001649
+{
+	EditorInfosPosition = int2(-3239, 794);
+}
+CMaterialMathsInv	$LOCAL$/_Att
+{
+	EditorInfosPosition = int2(-548, 652);
+	Input = $LOCAL$/_Dist_To_Light_SQ.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_00004AE1
+{
+	EditorInfosPosition = int2(-1715, 579);
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_00007E87.y;
+	Input1 = $LOCAL$/CMaterialMathsVectorSplitter_00007E87.z;
+}
+CMaterialMathsCoordinateSpaceConverter	$LOCAL$/CMaterialMathsCoordinateSpaceConverter_00005AF1
+{
+	EditorInfosPosition = int2(-2733, 817);
+	Input = $LOCAL$/CMaterialMathsVectorBuilder_000001EB.Result;
+	TargetSpace = ClipSpace;
+	RotationsOnly = false;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_000001EB
+{
+	EditorInfosPosition = int2(-2886, 819);
+	x = $LOCAL$/CMaterialMathsVectorSplitter_000026E9.x;
+	y = $LOCAL$/CMaterialMathsVectorSplitter_000026E9.y;
+	z = $LOCAL$/CMaterialMathsVectorSplitter_000026E9.z;
+	w = $LOCAL$/CMaterialMathsConstant_00000BB3.Result;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/ClipSpace_XY_M1_P1
+{
+	EditorInfosPosition = int2(-2245, 819);
+	x = $LOCAL$/CMaterialMathsDiv_000012DB.Result;
+	y = $LOCAL$/CMaterialMathsDiv_00002EA6.Result;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_000026E9
+{
+	EditorInfosPosition = int2(-3081, 794);
+	Input = $LOCAL$/CMaterialVertexStreamPositions_00001649.Positions;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_000012DB
+{
+	EditorInfosPosition = int2(-2394, 791);
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_00006952.x;
+	Input1 = $LOCAL$/CMaterialMathsVectorSplitter_00006952.w;
+}
+CMaterialMathsMul	$LOCAL$/FragmentPositionInViewSpace
+{
+	EditorInfosPosition = int2(-1125, 755);
+	Input0 = $LOCAL$/ReconstructedViewspacePosition.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_000012DB.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_00002EA6
+{
+	EditorInfosPosition = int2(-2397, 864);
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_00006952.y;
+	Input1 = $LOCAL$/CMaterialMathsVectorSplitter_00006952.w;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_3E6F20BA
+{
+	EditorInfosPosition = int2(283, 1086);
+	Input0 = $LOCAL$/CMaterialMathsMul_00001953.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant3_00004CD4.Result;
+}
+CMaterialParameterExporter	$LOCAL$/SceneNormalBuffer
+{
+	EditorInfosPosition = int2(-573, 548);
+	ParameterName = "SceneNormalBuffer";
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_134B3400
+{
+	EditorInfosPosition = int2(-384, 549);
+	Filtering = Point;
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	UseHalfPixelOffset = true;
+	TextureOverride = $LOCAL$/SceneNormalBuffer;
+	Texcoords = $LOCAL$/NormalizedScreenspacePos_0_1.Result;
+}
+CMaterialMathsNormalize	$LOCAL$/_L
+{
+	EditorInfosPosition = int2(-550, 717);
+	Input = $LOCAL$/FragmentToLight.Result;
+}
+CMaterialMathsDot	$LOCAL$/_N_Dot_L
+{
+	EditorInfosPosition = int2(48, 306);
+	Input0 = $LOCAL$/_L.Result;
+	Input1 = $LOCAL$/_N.OutputNormalXYZ;
+}
+CMaterialMathsConstant3	$LOCAL$/LightPositionInViewSpace
+{
+	EditorInfosPosition = int2(-1102, 692);
+	GetFromParameter = "LightPosition";
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_00000099
+{
+	EditorInfosPosition = int2(-1713, 648);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_000012DB
+{
+	EditorInfosPosition = int2(-1303, 781);
+	Input0 = $LOCAL$/CMaterialMathsDepthDecode_520C3609.OutputDecodedDepth;
+	Input1 = $LOCAL$/CMaterialMathsConstant_00000F3E.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_00006784
+{
+	EditorInfosPosition = int2(-1718, 510);
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_00007E87.x;
+	Input1 = $LOCAL$/CMaterialMathsVectorSplitter_00007E87.z;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_00006952
+{
+	EditorInfosPosition = int2(-2585, 815);
+	Input = $LOCAL$/CMaterialMathsCoordinateSpaceConverter_00005AF1.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_00000BB3
+{
+	EditorInfosPosition = int2(-3075, 883);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_00000F3E
+{
+	EditorInfosPosition = int2(-1438, 810);
+	FloatValue = -1.0000000e+000;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_00000029
+{
+	EditorInfosPosition = int2(1038, 451);
+	Input = $LOCAL$/_RGB_x_N_Dot_L_x_Att.Result;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_000018BE
+{
+	EditorInfosPosition = int2(1215, 498);
+	x = $LOCAL$/CMaterialMathsVectorSplitter_00000029.x;
+	y = $LOCAL$/CMaterialMathsVectorSplitter_00000029.y;
+	z = $LOCAL$/CMaterialMathsVectorSplitter_00000029.z;
+	w = $LOCAL$/CMaterialMathsMul_C2E7A3B1.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_04A13763
+{
+	EditorInfosPosition = int2(571, 579);
+	FloatValue = 2.7182817e+000;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_17D80FCB
+{
+	EditorInfosPosition = int2(-151, 605);
+	x = $LOCAL$/CMaterialTexture_134B3400.r;
+	y = $LOCAL$/CMaterialTexture_134B3400.g;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_14068FFF
+{
+	EditorInfosPosition = int2(-22, 1667);
+	x = $LOCAL$/CMaterialTexture_DF3AF0B6.r;
+	y = $LOCAL$/CMaterialTexture_DF3AF0B6.g;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_5652E411
+{
+	EditorInfosPosition = int2(301, 660);
+	FloatValue = 4.0000000e+000;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_92E63671
+{
+	EditorInfosPosition = int2(92, 2442);
+	x = $LOCAL$/CMaterialTexture_46CD2D72.r;
+	y = $LOCAL$/CMaterialTexture_46CD2D72.g;
+}
+CMaterialMathsMul	$LOCAL$/_N_Dot_L_x_Shadow
+{
+	EditorInfosPosition = int2(235, 304);
+	Input0 = $LOCAL$/ShadowTerm.ShadowCoeff;
+	Input1 = $LOCAL$/CMaterialMathsMax_00006784.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_6B22449A
+{
+	EditorInfosPosition = int2(647, 605);
+	Input = $LOCAL$/CMaterialMathsConstant_04A13763.Result;
+	Exponent = $LOCAL$/CMaterialMathsNeg_A6C6B8F5.Result;
+}
+CMaterialMathsMax	$LOCAL$/CMaterialMathsMax_00006784
+{
+	EditorInfosPosition = int2(84, 390);
+	Input0 = $LOCAL$/_N_Dot_L.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant_00004AE1.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_00004AE1
+{
+	EditorInfosPosition = int2(-111, 425);
+}
+CMaterialGraphicsShadow	$LOCAL$/ShadowTerm
+{
+	EditorInfosPosition = int2(154, 226);
+	Position = $LOCAL$/FragmentPositionInViewSpace.Result;
+	NDotL = $LOCAL$/_N_Dot_L.Result;
+	FragmentToLight = $LOCAL$/_L.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_CC50B981
+{
+	EditorInfosPosition = int2(509, 495);
+	Input0 = $LOCAL$/CMaterialTexture_134B3400.b;
+	Input1 = $LOCAL$/CMaterialMathsSub_DC567C03.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_004AB2AD
+{
+	EditorInfosPosition = int2(270, 536);
+	FloatValue = 5.0000000e+000;
+}
+CMaterialMathsDot	$LOCAL$/_V_Dot_H
+{
+	EditorInfosPosition = int2(186, 517);
+	Input0 = $LOCAL$/_V.Result;
+	Input1 = $LOCAL$/_H.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_6C413C63
+{
+	EditorInfosPosition = int2(863, 484);
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_BC8B3708.x;
+	Input1 = $LOCAL$/CMaterialMathsPow_9BF1BEA2.Result;
+}
+CMaterialMathsAdd	$LOCAL$/_FresnelReflectance
+{
+	EditorInfosPosition = int2(582, 525);
+	Input0 = $LOCAL$/CMaterialMathsMul_CC50B981.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_FA6866B2.Result;
+}
+CMaterialMathsNormalize	$LOCAL$/CMaterialMathsNormalize_9EDA6ADD
+{
+	EditorInfosPosition = int2(-691, 755);
+	Input = $LOCAL$/FragmentPositionInViewSpace.Result;
+}
+CMaterialMathsAdd	$LOCAL$/CMaterialMathsAdd_A7F0D724
+{
+	EditorInfosPosition = int2(583, 1301);
+	Input0 = $LOCAL$/CMaterialMathsMul_EBEDD5A3.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_8D3E52DC.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_E40AD051
+{
+	EditorInfosPosition = int2(302, 1436);
+	FloatValue = 4.0000000e+000;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_10D0C407
+{
+	EditorInfosPosition = int2(375, 1458);
+	Input = $LOCAL$/CMaterialTexture_000013E9.a;
+	Exponent = $LOCAL$/CMaterialMathsConstant_35E84ECA.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_F71AE298
+{
+	EditorInfosPosition = int2(435, 1366);
+	Input = $LOCAL$/CMaterialMathsTan_8DDB2EAE.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_4C2C6394.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_4C2C6394
+{
+	EditorInfosPosition = int2(370, 1382);
+	FloatValue = 2.0000000e+000;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_3391D836
+{
+	EditorInfosPosition = int2(181, 1257);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_8D3E52DC
+{
+	EditorInfosPosition = int2(347, 1297);
+	Input = $LOCAL$/CMaterialMathsSub_AB816E21.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_DF02162F.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_EA0569DA
+{
+	EditorInfosPosition = int2(345, 1261);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_0FE5C953
+{
+	EditorInfosPosition = int2(224, 1359);
+	Input0 = $LOCAL$/CMaterialMathsNormalDecode_4C315B62.OutputNormalXYZ;
+	Input1 = $LOCAL$/CMaterialMathsNormalize_FB1412DF.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_1B054AB9
+{
+	EditorInfosPosition = int2(464, 1448);
+	Input0 = $LOCAL$/CMaterialMathsPow_A44EB1D0.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_10D0C407.Result;
+}
+CMaterialMathsNeg	$LOCAL$/CMaterialMathsNeg_60D2954D
+{
+	EditorInfosPosition = int2(571, 1394);
+	Input = $LOCAL$/CMaterialMathsDiv_E6CE56FB.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_38FDB640
+{
+	EditorInfosPosition = int2(344, 485);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_90AA1E8F
+{
+	EditorInfosPosition = int2(268, 500);
+	Input0 = $LOCAL$/CMaterialMathsConstant_EEC37ABC.Result;
+	Input1 = $LOCAL$/_V_Dot_H.Result;
+}
+CMaterialParameterExporter	$LOCAL$/CMaterialParameterExporter_00003CD5
+{
+	EditorInfosPosition = int2(-339, 1126);
+	ParameterName = "SceneNormalBuffer";
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_000013E9
+{
+	EditorInfosPosition = int2(-250, 1118);
+	Filtering = Point;
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	UseHalfPixelOffset = true;
+	TextureOverride = $LOCAL$/CMaterialParameterExporter_00003CD5;
+	Texcoords = $LOCAL$/NormalizedScreenspacePos_0_1.Result;
+}
+CMaterialMathsNormalize	$LOCAL$/CMaterialMathsNormalize_FB1412DF
+{
+	EditorInfosPosition = int2(145, 1377);
+	Input = $LOCAL$/CMaterialMathsAdd_2FA4E94C.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_00DE2DA2
+{
+	EditorInfosPosition = int2(790, 617);
+	Input0 = $LOCAL$/_FresnelReflectance.Result;
+	Input1 = $LOCAL$/CMaterialMathsDiv_6C381F0B.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_0B78440B
+{
+	EditorInfosPosition = int2(720, 532);
+	FloatValue = 5.0000000e-001;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_8432367E
+{
+	EditorInfosPosition = int2(644, 465);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_C496359A
+{
+	EditorInfosPosition = int2(781, 485);
+	Input0 = $LOCAL$/CMaterialMathsSub_4AA52C17.Result;
+	Input1 = $LOCAL$/CMaterialMathsSub_4AA52C17.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_FA6866B2
+{
+	EditorInfosPosition = int2(346, 521);
+	Input = $LOCAL$/CMaterialMathsSub_90AA1E8F.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_004AB2AD.Result;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_4AA52C17
+{
+	EditorInfosPosition = int2(712, 484);
+	Input0 = $LOCAL$/CMaterialMathsConstant_8432367E.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_AA50DF5D.Result;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_00007983
+{
+	EditorInfosPosition = int2(38, 1058);
+	Input0 = $LOCAL$/_L.Result;
+	Input1 = $LOCAL$/CMaterialMathsNormalDecode_4C315B62.OutputNormalXYZ;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_9BF1BEA2
+{
+	EditorInfosPosition = int2(785, 516);
+	Input = $LOCAL$/_Att.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_0B78440B.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_C314B1E1
+{
+	EditorInfosPosition = int2(434, 590);
+	Input = $LOCAL$/CMaterialMathsTan_3FAB756E.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_32ACA454.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_32ACA454
+{
+	EditorInfosPosition = int2(369, 606);
+	FloatValue = 2.0000000e+000;
+}
+CMaterialMathsNormalDecode	$LOCAL$/CMaterialMathsNormalDecode_4C315B62
+{
+	EditorInfosPosition = int2(-109, 1136);
+	InputEncoding = $LOCAL$/CMaterialMathsVectorBuilder_49FE949D.Result;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_A49C695E
+{
+	EditorInfosPosition = int2(142, 649);
+	Input0 = $LOCAL$/CMaterialMathsAdd_2C9F7679.Result;
+	Input1 = $LOCAL$/CMaterialMathsAdd_2C9F7679.Result;
+}
+CMaterialMathsACos	$LOCAL$/CMaterialMathsACos_1AF39A25
+{
+	EditorInfosPosition = int2(302, 570);
+	Input = $LOCAL$/_N_Dot_H.Result;
+}
+CMaterialMathsMax	$LOCAL$/CMaterialMathsMax_00005039
+{
+	EditorInfosPosition = int2(132, 1086);
+	Input0 = $LOCAL$/CMaterialMathsDot_00007983.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant_0000542C.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_0000542C
+{
+	EditorInfosPosition = int2(40, 1110);
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_00001953
+{
+	EditorInfosPosition = int2(206, 1053);
+	Input0 = $LOCAL$/CMaterialGraphicsShadow_BC8B8C84.ShadowCoeff;
+	Input1 = $LOCAL$/CMaterialMathsMax_00005039.Result;
+}
+CMaterialMathsConstant3	$LOCAL$/CMaterialMathsConstant3_00004CD4
+{
+	EditorInfosPosition = int2(199, 1121);
+	FloatValue = float3(1.0000000e-001, 0.0000000e+000, 1.0000000e-001);
+	GetFromParameter = "LightColor";
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_00005FA4
+{
+	EditorInfosPosition = int2(424, 1063);
+	Input0 = $LOCAL$/_Att.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_3E6F20BA.Result;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_00002059
+{
+	EditorInfosPosition = int2(1046, 1078);
+	Input = $LOCAL$/CMaterialMathsMul_00005FA4.Result;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_0000127E
+{
+	EditorInfosPosition = int2(1137, 1096);
+	x = $LOCAL$/CMaterialMathsVectorSplitter_00002059.x;
+	y = $LOCAL$/CMaterialMathsVectorSplitter_00002059.y;
+	z = $LOCAL$/CMaterialMathsVectorSplitter_00002059.z;
+	w = $LOCAL$/CMaterialMathsMul_6005161D.Result;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_1B830BD7
+{
+	EditorInfosPosition = int2(-92, -264);
+	x = $LOCAL$/CMaterialTexture_53655375.r;
+	y = $LOCAL$/CMaterialTexture_53655375.g;
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_000001D3
+{
+	EditorInfosPosition = int2(1296, 1064);
+	CustomRenderTargets = 
+	{
+		$LOCAL$/CMaterialGraphicsRTChooser_BB4152A3,
+	};
+	CullMode = Front;
+	AlphaBlendMode = Additive;
+	DepthTest = false;
+	DepthWrite = false;
+	CastShadows = false;
+	StencilFunc = None;
+}
+CMaterial	$LOCAL$/_Internal_LightBuffer_VolumeStencilPass_SPOTLIGHT
+{
+	EditorInfosPosition = int2(1481, 1064);
+	GraphicsObject = $LOCAL$/CMaterialGraphics_000001D3;
+}
+CMaterialMathsNormalize	$LOCAL$/_H
+{
+	EditorInfosPosition = int2(144, 601);
+	Input = $LOCAL$/CMaterialMathsAdd_2C9F7679.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_B9B3398A
+{
+	EditorInfosPosition = int2(303, 695);
+	FloatValue = 2.0000000e+000;
+}
+CMaterialMathsMax	$LOCAL$/CMaterialMathsMax_45C3E54B
+{
+	EditorInfosPosition = int2(939, 1423);
+	Input0 = $LOCAL$/CMaterialMathsConstant_D0D07328.Result;
+	Input1 = $LOCAL$/CMaterialMathsDiv_E7A3DAE2.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_6875BEBE
+{
+	EditorInfosPosition = int2(713, 1396);
+	Input0 = $LOCAL$/CMaterialMathsPow_86E5A957.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_1B054AB9.Result;
+}
+CMaterialMathsConstant2	$LOCAL$/CMaterialMathsConstant2_F1D95AA2
+{
+	EditorInfosPosition = int2(-2220, 968);
+	FloatValue = float2(5.0000000e-001, -5.0000000e-001);
+}
+CMaterialMathsConstant2	$LOCAL$/CMaterialMathsConstant2_2FD064E8
+{
+	EditorInfosPosition = int2(-2224, 908);
+	FloatValue = float2(1.0000000e+000, -1.0000000e+000);
+}
+CMaterialMathsDot	$LOCAL$/_N_Dot_H
+{
+	EditorInfosPosition = int2(223, 583);
+	Input0 = $LOCAL$/_N.OutputNormalXYZ;
+	Input1 = $LOCAL$/_H.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_56AF16F6
+{
+	EditorInfosPosition = int2(463, 672);
+	Input0 = $LOCAL$/CMaterialMathsPow_ADF57690.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_30C301C7.Result;
+}
+CMaterialGraphicsRTChooser	$LOCAL$/CMaterialGraphicsRTChooser_0032B3FB
+{
+	EditorInfosPosition = int2(1363, 511);
+	RenderTargetName = "SceneIrradiance";
+	OutputFragment = $LOCAL$/CMaterialMathsVectorBuilder_000018BE.Result;
+}
+CMaterialGraphicsRTChooser	$LOCAL$/CMaterialGraphicsRTChooser_BB4152A3
+{
+	EditorInfosPosition = int2(1212, 1111);
+	RenderTargetName = "SceneIrradiance";
+	OutputFragment = $LOCAL$/CMaterialMathsVectorBuilder_0000127E.Result;
+}
+CMaterialMathsAdd	$LOCAL$/CMaterialMathsAdd_EA94878C
+{
+	EditorInfosPosition = int2(-2, -56);
+	Input0 = $LOCAL$/_L.Result;
+	Input1 = $LOCAL$/_V.Result;
+}
+CMaterialMathsConstant3	$LOCAL$/CMaterialMathsConstant3_815F2512
+{
+	EditorInfosPosition = int2(398, -273);
+	FloatValue = float3(1.0000000e-001, 0.0000000e+000, 1.0000000e-001);
+	GetFromParameter = "LightColor";
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_3117F78D
+{
+	EditorInfosPosition = int2(1181, -181);
+	CustomRenderTargets = 
+	{
+		$LOCAL$/CMaterialGraphicsRTChooser_5DF43EE7,
+	};
+	CullMode = Front;
+	AlphaBlendMode = Additive;
+	DepthTest = false;
+	DepthWrite = false;
+	CastShadows = false;
+	StencilFunc = None;
+}
+CMaterial	$LOCAL$/_Internal_LightBuffer_VolumeStencilPass_LIGHTSHADOWPROJECTOR
+{
+	EditorInfosPosition = int2(1376, -182);
+	GraphicsObject = $LOCAL$/CMaterialGraphics_3117F78D;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_A69B7D68
+{
+	EditorInfosPosition = int2(793, -48);
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_3EF13722
+{
+	EditorInfosPosition = int2(794, -9);
+	Input0 = $LOCAL$/CMaterialMathsMul_8DCA81C9.Result;
+	Input1 = $LOCAL$/CMaterialMathsDot_8E413266.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_5DE98461
+{
+	EditorInfosPosition = int2(493, -302);
+	Input0 = $LOCAL$/CMaterialMathsMul_F8073586.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant3_815F2512.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_FB5E015D
+{
+	EditorInfosPosition = int2(935, -34);
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_2DC9CC01.x;
+	Input1 = $LOCAL$/CMaterialMathsMax_D1DBC68B.Result;
+}
+CMaterialGraphicsSaturate	$LOCAL$/CMaterialGraphicsSaturate_EDA86E03
+{
+	EditorInfosPosition = int2(793, 1272);
+	SaturationLevel = 0.0000000e+000;
+	InputColor = $LOCAL$/CMaterialMathsMul_00005FA4.Result;
+}
+CMaterialParameterExporter	$LOCAL$/CMaterialParameterExporter_9EDE111A
+{
+	EditorInfosPosition = int2(-251, -283);
+	ParameterName = "SceneNormalBuffer";
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_53655375
+{
+	EditorInfosPosition = int2(-162, -291);
+	Filtering = Point;
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	UseHalfPixelOffset = true;
+	TextureOverride = $LOCAL$/CMaterialParameterExporter_9EDE111A;
+	Texcoords = $LOCAL$/NormalizedScreenspacePos_0_1.Result;
+}
+CMaterialMathsMax	$LOCAL$/CMaterialMathsMax_D1DBC68B
+{
+	EditorInfosPosition = int2(867, -23);
+	Input0 = $LOCAL$/CMaterialMathsConstant_A69B7D68.Result;
+	Input1 = $LOCAL$/CMaterialMathsDiv_3EF13722.Result;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_9ACB0597
+{
+	EditorInfosPosition = int2(191, -319);
+	Input0 = $LOCAL$/CMaterialMathsNormalDecode_7F8D0BA4.OutputNormalXYZ;
+	Input1 = $LOCAL$/_L.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_8DCA81C9
+{
+	EditorInfosPosition = int2(719, -53);
+	Input0 = $LOCAL$/CMaterialMathsAdd_0800ED64.Result;
+	Input1 = $LOCAL$/CMaterialMathsDiv_791086FE.Result;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_393418C9
+{
+	EditorInfosPosition = int2(960, -165);
+	Input = $LOCAL$/CMaterialMathsMul_4E92AFDF.Result;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_757AB868
+{
+	EditorInfosPosition = int2(1042, -139);
+	x = $LOCAL$/CMaterialMathsVectorSplitter_393418C9.x;
+	y = $LOCAL$/CMaterialMathsVectorSplitter_393418C9.y;
+	z = $LOCAL$/CMaterialMathsVectorSplitter_393418C9.z;
+	w = $LOCAL$/CMaterialMathsMul_FB5E015D.Result;
+}
+CMaterialMathsTan	$LOCAL$/CMaterialMathsTan_3FAB756E
+{
+	EditorInfosPosition = int2(368, 571);
+	Input = $LOCAL$/CMaterialMathsACos_1AF39A25.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_4BCB4D20
+{
+	EditorInfosPosition = int2(503, 617);
+	Input0 = $LOCAL$/CMaterialMathsPow_C314B1E1.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_30C301C7.Result;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_9C8AA226
+{
+	EditorInfosPosition = int2(143, 1425);
+	Input0 = $LOCAL$/CMaterialMathsAdd_2FA4E94C.Result;
+	Input1 = $LOCAL$/CMaterialMathsAdd_2FA4E94C.Result;
+}
+CMaterialMathsNeg	$LOCAL$/CMaterialMathsNeg_A6C6B8F5
+{
+	EditorInfosPosition = int2(570, 618);
+	Input = $LOCAL$/CMaterialMathsDiv_4BCB4D20.Result;
+}
+CMaterialMathsMax	$LOCAL$/CMaterialMathsMax_45F8F92C
+{
+	EditorInfosPosition = int2(938, 647);
+	Input0 = $LOCAL$/CMaterialMathsConstant_8A911DDD.Result;
+	Input1 = $LOCAL$/CMaterialMathsDiv_3BEF633F.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_F8073586
+{
+	EditorInfosPosition = int2(383, -312);
+	Input0 = $LOCAL$/CMaterialGraphicsShadow_C300F02A.IlluminationMask;
+	Input1 = $LOCAL$/CMaterialMathsMax_EA0EE030.Result;
+}
+CMaterialMathsNormalDecode	$LOCAL$/_N
+{
+	EditorInfosPosition = int2(-83, 526);
+	InputEncoding = $LOCAL$/CMaterialMathsVectorBuilder_17D80FCB.Result;
+}
+CMaterialMathsMax	$LOCAL$/CMaterialMathsMax_EA0EE030
+{
+	EditorInfosPosition = int2(268, -272);
+	Input0 = $LOCAL$/CMaterialMathsDot_9ACB0597.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant_D616BE33.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_D616BE33
+{
+	EditorInfosPosition = int2(186, -256);
+}
+CMaterialGraphicsShadow	$LOCAL$/CMaterialGraphicsShadow_C300F02A
+{
+	EditorInfosPosition = int2(276, -356);
+	UseLightTextures = true;
+	Position = $LOCAL$/FragmentPositionInViewSpace.Result;
+	NDotL = $LOCAL$/CMaterialMathsDot_9ACB0597.Result;
+	FragmentToLight = $LOCAL$/_L.Result;
+}
+CMaterialMathsNeg	$LOCAL$/_V
+{
+	EditorInfosPosition = int2(-550, 780);
+	Input = $LOCAL$/CMaterialMathsNormalize_9EDA6ADD.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_C2E7A3B1
+{
+	EditorInfosPosition = int2(1006, 636);
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_BC8B3708.x;
+	Input1 = $LOCAL$/CMaterialMathsMax_45F8F92C.Result;
+}
+CMaterialGraphicsRTChooser	$LOCAL$/CMaterialGraphicsRTChooser_5DF43EE7
+{
+	EditorInfosPosition = int2(1114, -126);
+	RenderTargetName = "SceneIrradiance";
+	OutputFragment = $LOCAL$/CMaterialMathsVectorBuilder_757AB868.Result;
+}
+CMaterialGraphicsSaturate	$LOCAL$/CMaterialGraphicsSaturate_4C7B6CF8
+{
+	EditorInfosPosition = int2(725, -148);
+	SaturationLevel = 0.0000000e+000;
+	InputColor = $LOCAL$/CMaterialMathsMul_4E92AFDF.Result;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_2DC9CC01
+{
+	EditorInfosPosition = int2(794, -130);
+	Input = $LOCAL$/CMaterialGraphicsSaturate_4C7B6CF8.OutputColor;
+}
+CMaterialGraphicsShadow	$LOCAL$/CMaterialGraphicsShadow_BC8B8C84
+{
+	EditorInfosPosition = int2(130, 1028);
+	UseShadowMaps = false;
+	Position = $LOCAL$/FragmentPositionInViewSpace.Result;
+	NDotL = $LOCAL$/CMaterialMathsDot_00007983.Result;
+	FragmentToLight = $LOCAL$/_L.Result;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_DE851040
+{
+	EditorInfosPosition = int2(865, 1302);
+	Input = $LOCAL$/CMaterialGraphicsSaturate_EDA86E03.OutputColor;
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_DF3AF0B6
+{
+	EditorInfosPosition = int2(-107, 1640);
+	Filtering = Point;
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	UseHalfPixelOffset = true;
+	TextureOverride = $LOCAL$/CMaterialParameterExporter_F9AE2A5A;
+	Texcoords = $LOCAL$/NormalizedScreenspacePos_0_1.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_0019D362
+{
+	EditorInfosPosition = int2(891, 1976);
+}
+CMaterialParameterExporter	$LOCAL$/CMaterialParameterExporter_F9AE2A5A
+{
+	EditorInfosPosition = int2(-185, 1632);
+	ParameterName = "SceneNormalBuffer";
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_3AFFE7CB
+{
+	EditorInfosPosition = int2(817, 1971);
+	Input0 = $LOCAL$/CMaterialMathsAdd_E0428F3E.Result;
+	Input1 = $LOCAL$/CMaterialMathsDiv_F9B7C7A8.Result;
+}
+CMaterialMathsMax	$LOCAL$/CMaterialMathsMax_56252C9D
+{
+	EditorInfosPosition = int2(965, 2001);
+	Input0 = $LOCAL$/CMaterialMathsConstant_0019D362.Result;
+	Input1 = $LOCAL$/CMaterialMathsDiv_6367CCEC.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_6367CCEC
+{
+	EditorInfosPosition = int2(892, 2015);
+	Input0 = $LOCAL$/CMaterialMathsMul_3AFFE7CB.Result;
+	Input1 = $LOCAL$/CMaterialMathsDot_E3921650.Result;
+}
+CMaterialMathsAdd	$LOCAL$/CMaterialMathsAdd_E0428F3E
+{
+	EditorInfosPosition = int2(609, 1879);
+	Input0 = $LOCAL$/CMaterialMathsMul_EFBBCFB5.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_8D01D8B6.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_94339E52
+{
+	EditorInfosPosition = int2(461, 1944);
+	Input = $LOCAL$/CMaterialMathsTan_FC1D9718.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_68005F2E.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_CF21E7FF
+{
+	EditorInfosPosition = int2(1033, 1990);
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_D42BDEE0.x;
+	Input1 = $LOCAL$/CMaterialMathsMax_56252C9D.Result;
+}
+CMaterialMathsDot	$LOCAL$/PL_N_Dot_L
+{
+	EditorInfosPosition = int2(197, 1636);
+	Input0 = $LOCAL$/_L.Result;
+	Input1 = $LOCAL$/CMaterialMathsNormalDecode_7F7B94EC.OutputNormalXYZ;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_084F8334
+{
+	EditorInfosPosition = int2(199, 1688);
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_27614D61
+{
+	EditorInfosPosition = int2(197, -170);
+	Input0 = $LOCAL$/CMaterialMathsConstant_88623876.Result;
+	Input1 = $LOCAL$/CMaterialMathsDot_4AB37AA0.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_3E1AD74A
+{
+	EditorInfosPosition = int2(400, 2003);
+	Input = $LOCAL$/CMaterialMathsDot_ECE3C0E5.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_664D9BD3.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_4C6A1CE0
+{
+	EditorInfosPosition = int2(207, 1835);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsMax	$LOCAL$/PL_DiffuseCosineTerm
+{
+	EditorInfosPosition = int2(301, 1672);
+	Input0 = $LOCAL$/PL_N_Dot_L.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant_084F8334.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_160D7147
+{
+	EditorInfosPosition = int2(303, 11);
+	Input = $LOCAL$/CMaterialTexture_53655375.a;
+	Exponent = $LOCAL$/CMaterialMathsConstant_AD7FF30A.Result;
+}
+CMaterialMathsConstant3	$LOCAL$/CMaterialMathsConstant3_8C0664C3
+{
+	EditorInfosPosition = int2(333, 1703);
+	FloatValue = float3(1.0000000e-001, 0.0000000e+000, 1.0000000e-001);
+	GetFromParameter = "LightColor";
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_49FE949D
+{
+	EditorInfosPosition = int2(-178, 1142);
+	x = $LOCAL$/CMaterialTexture_000013E9.r;
+	y = $LOCAL$/CMaterialTexture_000013E9.g;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_57E5283B
+{
+	EditorInfosPosition = int2(432, -53);
+	Input0 = $LOCAL$/CMaterialMathsPow_717B9CD8.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_160D7147.Result;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_9E9BA958
+{
+	EditorInfosPosition = int2(1125, 1772);
+	x = $LOCAL$/CMaterialMathsVectorSplitter_D79A8C25.x;
+	y = $LOCAL$/CMaterialMathsVectorSplitter_D79A8C25.y;
+	z = $LOCAL$/CMaterialMathsVectorSplitter_D79A8C25.z;
+	w = $LOCAL$/CMaterialMathsMul_CF21E7FF.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_2BB3DC0C
+{
+	EditorInfosPosition = int2(412, 1680);
+	Input0 = $LOCAL$/PL_DiffuseCosineTerm.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant3_8C0664C3.Result;
+}
+CMaterialMathsACos	$LOCAL$/CMaterialMathsACos_CD536DA5
+{
+	EditorInfosPosition = int2(231, -100);
+	Input = $LOCAL$/CMaterialMathsDot_E46F9293.Result;
+}
+CMaterialGraphicsRTChooser	$LOCAL$/CMaterialGraphicsRTChooser_40AF2AE6
+{
+	EditorInfosPosition = int2(1311, 1781);
+	RenderTargetName = "SceneIrradiance";
+	OutputFragment = $LOCAL$/CMaterialMathsVectorBuilder_9E9BA958.Result;
+}
+CMaterial	$LOCAL$/_Internal_LightBuffer_VolumeStencilPass_LIGHT
+{
+	EditorInfosPosition = int2(1728, 1753);
+	GraphicsObject = $LOCAL$/CMaterialGraphics_2AFFCE54;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_D79A8C25
+{
+	EditorInfosPosition = int2(1034, 1763);
+	Input = $LOCAL$/CMaterialMathsMul_62CFD5CD.Result;
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_2AFFCE54
+{
+	EditorInfosPosition = int2(1530, 1766);
+	CustomRenderTargets = 
+	{
+		$LOCAL$/CMaterialGraphicsRTChooser_40AF2AE6,
+	};
+	CullMode = Front;
+	AlphaBlendMode = Additive;
+	DepthTest = false;
+	DepthWrite = false;
+	CastShadows = false;
+	StencilFunc = None;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_60D36CA1
+{
+	EditorInfosPosition = int2(297, 1890);
+	FloatValue = 5.0000000e+000;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_EF5E6697
+{
+	EditorInfosPosition = int2(576, -65);
+	Input = $LOCAL$/CMaterialMathsConstant_4FD7D212.Result;
+	Exponent = $LOCAL$/CMaterialMathsNeg_DAA1F08D.Result;
+}
+CMaterialMathsAdd	$LOCAL$/CMaterialMathsAdd_0800ED64
+{
+	EditorInfosPosition = int2(511, -145);
+	Input0 = $LOCAL$/CMaterialMathsMul_3C7EAEE3.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_45CD411C.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_664D9BD3
+{
+	EditorInfosPosition = int2(328, 2014);
+	FloatValue = 4.0000000e+000;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_E3921650
+{
+	EditorInfosPosition = int2(169, 2003);
+	Input0 = $LOCAL$/CMaterialMathsAdd_B13702A6.Result;
+	Input1 = $LOCAL$/CMaterialMathsAdd_B13702A6.Result;
+}
+CMaterialMathsNormalize	$LOCAL$/CMaterialMathsNormalize_9127AED1
+{
+	EditorInfosPosition = int2(171, 1955);
+	Input = $LOCAL$/CMaterialMathsAdd_B13702A6.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_EFBBCFB5
+{
+	EditorInfosPosition = int2(536, 1849);
+	Input0 = $LOCAL$/CMaterialTexture_DF3AF0B6.b;
+	Input1 = $LOCAL$/CMaterialMathsSub_CB4F63D7.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_BB256909
+{
+	EditorInfosPosition = int2(674, 1959);
+	Input = $LOCAL$/CMaterialMathsConstant_47016F5C.Result;
+	Exponent = $LOCAL$/CMaterialMathsNeg_DACAC0AF.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_AD38397B
+{
+	EditorInfosPosition = int2(490, 2026);
+	Input0 = $LOCAL$/CMaterialMathsPow_3E1AD74A.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_FEF7B939.Result;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_EFC24935
+{
+	EditorInfosPosition = int2(433, 1281);
+	Input0 = $LOCAL$/CMaterialMathsConstant_EA0569DA.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_8D3E52DC.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_EBEDD5A3
+{
+	EditorInfosPosition = int2(510, 1271);
+	Input0 = $LOCAL$/CMaterialTexture_000013E9.b;
+	Input1 = $LOCAL$/CMaterialMathsSub_EFC24935.Result;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_A9461860
+{
+	EditorInfosPosition = int2(187, 1293);
+	Input0 = $LOCAL$/_V.Result;
+	Input1 = $LOCAL$/CMaterialMathsNormalize_FB1412DF.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_1FC745D2
+{
+	EditorInfosPosition = int2(572, 1355);
+	FloatValue = 2.7182817e+000;
+}
+CMaterialMathsTan	$LOCAL$/CMaterialMathsTan_8DDB2EAE
+{
+	EditorInfosPosition = int2(369, 1347);
+	Input = $LOCAL$/CMaterialMathsACos_FFB95A65.Result;
+}
+CMaterialMathsNormalDecode	$LOCAL$/CMaterialMathsNormalDecode_7F7B94EC
+{
+	EditorInfosPosition = int2(52, 1669);
+	InputEncoding = $LOCAL$/CMaterialMathsVectorBuilder_14068FFF.Result;
+}
+CMaterialMathsNormalDecode	$LOCAL$/CMaterialMathsNormalDecode_324FAAC6
+{
+	EditorInfosPosition = int2(160, 2436);
+	InputEncoding = $LOCAL$/CMaterialMathsVectorBuilder_92E63671.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_6C381F0B
+{
+	EditorInfosPosition = int2(712, 620);
+	Input0 = $LOCAL$/CMaterialMathsPow_6B22449A.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_56AF16F6.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_8A911DDD
+{
+	EditorInfosPosition = int2(864, 622);
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_A44EB1D0
+{
+	EditorInfosPosition = int2(374, 1425);
+	Input = $LOCAL$/CMaterialMathsDot_0FE5C953.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_E40AD051.Result;
+}
+CMaterialMathsACos	$LOCAL$/CMaterialMathsACos_FFB95A65
+{
+	EditorInfosPosition = int2(303, 1346);
+	Input = $LOCAL$/CMaterialMathsDot_0FE5C953.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_88623876
+{
+	EditorInfosPosition = int2(110, -189);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_B81BEC75
+{
+	EditorInfosPosition = int2(361, -165);
+	Input0 = $LOCAL$/CMaterialMathsConstant_FDC7DE1A.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_45CD411C.Result;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_BC8B3708
+{
+	EditorInfosPosition = int2(780, 427);
+	Input = $LOCAL$/CMaterialGraphicsSaturate_B02E9B9E.OutputColor;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_23CAC3E9
+{
+	EditorInfosPosition = int2(345, 375);
+	Input0 = $LOCAL$/_N_Dot_L_x_Shadow.Result;
+	Input1 = $LOCAL$/LightColor_RGB.Result;
+}
+CMaterialGraphicsSaturate	$LOCAL$/CMaterialGraphicsSaturate_B02E9B9E
+{
+	EditorInfosPosition = int2(698, 407);
+	SaturationLevel = 0.0000000e+000;
+	InputColor = $LOCAL$/CMaterialMathsMul_B3117497.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_4E92AFDF
+{
+	EditorInfosPosition = int2(589, -304);
+	Input0 = $LOCAL$/_Att.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_5DE98461.Result;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_CB4F63D7
+{
+	EditorInfosPosition = int2(459, 1859);
+	Input0 = $LOCAL$/CMaterialMathsConstant_833E43A4.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_8D01D8B6.Result;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_361D925A
+{
+	EditorInfosPosition = int2(213, 1871);
+	Input0 = $LOCAL$/_V.Result;
+	Input1 = $LOCAL$/CMaterialMathsNormalize_9127AED1.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_8D01D8B6
+{
+	EditorInfosPosition = int2(373, 1875);
+	Input = $LOCAL$/CMaterialMathsSub_A133C823.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_60D36CA1.Result;
+}
+CMaterialMathsNeg	$LOCAL$/CMaterialMathsNeg_DACAC0AF
+{
+	EditorInfosPosition = int2(597, 1972);
+	Input = $LOCAL$/CMaterialMathsDiv_D48F8BCD.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_47016F5C
+{
+	EditorInfosPosition = int2(598, 1933);
+	FloatValue = 2.7182817e+000;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_833E43A4
+{
+	EditorInfosPosition = int2(371, 1839);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_A133C823
+{
+	EditorInfosPosition = int2(295, 1854);
+	Input0 = $LOCAL$/CMaterialMathsConstant_4C6A1CE0.Result;
+	Input1 = $LOCAL$/CMaterialMathsDot_361D925A.Result;
+}
+CMaterialMathsACos	$LOCAL$/CMaterialMathsACos_06F25E87
+{
+	EditorInfosPosition = int2(329, 1924);
+	Input = $LOCAL$/CMaterialMathsDot_ECE3C0E5.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_D48F8BCD
+{
+	EditorInfosPosition = int2(530, 1971);
+	Input0 = $LOCAL$/CMaterialMathsPow_94339E52.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_FEF7B939.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_FB673014
+{
+	EditorInfosPosition = int2(330, 2049);
+	FloatValue = 2.0000000e+000;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_FDC7DE1A
+{
+	EditorInfosPosition = int2(273, -185);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_ECE3C0E5
+{
+	EditorInfosPosition = int2(250, 1937);
+	Input0 = $LOCAL$/CMaterialMathsNormalDecode_7F7B94EC.OutputNormalXYZ;
+	Input1 = $LOCAL$/CMaterialMathsNormalize_9127AED1.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_3C7EAEE3
+{
+	EditorInfosPosition = int2(438, -175);
+	Input0 = $LOCAL$/CMaterialTexture_53655375.b;
+	Input1 = $LOCAL$/CMaterialMathsSub_B81BEC75.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_775E4B6F
+{
+	EditorInfosPosition = int2(199, -134);
+	FloatValue = 5.0000000e+000;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_717B9CD8
+{
+	EditorInfosPosition = int2(363, -80);
+	Input = $LOCAL$/CMaterialMathsTan_A3EA26EE.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_0A3B29D4.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_45CD411C
+{
+	EditorInfosPosition = int2(275, -149);
+	Input = $LOCAL$/CMaterialMathsSub_27614D61.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_775E4B6F.Result;
+}
+CMaterialMathsTan	$LOCAL$/CMaterialMathsTan_FC1D9718
+{
+	EditorInfosPosition = int2(395, 1925);
+	Input = $LOCAL$/CMaterialMathsACos_06F25E87.Result;
+}
+CMaterialMathsAdd	$LOCAL$/CMaterialMathsAdd_B13702A6
+{
+	EditorInfosPosition = int2(95, 1968);
+	Input0 = $LOCAL$/_L.Result;
+	Input1 = $LOCAL$/_V.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_FEF7B939
+{
+	EditorInfosPosition = int2(401, 2036);
+	Input = $LOCAL$/CMaterialTexture_DF3AF0B6.a;
+	Exponent = $LOCAL$/CMaterialMathsConstant_FB673014.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_AD7FF30A
+{
+	EditorInfosPosition = int2(232, 24);
+	FloatValue = 2.0000000e+000;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_0A3B29D4
+{
+	EditorInfosPosition = int2(298, -64);
+	FloatValue = 2.0000000e+000;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_68005F2E
+{
+	EditorInfosPosition = int2(396, 1960);
+	FloatValue = 2.0000000e+000;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_62CFD5CD
+{
+	EditorInfosPosition = int2(501, 1659);
+	Input0 = $LOCAL$/_Att.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_2BB3DC0C.Result;
+}
+CMaterialGraphicsSaturate	$LOCAL$/CMaterialGraphicsSaturate_304AD6A1
+{
+	EditorInfosPosition = int2(819, 1842);
+	SaturationLevel = 0.0000000e+000;
+	InputColor = $LOCAL$/CMaterialMathsMul_62CFD5CD.Result;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_D42BDEE0
+{
+	EditorInfosPosition = int2(892, 1866);
+	Input = $LOCAL$/CMaterialGraphicsSaturate_304AD6A1.OutputColor;
+}
+CMaterialMathsAdd	$LOCAL$/CMaterialMathsAdd_2C9F7679
+{
+	EditorInfosPosition = int2(67, 614);
+	Input0 = $LOCAL$/_L.Result;
+	Input1 = $LOCAL$/_V.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_791086FE
+{
+	EditorInfosPosition = int2(641, -50);
+	Input0 = $LOCAL$/CMaterialMathsPow_EF5E6697.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_BB8961F9.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_BB8961F9
+{
+	EditorInfosPosition = int2(392, 1);
+	Input0 = $LOCAL$/CMaterialMathsPow_8D53C410.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_160D7147.Result;
+}
+CMaterialMathsNeg	$LOCAL$/CMaterialMathsNeg_DAA1F08D
+{
+	EditorInfosPosition = int2(499, -52);
+	Input = $LOCAL$/CMaterialMathsDiv_57E5283B.Result;
+}
+CMaterialMathsTan	$LOCAL$/CMaterialMathsTan_A3EA26EE
+{
+	EditorInfosPosition = int2(297, -99);
+	Input = $LOCAL$/CMaterialMathsACos_CD536DA5.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_4FD7D212
+{
+	EditorInfosPosition = int2(500, -91);
+	FloatValue = 2.7182817e+000;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_E46F9293
+{
+	EditorInfosPosition = int2(152, -87);
+	Input0 = $LOCAL$/CMaterialMathsNormalDecode_7F8D0BA4.OutputNormalXYZ;
+	Input1 = $LOCAL$/CMaterialMathsNormalize_4B0E381F.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_D0D07328
+{
+	EditorInfosPosition = int2(865, 1398);
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_86E5A957
+{
+	EditorInfosPosition = int2(648, 1381);
+	Input = $LOCAL$/CMaterialMathsConstant_1FC745D2.Result;
+	Exponent = $LOCAL$/CMaterialMathsNeg_60D2954D.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_8D53C410
+{
+	EditorInfosPosition = int2(302, -21);
+	Input = $LOCAL$/CMaterialMathsDot_E46F9293.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_3DF81F91.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_3DF81F91
+{
+	EditorInfosPosition = int2(230, -10);
+	FloatValue = 4.0000000e+000;
+}
+CMaterialMathsNormalize	$LOCAL$/CMaterialMathsNormalize_4B0E381F
+{
+	EditorInfosPosition = int2(74, -69);
+	Input = $LOCAL$/CMaterialMathsAdd_EA94878C.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_6005161D
+{
+	EditorInfosPosition = int2(1007, 1412);
+	Input0 = $LOCAL$/CMaterialMathsVectorSplitter_DE851040.x;
+	Input1 = $LOCAL$/CMaterialMathsMax_45C3E54B.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_49A9DA89
+{
+	EditorInfosPosition = int2(791, 1393);
+	Input0 = $LOCAL$/CMaterialMathsAdd_A7F0D724.Result;
+	Input1 = $LOCAL$/CMaterialMathsDiv_6875BEBE.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_E7A3DAE2
+{
+	EditorInfosPosition = int2(866, 1437);
+	Input0 = $LOCAL$/CMaterialMathsMul_49A9DA89.Result;
+	Input1 = $LOCAL$/CMaterialMathsDot_9C8AA226.Result;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_4AB37AA0
+{
+	EditorInfosPosition = int2(116, -153);
+	Input0 = $LOCAL$/_V.Result;
+	Input1 = $LOCAL$/CMaterialMathsNormalize_4B0E381F.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_F9B7C7A8
+{
+	EditorInfosPosition = int2(739, 1974);
+	Input0 = $LOCAL$/CMaterialMathsPow_BB256909.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_AD38397B.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_E6CE56FB
+{
+	EditorInfosPosition = int2(504, 1393);
+	Input0 = $LOCAL$/CMaterialMathsPow_F71AE298.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_10D0C407.Result;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_AB816E21
+{
+	EditorInfosPosition = int2(269, 1276);
+	Input0 = $LOCAL$/CMaterialMathsConstant_3391D836.Result;
+	Input1 = $LOCAL$/CMaterialMathsDot_A9461860.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_DF02162F
+{
+	EditorInfosPosition = int2(271, 1312);
+	FloatValue = 5.0000000e+000;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_35E84ECA
+{
+	EditorInfosPosition = int2(304, 1471);
+	FloatValue = 2.0000000e+000;
+}
+CMaterialMathsAdd	$LOCAL$/CMaterialMathsAdd_2FA4E94C
+{
+	EditorInfosPosition = int2(68, 1390);
+	Input0 = $LOCAL$/_L.Result;
+	Input1 = $LOCAL$/_V.Result;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_DC567C03
+{
+	EditorInfosPosition = int2(432, 505);
+	Input0 = $LOCAL$/CMaterialMathsConstant_38FDB640.Result;
+	Input1 = $LOCAL$/CMaterialMathsPow_FA6866B2.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_EEC37ABC
+{
+	EditorInfosPosition = int2(180, 481);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_3BEF633F
+{
+	EditorInfosPosition = int2(865, 661);
+	Input0 = $LOCAL$/CMaterialMathsMul_00DE2DA2.Result;
+	Input1 = $LOCAL$/CMaterialMathsDot_A49C695E.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_30C301C7
+{
+	EditorInfosPosition = int2(374, 682);
+	Input = $LOCAL$/CMaterialTexture_134B3400.a;
+	Exponent = $LOCAL$/CMaterialMathsConstant_B9B3398A.Result;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_ADF57690
+{
+	EditorInfosPosition = int2(373, 649);
+	Input = $LOCAL$/_N_Dot_H.Result;
+	Exponent = $LOCAL$/CMaterialMathsConstant_5652E411.Result;
+}
+CMaterial	$LOCAL$/_Internal_LightBuffer_SplatPass_LIGHT_NO_SPEC
+{
+	EditorInfosPosition = int2(2114, 2331);
+	GraphicsObject = $LOCAL$/CMaterialGraphics_FA09CB71;
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_FA09CB71
+{
+	EditorInfosPosition = int2(1918, 2329);
+	CustomRenderTargets = 
+	{
+		$LOCAL$/CMaterialGraphicsRTChooser_68C0CF85,
+	};
+	CullMode = None;
+	AlphaBlendMode = Additive;
+	DepthWrite = false;
+	CastShadows = false;
+	StencilFunc = None;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_882D526A
+{
+	EditorInfosPosition = int2(1617, 2414);
+	x = $LOCAL$/CMaterialMathsVectorSplitter_1CF2979F.x;
+	y = $LOCAL$/CMaterialMathsVectorSplitter_1CF2979F.y;
+	z = $LOCAL$/CMaterialMathsVectorSplitter_1CF2979F.z;
+	w = $LOCAL$/CMaterialMathsConstant_3528E227.Result;
+}
+CMaterialGraphicsRTChooser	$LOCAL$/CMaterialGraphicsRTChooser_68C0CF85
+{
+	EditorInfosPosition = int2(1764, 2415);
+	RenderTargetName = "SceneIrradiance";
+	OutputFragment = $LOCAL$/CMaterialMathsVectorBuilder_882D526A.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_3528E227
+{
+	EditorInfosPosition = int2(1435, 2481);
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_46CD2D72
+{
+	EditorInfosPosition = int2(18, 2410);
+	Filtering = Point;
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	UseHalfPixelOffset = true;
+	TextureOverride = $LOCAL$/CMaterialParameterExporter_F40C777C;
+	Texcoords = $LOCAL$/NormalizedScreenspacePos_0_1.Result;
+}
+CMaterialMathsDiv	$LOCAL$/SL_RemappedAttenuationPolynomial
+{
+	EditorInfosPosition = int2(809, 2307);
+	Input0 = $LOCAL$/CMaterialMathsSub_CF6B442C.Result;
+	Input1 = $LOCAL$/CMaterialMathsSub_BD976A74.Result;
+}
+CMaterialParameterExporter	$LOCAL$/CMaterialParameterExporter_F40C777C
+{
+	EditorInfosPosition = int2(-59, 2402);
+	ParameterName = "SceneNormalBuffer";
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_DA32284F
+{
+	EditorInfosPosition = int2(132, 2314);
+	Input0 = $LOCAL$/SL_LightOrigin_InViewSpace.Result;
+	Input1 = $LOCAL$/FragmentPositionInViewSpace.Result;
+}
+CMaterialMathsMax	$LOCAL$/SL_N_Dot_L
+{
+	EditorInfosPosition = int2(456, 2435);
+	Input0 = $LOCAL$/CMaterialMathsDot_3E4408E1.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant_982FBD0C.Result;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_BD976A74
+{
+	EditorInfosPosition = int2(647, 2339);
+	Input0 = $LOCAL$/CMaterialMathsConstant_962EF2E4.Result;
+	Input1 = $LOCAL$/SL__C2_N_0_0.y;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_BFF3CDC8
+{
+	EditorInfosPosition = int2(567, 2466);
+	Input0 = $LOCAL$/SL_N_Dot_L.Result;
+	Input1 = $LOCAL$/CMaterialMathsVectorBuilder_29EF0AEF.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_EC4C556B
+{
+	EditorInfosPosition = int2(1260, 2380);
+	Input0 = $LOCAL$/CMaterialMathsMax_48EA1119.Result;
+	Input1 = $LOCAL$/CMaterialMathsMul_BFF3CDC8.Result;
+}
+CMaterialMathsSub	$LOCAL$/CMaterialMathsSub_CF6B442C
+{
+	EditorInfosPosition = int2(728, 2279);
+	Input0 = $LOCAL$/SL_Att_Polynomial.Result;
+	Input1 = $LOCAL$/SL__C2_N_0_0.y;
+}
+CMaterialMathsDot	$LOCAL$/CMaterialMathsDot_3E4408E1
+{
+	EditorInfosPosition = int2(352, 2399);
+	Input0 = $LOCAL$/CMaterialMathsNormalize_13EF4C8A.Result;
+	Input1 = $LOCAL$/CMaterialMathsNormalDecode_324FAAC6.OutputNormalXYZ;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_982FBD0C
+{
+	EditorInfosPosition = int2(354, 2451);
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_1CF2979F
+{
+	EditorInfosPosition = int2(1432, 2385);
+	Input = $LOCAL$/CMaterialMathsMul_EC4C556B.Result;
+}
+CMaterialMathsDot	$LOCAL$/SL_d2
+{
+	EditorInfosPosition = int2(262, 2292);
+	Input0 = $LOCAL$/CMaterialMathsSub_DA32284F.Result;
+	Input1 = $LOCAL$/CMaterialMathsSub_DA32284F.Result;
+}
+CMaterialMathsNormalize	$LOCAL$/CMaterialMathsNormalize_13EF4C8A
+{
+	EditorInfosPosition = int2(259, 2353);
+	Input = $LOCAL$/CMaterialMathsSub_DA32284F.Result;
+}
+CMaterialMathsNormalize	$LOCAL$/CMaterialMathsNormalize_3A4B6125
+{
+	EditorInfosPosition = int2(160, 2391);
+}
+CMaterialVertexStreamCustom	$LOCAL$/SL_LightOrigin_InWorldSpace
+{
+	EditorInfosPosition = int2(-402, 2209);
+	StreamName = "LightOrigin";
+	Type = Float3;
+}
+CMaterialVertexStreamCustom	$LOCAL$/SL_LightParams
+{
+	EditorInfosPosition = int2(137, 2198);
+	StreamName = "LightParams";
+	Type = Float4;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/SL__C2_N_0_0
+{
+	EditorInfosPosition = int2(252, 2215);
+	Input = $LOCAL$/SL_LightParams.Value;
+}
+CMaterialMathsCoordinateSpaceConverter	$LOCAL$/SL_LightOrigin_InViewSpace
+{
+	EditorInfosPosition = int2(-122, 2241);
+	Input = $LOCAL$/SL_LightOrigin_InWorldSpace.Value;
+	SourceSpace = WorldSpace;
+	TargetSpace = ViewSpace;
+	RotationsOnly = false;
+}
+CMaterialVertexStreamColors	$LOCAL$/CMaterialVertexStreamColors_8B8C9B92
+{
+	EditorInfosPosition = int2(283, 2488);
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_29EF0AEF
+{
+	EditorInfosPosition = int2(473, 2512);
+	x = $LOCAL$/CMaterialMathsVectorSplitter_220DF9F6.x;
+	y = $LOCAL$/CMaterialMathsVectorSplitter_220DF9F6.y;
+	z = $LOCAL$/CMaterialMathsVectorSplitter_220DF9F6.z;
+}
+CMaterialMathsVectorSplitter	$LOCAL$/CMaterialMathsVectorSplitter_220DF9F6
+{
+	EditorInfosPosition = int2(381, 2504);
+	Input = $LOCAL$/CMaterialVertexStreamColors_8B8C9B92.Colors;
+}
+CMaterialMathsMul	$LOCAL$/SL_X
+{
+	EditorInfosPosition = int2(374, 2262);
+	Input0 = $LOCAL$/SL__C2_N_0_0.x;
+	Input1 = $LOCAL$/SL_d2.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_14F13FF5
+{
+	EditorInfosPosition = int2(379, 2229);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_962EF2E4
+{
+	EditorInfosPosition = int2(568, 2314);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsSub	$LOCAL$/SL_1_Minus_X
+{
+	EditorInfosPosition = int2(542, 2234);
+	Input0 = $LOCAL$/CMaterialMathsConstant_14F13FF5.Result;
+	Input1 = $LOCAL$/SL_X.Result;
+}
+CMaterialMathsDiv	$LOCAL$/SL_Att_Polynomial
+{
+	EditorInfosPosition = int2(635, 2269);
+	Input0 = $LOCAL$/SL_1_Minus_X.Result;
+	Input1 = $LOCAL$/SL_1_Plus_X.Result;
+}
+CMaterialMathsAdd	$LOCAL$/SL_1_Plus_X
+{
+	EditorInfosPosition = int2(537, 2290);
+	Input0 = $LOCAL$/CMaterialMathsConstant_14F13FF5.Result;
+	Input1 = $LOCAL$/SL_X.Result;
+}
+CMaterialMathsMax	$LOCAL$/CMaterialMathsMax_48EA1119
+{
+	EditorInfosPosition = int2(904, 2301);
+	Input0 = $LOCAL$/CMaterialMathsConstant_853E0F78.Result;
+	Input1 = $LOCAL$/SL_RemappedAttenuationPolynomial.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_853E0F78
+{
+	EditorInfosPosition = int2(816, 2278);
+}
+CMaterialProxy	$LOCAL$/_Internal_LightBuffer_SplatPass_LIGHT_NO_SPEC_Proxy
+{
+	EditorInfosPosition = int2(2518, 2326);
+	BaseMaterial = $LOCAL$/_Internal_LightBuffer_SplatPass_LIGHT_NO_SPEC;
+}
+CMaterialMathsNormalDecode	$LOCAL$/CMaterialMathsNormalDecode_7F8D0BA4
+{
+	EditorInfosPosition = int2(-23, -270);
+	InputEncoding = $LOCAL$/CMaterialMathsVectorBuilder_1B830BD7.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_B3117497
+{
+	EditorInfosPosition = int2(582, 422);
+	Input0 = $LOCAL$/CMaterialMathsMul_23CAC3E9.Result;
+	Input1 = $LOCAL$/_Att.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_F4C5FFC9
+{
+	EditorInfosPosition = int2(414, 420);
+	FloatValue = 1.0000000e+000;
+}
+CMaterialMathsLerp	$LOCAL$/CMaterialMathsLerp_B9210368
+{
+	EditorInfosPosition = int2(491, 436);
+	Input0 = $LOCAL$/_Att.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant_F4C5FFC9.Result;
+	Interpolator = $LOCAL$/CMaterialMathsMul_C496359A.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_AA50DF5D
+{
+	EditorInfosPosition = int2(348, 453);
+	Input0 = $LOCAL$/CMaterialTexture_134B3400.a;
+	Input1 = $LOCAL$/CMaterialTexture_134B3400.a;
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_50247931
+{
+	EditorInfosPosition = int2(114, 709);
+	Path = "Textures/SpecularReflectanceIntegral.png";
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Texcoords = $LOCAL$/CMaterialMathsVectorBuilder_D25F12DB.Result;
+}
+CMaterialTexture	$LOCAL$/CMaterialTexture_65E7B933
+{
+	EditorInfosPosition = int2(112, 789);
+	Path = "Textures/FresnelReflectanceIntegral.png";
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Texcoords = $LOCAL$/CMaterialMathsVectorBuilder_45BC302D.Result;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_CFBDC945
+{
+	EditorInfosPosition = int2(253, 828);
+	Input0 = $LOCAL$/CMaterialTexture_65E7B933.r;
+	Input1 = $LOCAL$/CMaterialMathsConstant_3283A9E7.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_3283A9E7
+{
+	EditorInfosPosition = int2(177, 844);
+	FloatValue = 3.3333001e-001;
+}
+CMaterialMathsMul	$LOCAL$/CMaterialMathsMul_20325F99
+{
+	EditorInfosPosition = int2(339, 798);
+	Input0 = $LOCAL$/CMaterialTexture_50247931.r;
+	Input1 = $LOCAL$/CMaterialMathsMul_CFBDC945.Result;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_D25F12DB
+{
+	EditorInfosPosition = int2(13, 707);
+	x = $LOCAL$/CMaterialTexture_134B3400.a;
+	y = $LOCAL$/CMaterialMathsMax_00006784.Result;
+}
+CMaterialMathsVectorBuilder	$LOCAL$/CMaterialMathsVectorBuilder_45BC302D
+{
+	EditorInfosPosition = int2(35, 795);
+	x = $LOCAL$/CMaterialTexture_134B3400.b;
+	y = $LOCAL$/CMaterialMathsMax_00006784.Result;
+}
+CMaterialMathsDiv	$LOCAL$/CMaterialMathsDiv_26A3880F
+{
+	EditorInfosPosition = int2(924, 705);
+	Input0 = $LOCAL$/CMaterialMathsDiv_3BEF633F.Result;
+	Input1 = $LOCAL$/CMaterialMathsAdd_948D0296.Result;
+}
+CMaterialMathsAdd	$LOCAL$/CMaterialMathsAdd_948D0296
+{
+	EditorInfosPosition = int2(442, 819);
+	Input0 = $LOCAL$/CMaterialMathsMul_20325F99.Result;
+	Input1 = $LOCAL$/CMaterialMathsConstant_31D195C0.Result;
+}
+CMaterialMathsConstant	$LOCAL$/CMaterialMathsConstant_31D195C0
+{
+	EditorInfosPosition = int2(358, 850);
+	FloatValue = 9.9999997e-005;
+}
+CMaterialMathsDepthDecode	$LOCAL$/CMaterialMathsDepthDecode_520C3609
+{
+	EditorInfosPosition = int2(-1567, 748);
+	InputEncoding = $LOCAL$/_Z.rgba;
+}

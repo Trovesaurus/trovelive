@@ -1,0 +1,61 @@
+CPostprocessContext	$LOCAL$/Resource
+{
+	EditorInfosPosition = int2(3866, 1014);
+	EditorInfosIsBlockMinimized = 0;
+	Feed = $LOCAL$/GammaCorrect;
+}
+CPostprocessSingle	$LOCAL$/GammaCorrect
+{
+	EditorInfosPosition = int2(3674, 1014);
+	Feed0 = $LOCAL$/CPostprocessFeedFramebuffer_0000442B;
+	ShaderTexture0 = 
+	{
+		$LOCAL$/Framebuffer,
+	};
+	Shader = $LOCAL$/CMaterial_0000491C;
+	UseNormalizedTexcoords = true;
+	FramebufferFormat = RGBA_FP16;
+}
+CPostprocessFeedFramebuffer	$LOCAL$/CPostprocessFeedFramebuffer_0000442B
+{
+	EditorInfosPosition = int2(3581, 1008);
+	EditorInfosIsBlockMinimized = 0;
+	FeedName = "ImageToProcess";
+}
+CMaterialTexture	$LOCAL$/Framebuffer
+{
+	EditorInfosPosition = int2(3167, 1010);
+	Filtering = Point;
+	WrapU = Clamp;
+	WrapV = Clamp;
+	WrapW = Clamp;
+	Type = Rectangle;
+	UseHalfPixelOffset = true;
+}
+CMaterial	$LOCAL$/CMaterial_0000491C
+{
+	EditorInfosPosition = int2(3581, 1069);
+	EditorInfosIsBlockMinimized = 0;
+	GraphicsObject = $LOCAL$/CMaterialGraphics_00004D06;
+}
+CMaterialGraphics	$LOCAL$/CMaterialGraphics_00004D06
+{
+	EditorInfosPosition = int2(3484, 1068);
+	EditorInfosIsBlockMinimized = 0;
+	Color = $LOCAL$/CMaterialMathsPow_6D9232CE.Result;
+	DepthTest = false;
+	DepthWrite = false;
+}
+CMaterialMathsPow	$LOCAL$/CMaterialMathsPow_6D9232CE
+{
+	EditorInfosPosition = int2(3360, 1055);
+	Input = $LOCAL$/Framebuffer.rgb;
+	Exponent = $LOCAL$/OneOverGamma_2_2.Result;
+}
+CMaterialMathsConstant	$LOCAL$/OneOverGamma_2_2
+{
+	EditorInfosPosition = int2(3124, 1118);
+	EditorInfosIsBlockMinimized = 0;
+	FloatValue = 4.5454547e-001;
+	GetFromParameter = "OneOverGamma";
+}

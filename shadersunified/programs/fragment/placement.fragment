@@ -1,0 +1,82 @@
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat3, worldPos, TEXCOORD1)
+  KPDataInOut( KFloat4, color, TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+KPSMain(PlacementPS)
+{
+  KFloat scroll = gameTime * 1.0;
+  KFloat3 coord = KInput(worldPos) * 100.0;
+  KFloat n = abs(sin(coord.x + scroll))
+               + abs(sin(coord.y + scroll))
+               + abs(sin(coord.z + scroll));
+  
+  KFloat stipple = n*0.3333333333333;
+  
+  //Approximate a rounded edge using black magicks
+  KFloat2 toCenter = KFrac(KInput(texCoord0)*4.0);  
+  toCenter = abs(toCenter - KFloat2(0.5, 0.5))*2.05 + 0.2;
+  toCenter = clamp(toCenter, 0.0, 1.0);
+  KFloat distToBorder = (pow(toCenter.x, 3.0) + pow(toCenter.y, 3.0))*1.41421356237;
+  distToBorder = pow(distToBorder, 1.0);
+  
+  KFloat3 color0 = KInput(color).xyz;
+  KFloat3 color1 = ((1.0 - KInput(color))*0.4 + KInput(color)).xyz;
+  color1 = color0*0.5;
+  
+  KFloat4 outColor = KFloat4(KLerp( color1, color0, stipple), distToBorder*stipple*0.45);
+  
+  KPSOutput(outColor);
+}
+
+KFloat3 rgb2hsv(KFloat3 c)
+{
+    KFloat4 K = KFloat4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    KFloat4 p = KLerp(KFloat4(c.zy, K.wz), KFloat4(c.yz, K.xy), step(c.z, c.y));
+    KFloat4 q = KLerp(KFloat4(p.xyw, c.x), KFloat4(c.x, p.yzx), step(p.x, c.x));
+
+    KFloat d = q.x - min(q.w, q.y);
+    KFloat e = 1.0e-10;
+    return KFloat3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+ 
+KFloat3 hsv2rgb(KFloat3 c)
+{
+    KFloat4 K = KFloat4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    KFloat3 p = abs(KFrac(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * KLerp(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+
+KPSMain(PlacementTerraformingPS)
+{
+  KFloat scroll = gameTime * 1.0;
+  KFloat3 coord = KInput(worldPos) * 4.0;
+  KFloat stippleSum = abs(sin(coord.x + scroll))
+               + abs(sin(coord.y - scroll*0.5))
+               + abs(sin(coord.z + scroll));
+  KFloat stipple = 1.0-stippleSum*0.3333333333333;
+  KFloat stippleRound = sqrt(stipple);
+
+  KFloat3 baseColor = KInput(color).xyz;
+  
+  //faded color
+  KFloat3 hsv = rgb2hsv(baseColor);
+  KFloat3 fadedColor = hsv2rgb(KFloat3(hsv.x, hsv.y*0.25, hsv.z*0.5));
+  
+  KFloat hueShift = 0.6*stipple - 0.3;
+  if(hueShift + hsv.x < 0.0)
+  {
+    hueShift += 1.0;
+  }
+  
+  //fullbright hueshifted color
+  KFloat3 fullbrightColor = hsv2rgb(KFloat3(hsv.x + hueShift, 1.0, 1.0));
+  
+  KFloat4 outColor = KFloat4(KLerp( baseColor, fadedColor+fullbrightColor, stippleRound), stipple*stipple*0.75 + 0.25);
+  
+  KPSOutput(outColor);
+}

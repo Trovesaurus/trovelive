@@ -1,0 +1,97 @@
+
+KCBBegin(INSTANCE_DATA)
+  KUniform(KMat4, _instanceMatrices[MAX_INSTANCES])
+  KUniform(KFloat4, _illumination[MAX_INSTANCES])
+KCBEnd
+
+KCBBegin(PULSE_INSTANCE_DATA)
+  KUniform(KFloat3, _pulseColor[MAX_INSTANCES])
+KCBEnd
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat2, in_TexCoord0, UV)
+  KVDataInOut( KFloat2, in_Extra, EXTRA)
+  KVDataInOut( KFloat4, in_Color0, COLOR0)
+  KVDataInOut( KFloat4, in_Color1, COLOR1)
+  KVDataInOut( KFloat3, in_Normal, NORMAL)
+  KVDataInOut( KFloat3, in_Tangent, TANGENT)
+  KInstanceData
+KVDataEnd
+
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, texCoord1, TEXCOORD1)
+  
+  KPDataInOut( KFloat4, tintColor, COLOR0)
+  KPDataInOut( KFloat4, blockColor, COLOR1)
+  
+  KPDataInOut( KFloat4, fog, TEXCOORD2)
+  KPDataInOut( KFloat3, reflectVec, TEXCOORD3)
+  KPDataInOut( KFloat3, normal, TEXCOORD4)
+  KPDataInOut( KFloat3, tangent, TEXCOORD5)
+  KPDataInOut( KFloat3, worldPos, TEXCOORD6)
+KPDataEnd
+
+KModifierFunction BasicObject(KVSData KInputVar)
+{
+  KDeclareOutput;
+  
+  KMat4 modelViewMatrix = KMUL(gViewMatrix, _instanceMatrices[KInstanceID]);
+  KMat3 normalMatrix = KUpper3x3(modelViewMatrix);
+
+  KFloat4 transformedPoint = KMUL(_instanceMatrices[KInstanceID], KFloat4(KInput(in_Position), 1.0));
+  KSetPosition(Pos, KMUL(gViewProjectionMatrix, transformedPoint));
+  
+  
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  KOutput(texCoord1) = KInput(in_Extra);
+  
+  KOutput(normal) = normalize(KMUL(normalMatrix, KInput(in_Normal)).xyz);
+  KOutput(tangent) = normalize(KMUL(normalMatrix, KInput(in_Tangent)).xyz);
+  
+  KOutput(worldPos) = KMUL(modelViewMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  
+  KFloat fogDarkCoeff = clamp(dot(normalize(KOutput(worldPos)), sunLightPosition)*2.0 - 1.0, 0.0, 1.0);
+  KOutput(fog).xyz = KLerp(darkFogColor, lightFogColor, fogDarkCoeff).xyz;
+  KOutput(fog).w = Lighting_DepthFogVertex(length(KOutput(worldPos)));
+  
+  KFloat3 eyePos = KMUL(modelViewMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  KFloat3 eyeNormal = KMUL(gViewMatrix, KFloat4(KInput(in_Normal), 0.0)).xyz;
+  KFloat3 R = reflect(KOutput(worldPos), KOutput(normal)).xyz;
+  
+  //TODO - could precalculate inverse and pass it in here, GPU inverse is hella slow
+  // Since transpose == inverse for an orthogonal matrix, this works fine for most cases
+  R = KMUL(transpose(gViewMatrix), KFloat4(R,0.0)).xyz;
+  
+  KOutput(reflectVec).xyz = R.xyz;
+  
+  
+  KVSOutput;
+} 
+
+KVSMain(ObjectReflectInstancedVS)
+{
+  KDeclareOutput;
+  KModifyData(BasicObject);
+  
+  KOutput(tintColor) = KInput(in_Color0);
+  KOutput(blockColor) = KInput(in_Color1);
+  
+  KVSOutput;
+}
+
+KVSMain(ObjectReflectAreaColorInstancedVS)
+{
+  KDeclareOutput;
+  KModifyData(BasicObject);
+  
+  KOutput(blockColor) = _illumination[KInstanceID];
+  KOutput(blockColor).w *= KInput(in_Color1).w;
+  
+  KOutput(tintColor) = KInput(in_Color0);
+  
+  KVSOutput;
+}

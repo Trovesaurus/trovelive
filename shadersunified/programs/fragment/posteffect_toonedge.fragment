@@ -1,0 +1,236 @@
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+
+KFloat zSpaceDepth(KFloat sampleValue)
+{
+  KFloat z_a = zNear+zFar - (2.0*zNear*zFar)/sampleValue;
+  KFloat z_b = (zFar - zNear);
+  return 0.5*(z_a/z_b +1.0);
+}
+
+KFloat eyeSpaceDepth(KFloat sampleValue)
+{
+  KFloat z_b = sampleValue;//texture(depth, texCoord0.st).x;
+  KFloat z_n = KRescaleDepthValue(z_b);
+  KFloat z_e = 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+
+	return z_e;
+}
+
+KFloat4 eyeSpaceDepth(KFloat4 sampleValue)
+{
+    KFloat4 z_b = sampleValue;//texture(depth, texCoord0.st).x;
+    KFloat4 z_n = KRescaleDepthValue4(z_b); //KFloat4 z_n = 2.0 * z_b - KFloat4(1.0,1.0,1.0,1.0);
+    KFloat4 z_e = 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+
+	return z_e;
+}
+
+KFloat sobelFilter(KFloat4 first, KFloat4 second)
+{
+  KFloat Gx = dot(first, KFloat4(1.0,-1.0,1.0,-1.0)) + dot(second, KFloat4(0.0, 2.0, -2.0, 0.0));
+  KFloat Gy = dot(first, KFloat4(1.0,1.0,-1.0,-1.0)) + dot(second, KFloat4(2.0, 0.0, 0.0, -2.0));
+  return (Gx*Gx+Gy*Gy);
+}
+
+KFloat basicFilter(KFloat4 first, KFloat4 second, KFloat center)
+{
+  return dot(first, KFloat4(-1.0,-1.0,-1.0,-1.0)) + dot(second, KFloat4(-1.0,-1.0,-1.0,-1.0)) + center*8.0;
+}
+
+KFloat smoothRamp(KFloat value)
+{
+  const KFloat low_threshold = 0.2;
+  const KFloat high_threshold = 0.5;
+  if(value > low_threshold)
+  {
+    KFloat ramp = (value - low_threshold) / (high_threshold - low_threshold);
+    return clamp(KLerp(0.6, 0.0, ramp), 0.0, 1.0);
+  }
+  else
+  {
+    return 1.0;
+  }
+}
+
+KFloat GetMin(KFloat4 a, KFloat4 b)
+{
+  KFloat4 min4 = min(a,b);
+  return min( min(min4.x, min4.y), min(min4.z, min4.w));
+}
+
+KFloat FxaaLuma(KFloat3 rgb) {
+//Y = 0.2126 R + 0.7152 G + 0.0722 B
+  //return 0.2126*rgb.x + 0.7152*rgb.y + 0.0722*rgb.z;
+  return sqrt(dot(rgb, KFloat3(0.299, 0.587, 0.114)));
+    //return rgb.y * (0.587/0.299) + rgb.x; 
+}
+
+KFloat CalculateFogStrength(KFloat fog, KFloat lineStrength)
+{
+  KFloat fogMin = 1.0-fog;
+  fogMin = clamp( (fogMin - 0.4)/(1.0-0.4), 0.0, 1.0);
+  return 1.0-min(fogMin, lineStrength);
+}
+
+KFloat2 CalculateLineAndFogStrength(KFloat2 texCoord0, KFloat centerDepth, KFloat4 depthDiagonal, KFloat4 depthAxial)
+{
+  KFloat nearestDepth = min(GetMin(depthDiagonal, depthAxial), centerDepth);
+  KFloat nearestWorldDepth = eyeSpaceDepth(nearestDepth);
+  
+  depthDiagonal = eyeSpaceDepth(depthDiagonal);
+  depthAxial = eyeSpaceDepth(depthAxial);
+  centerDepth = eyeSpaceDepth(centerDepth);
+  
+  KFloat sum = basicFilter(depthDiagonal, depthAxial, centerDepth);
+  KFloat decrease = 1.0 - log( nearestWorldDepth * 0.2) / log(20.0);
+  sum = sum * decrease;
+  
+  KFloat fog = Lighting_DepthFogFragment( nearestWorldDepth, 2*(texCoord0.x-0.5), 2*(texCoord0.y-0.5));
+  
+  //closeFade forces lines to be visible near the camera
+  float closeFade = clamp((nearestWorldDepth - 2.0 )*0.1, 0.0, 1.0);
+  fog = min(fog, closeFade);
+  
+  KFloat edgeBlend = 1.0-smoothRamp(sum);
+  
+  KFloat sobelBlend = sobelFilter(depthDiagonal, depthAxial);
+  
+  //avoid sqrt by squaring world depth
+  sobelBlend = sobelBlend/(nearestWorldDepth*nearestWorldDepth);
+  
+  //Force a stronger outline on the player
+  sobelBlend *= decrease;
+  if (sobelBlend > 0.2)
+  {
+    KFloat multer = 1.0 - clamp(nearestWorldDepth-4.0, 0.0,1.0);
+    sobelBlend *= multer*5.0+1.0;
+  }
+  sobelBlend = 1.0-smoothRamp(sobelBlend);
+  
+  KFloat lineStrength = max(edgeBlend, sobelBlend);
+  lineStrength *= clamp(1.0-fog*2.0, 0.0, 1.0);
+  
+  KFloat fogStrength = CalculateFogStrength(fog, lineStrength);
+  
+  return KFloat2(lineStrength, fogStrength);
+}
+
+KFloat CalculateLineStrength(KFloat centerDepth, KFloat4 depthDiagonal, KFloat4 depthAxial)
+{
+  depthDiagonal = eyeSpaceDepth(depthDiagonal);
+  depthAxial = eyeSpaceDepth(depthAxial);
+  centerDepth = eyeSpaceDepth(centerDepth);
+  
+  KFloat sobelBlend = sobelFilter(depthDiagonal, depthAxial);
+  
+  KFloat nearestWorldDepth = min(GetMin(depthDiagonal, depthAxial), centerDepth);
+  //avoid sqrt by squaring world depth
+  sobelBlend = sobelBlend/(nearestWorldDepth*nearestWorldDepth);
+  
+  sobelBlend = 1.0-smoothRamp(sobelBlend);
+  
+  return sobelBlend;
+}
+
+KPSMain(PostEffectPreviewOutlinePS)
+{
+  KFloat centerDepth = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0)).x;
+  const KFloat depthFalloff = 0.250;
+  
+  KFloat4 depthDiagonal;
+  KFloat4 depthAxial;
+  depthDiagonal.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[0]*depthFalloff).x;
+  depthDiagonal.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[2]*depthFalloff).x;
+  depthDiagonal.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[6]*depthFalloff).x;
+  depthDiagonal.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[8]*depthFalloff).x;
+  depthAxial.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KFloat2(0.0,  KInput(kernelCoords)[0].y)*depthFalloff).x;
+  depthAxial.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[3]*depthFalloff).x;
+  depthAxial.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[5]*depthFalloff).x;
+  depthAxial.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KFloat2(0.0,  KInput(kernelCoords)[6].y)*depthFalloff).x;
+
+  KFloat lineStrength = CalculateLineStrength(centerDepth, depthDiagonal, depthAxial);
+  
+  KFloat4 sampledColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+
+  // This guarantees that the outline won't stomp on visible color in the render (ie. outline encroachment)
+  lineStrength = min(lineStrength, 1.0-sampledColor.w);
+  
+  KPSOutput(KLerp(sampledColor, KFloat4(0,0,0,1), lineStrength)); 
+}
+
+KPSMain(PostEffectToonEdgePS)
+{
+  KFloat centerDepth = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0)).x;
+  KFloat depthFalloff = 1.0-clamp( (eyeSpaceDepth(centerDepth)-130.0)/(256-130.0), 0.0, 1.0);
+  depthFalloff = depthFalloff*0.07 + 0.25;
+  depthFalloff *= 1.1;
+  
+  KFloat4 depthDiagonal;
+  KFloat4 depthAxial;
+  depthDiagonal.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[0]*depthFalloff).x;
+  depthDiagonal.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[2]*depthFalloff).x;
+  depthDiagonal.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[6]*depthFalloff).x;
+  depthDiagonal.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[8]*depthFalloff).x;
+  depthAxial.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KFloat2(0.0,  KInput(kernelCoords)[0].y)*depthFalloff).x;
+  depthAxial.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[3]*depthFalloff).x;
+  depthAxial.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[5]*depthFalloff).x;
+  depthAxial.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KFloat2(0.0,  KInput(kernelCoords)[6].y)*depthFalloff).x;
+
+  KFloat2 lineAndFogStrength = CalculateLineAndFogStrength(KInput(texCoord0), centerDepth, depthDiagonal, depthAxial);
+  
+  KFloat4 sampledColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KFloat4 foggedColor = sampledColor*lineAndFogStrength.y;
+  foggedColor.w = 1.0;
+  
+  KPSOutput(KLerp(sampledColor, foggedColor, lineAndFogStrength.x)); 
+}
+
+KPSMain(PostEffectToonEdgeWithXRayPS)
+{
+  KFloat centerDepth = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0)).x;
+  KFloat depthFalloff = 1.0-clamp( (eyeSpaceDepth(centerDepth)-130.0)/(256-130.0), 0.0, 1.0);
+  depthFalloff = depthFalloff*0.07 + 0.25;
+  depthFalloff *= 1.1;
+  
+  KFloat4 depthDiagonal;
+  KFloat4 depthAxial;
+  depthDiagonal.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[0]*depthFalloff).x;
+  depthDiagonal.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[2]*depthFalloff).x;
+  depthDiagonal.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[6]*depthFalloff).x;
+  depthDiagonal.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[8]*depthFalloff).x;
+  depthAxial.x = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KFloat2(0.0,  KInput(kernelCoords)[0].y)*depthFalloff).x;
+  depthAxial.y = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[3]*depthFalloff).x;
+  depthAxial.z = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KInput(kernelCoords)[5]*depthFalloff).x;
+  depthAxial.w = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0) + KFloat2(0.0,  KInput(kernelCoords)[6].y)*depthFalloff).x;
+
+  KFloat2 lineAndFogStrength = CalculateLineAndFogStrength(KInput(texCoord0), centerDepth, depthDiagonal, depthAxial);
+  
+  KFloat4 effectColor = KSampleTexture(effectSampler, effectTexture, KInput(texCoord0));
+  KFloat4 sampledColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  sampledColor.xyz = KLerp(sampledColor.xyz, effectColor.xyz, effectColor.w);
+  
+  KFloat4 foggedColor = sampledColor*lineAndFogStrength.y;
+  foggedColor.w = 1.0;
+  
+  KPSOutput(KLerp(sampledColor, foggedColor, lineAndFogStrength.x)); 
+}
+
+KPSMain(PostEffectToonEdgeWithXRayCopyPS)
+{
+  KFloat4 effectColor = KSampleTexture(effectSampler, effectTexture, KInput(texCoord0));
+  KFloat4 sampledColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KFloat4 resultColor = KFloat4(KLerp(sampledColor.xyz, effectColor.xyz, effectColor.w), 1.0);
+  
+  KPSOutput(resultColor); 
+}
+
+

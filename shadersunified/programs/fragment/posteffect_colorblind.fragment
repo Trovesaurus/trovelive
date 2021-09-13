@@ -1,0 +1,85 @@
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+// {Normal:{ R:[100, 0, 0], G:[0, 100, 0], B:[0, 100, 0]},
+ // Protanopia:{ R:[56.667, 43.333, 0], G:[55.833, 44.167, 0], B:[0, 24.167, 75.833]},
+ // Protanomaly:{ R:[81.667, 18.333, 0], G:[33.333, 66.667, 0], B:[0, 12.5, 87.5]},
+ // Deuteranopia:{ R:[62.5, 37.5, 0], G:[70, 30, 0], B:[0, 30, 70]},
+ // Deuteranomaly:{ R:[80, 20, 0], G:[25.833, 74.167, 0], B:[0, 14.167, 85.833]},
+ // Tritanopia:{ R:[95, 5, 0], G:[0, 43.333, 56.667], B:[0, 47.5, 52.5]},
+ // Tritanomaly:{ R:[96.667, 3.333, 0], G:[0, 73.333, 26.667], B:[0, 18.333, 81.667]},
+ // Achromatopsia:{ R:[29.9, 58.7, 11.4], G:[29.9, 58.7, 11.4], B:[29.9, 58.7, 11.4]},
+ // Achromatomaly:{ R:[61.8, 32, 6.2], G:[16.3, 77.5, 6.2], B:[16.3, 32.0, 51.6]}
+
+
+// from http://web.archive.org/web/20081014161121/http://www.colorjack.com/labs/colormatrix/
+
+// Additional info: http://www.colourblindawareness.org/colour-blindness/types-of-colour-blindness/
+ 
+KMat3 Protanopia()
+{
+  return KMat3(0.56667, 0.43333, 0, 0.55833, 0.44167, 0, 0, 0.24167, 0.75833);
+}
+
+KMat3 Protanomaly()
+{
+  return KMat3(.81667, .18333, 0, .33333, .66667, 0, 0, .125, .875);
+}
+
+KMat3 Deuteranopia()
+{
+  return KMat3(.625, .375, 0, .70, .30, 0, 0, .30, .70); 
+}
+
+KMat3 Deuteranomaly()
+{
+  return KMat3(.80, .20, 0, .25833, .74167, 0, 0, .14167, .85833);
+}
+
+KPSMain(PostEffectProtanomalyPS) 
+{
+  KFloat4 textureColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KPSOutput( KFloat4( KMUL(Protanomaly(), textureColor.rgb), 1.0) );
+} 
+
+KPSMain(PostEffectProtanopiaPS) 
+{
+  KFloat4 textureColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KPSOutput( KFloat4( KMUL(Protanopia(), textureColor.rgb), 1.0) );
+}
+
+KPSMain(PostEffectDeuteranomalyPS) 
+{
+  KFloat4 textureColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KPSOutput( KFloat4( KMUL(Deuteranomaly(), textureColor.rgb), 1.0) );
+}
+ 
+KPSMain(PostEffectDeuteranopiaPS) 
+{
+  KFloat4 textureColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KPSOutput( KFloat4( KMUL(Deuteranopia(), textureColor.rgb), 1.0) );
+}
+
+KPSMain(PostEffectGrayscalePS) 
+{
+const KFloat3 luminanceCoefficient = KFloat3(0.2125, 0.7154, 0.0721);
+  
+  KFloat scroll = gameTime;
+  
+  
+  KFloat4 textureColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KFloat luminanceStrength = dot(textureColor.xyz, luminanceCoefficient);
+  
+  
+  KPSOutput( KFloat4( luminanceStrength,luminanceStrength,luminanceStrength, 1.0) );
+}

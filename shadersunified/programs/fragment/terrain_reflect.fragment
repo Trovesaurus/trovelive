@@ -1,0 +1,98 @@
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, texCoord1, TEXCOORD1)
+  
+  KPDataInOut( KFloat4, tintColor, COLOR0)
+  KPDataInOut( KFloat4, blockColor, COLOR1)
+  
+  KPDataInOut( KFloat4, fog, TEXCOORD2)
+  KPDataInOut( KFloat3, reflectVec, TEXCOORD3)
+  KPDataInOut( KFloat3, normal, TEXCOORD4)
+  KPDataInOut( KFloat3, tangent, TEXCOORD5)
+  KPDataInOut( KFloat3, worldPos, TEXCOORD6)
+  
+  KPDataOutColor
+KPDataEnd
+
+KFloat4 GetPointLightingReflect(KFloat3 viewNormal, KFloat3 worldPos)
+{
+  if (dot(viewNormal,viewNormal) > .5)
+  {
+    return KFloat4(Lighting_PointLighting(viewNormal, worldPos, sunLightColor.xyz), 0.0);
+  }
+  else
+  {
+    return KFloat4(0.0, 0.0, 0.0, 0.0);
+  }
+}
+
+KFloat4 CalcTerrainReflectColor(KPSData KInputVar)
+{
+  KHalf4 diffuseColor = KSampleTextureNoMip(diffuseSampler, diffuseTexture, KInput(texCoord1));
+  KHalf4 effectColor = KSampleTextureNoMip(effectSampler, effectTexture, KInput(texCoord1));
+  
+  KFloat4 normalLookup = NormalMap_GetNormalWithSS(KInput(texCoord0), KInput(normal), KInput(tangent));
+  KFloat3 viewNormal = normalLookup.xyz;
+  
+  KFloat4 diffuseLighting = sunLightColor*Lighting_DiffuseStrength(viewNormal, sunLightPosition);
+
+  KFloat darkness = KInput(blockColor).w;
+  
+  KFloat cubeStrength = Lighting_CubeStrength(viewNormal, KInput(worldPos))*effectColor.z*(0.333333+darkness*0.66666667);
+  KFloat brdfStrength = darkness*(1.0 - cubeStrength);
+  cubeStrength *= 2.0;
+  KFloat4 specularColor = Lighting_CubeSample(KInput(reflectVec).xyz)*cubeStrength +
+                          Lighting_BRDFSpecular(viewNormal, 
+                                                sunLightPosition,
+                                                KInput(worldPos),
+                                                effectColor.x*8.0)*sunLightSpecular*brdfStrength;
+  
+  KFloat4 pointLightColor = GetPointLightingReflect(viewNormal, KInput(worldPos));
+  
+  KFloat4 nonGlowingColor = (KInput(blockColor) + diffuseLighting*darkness + specularColor + ambientLightColor + pointLightColor);
+  
+  //effectColor.y is the glow amount
+  KFloat4 fullyLitColor = KInput(tintColor) * diffuseColor * KLerp(nonGlowingColor, KFloat4(1.0,1.0,1.0,1.0), effectColor.y);
+  
+  KFloat4 fogAndLitColor;
+  fogAndLitColor.xyz = KLerp(fullyLitColor.xyz, KInput(fog).xyz, KInput(fog).w);
+  fogAndLitColor.w = max( max(specularColor.x, specularColor.y),
+                          max(KInput(tintColor).w, specularColor.z)) *
+                          diffuseColor.w;
+  
+  return fogAndLitColor;
+}
+
+KFloat4 CalcMetalColor(KPSData KInputVar)
+{
+  KFloat4 normalLookup = NormalMap_GetNormalWithSS(KInput(texCoord0), KInput(normal), KInput(tangent));
+  KFloat3 viewNormal = normalLookup.xyz;
+  
+  KFloat4 diffuseLighting = sunLightColor*Lighting_DiffuseStrength(viewNormal, sunLightPosition);
+  
+  KFloat4 cubeColor = Lighting_CubeSample(KInput(reflectVec).xyz);
+  
+  //Make more 'gold colored'
+  const KFloat colorPower = 0.400;
+  cubeColor.xyz = pow(abs(cubeColor.xyz), KFloat3(colorPower, colorPower, colorPower));
+  cubeColor.xyz *= KFloat3(0.90980392156862744, 0.84313725490196079, 0.47450980392156861);
+  cubeColor.xyz *= 2.0;
+  
+  return cubeColor*KLerp(KFloat4(1.0, 1.0, 1.0, 1.0), diffuseLighting, KFloat4(0.6, 0.6, 0.6, 0.6));
+}
+
+KPSMain(TerrainReflectPS)
+{ 
+  KFloat4 terrainColor = CalcTerrainReflectColor(KInputVar);
+    
+  KPSOutput(terrainColor);
+}
+
+KPSMain(TerrainMetalPS)
+{ 
+  KFloat4 terrainColor = CalcMetalColor(KInputVar);
+    
+  KPSOutput(terrainColor);
+}

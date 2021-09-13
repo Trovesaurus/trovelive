@@ -1,0 +1,78 @@
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat2, in_TexCoord0, UV)
+  KVDataInOut( KFloat2, in_Extra, EXTRA)
+  KVDataInOut( KFloat4, in_Color0, COLOR0)
+  KVDataInOut( KFloat4, in_Color1, COLOR1)
+  KVDataInOut( KFloat3, in_Normal, NORMAL)
+  KVDataInOut( KFloat3, in_Tangent, TANGENT)
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, texCoord1, TEXCOORD1)
+  
+  KPDataInOut( KFloat4, tintColor, COLOR0)
+  KPDataInOut( KFloat4, blockColor, COLOR1)
+  
+  KPDataInOut( KFloat4, fog, TEXCOORD2)
+  KPDataInOut( KFloat3, reflectVec, TEXCOORD3)
+  KPDataInOut( KFloat3, normal, TEXCOORD4)
+  KPDataInOut( KFloat3, tangent, TEXCOORD5)
+  KPDataInOut( KFloat3, worldPos, TEXCOORD6)
+KPDataEnd
+
+KFloat4 _TransformTerrainReflect(KFloat3 position)
+{
+  return KMUL(gModelViewProjectionMatrix, KFloat4(position, 1.0));
+}
+
+KModifierFunction BasicTerrainReflect(KVSData KInputVar)
+{
+  KDeclareOutput;
+  
+  KSetPosition(Pos, _TransformTerrainReflect(KInput(in_Position)));
+  KOutput(texCoord0) = KInput(in_TexCoord0);
+  KOutput(texCoord1) = KInput(in_Extra);
+  
+  KOutput(tintColor) = KInput(in_Color0);
+  KOutput(blockColor) = KInput(in_Color1);
+  
+  KOutput(normal) = normalize(KMUL(gNormalMatrix, KInput(in_Normal)));
+  KOutput(tangent) = normalize(KMUL(gNormalMatrix, KInput(in_Tangent)));
+  
+  KOutput(worldPos) = KMUL(gModelViewMatrix, KFloat4(KInput(in_Position), 1.0)).xyz;
+  
+  KFloat fogDarkCoeff = clamp(dot(normalize(KOutput(worldPos)), sunLightPosition)*2.0 - 1.0, 0.0, 1.0);
+  KOutput(fog).xyz = KLerp(darkFogColor, lightFogColor, fogDarkCoeff).xyz;
+  KOutput(fog).w = Lighting_DepthFogVertex(length(KOutput(worldPos)));
+  
+  KFloat3 bentNormal = normalize(KMUL(gNormalMatrix, KInput(in_Normal) + normalize(KInput(in_Position))*0.50));
+  
+  KFloat3 R = reflect(KOutput(worldPos), bentNormal).xyz;
+  
+  //TODO - could precalculate inverse and pass it in here, GPU inverse is hella slow
+  // Since transpose == inverse for an orthogonal matrix, this works fine for most cases
+  R = KMUL(transpose(gViewMatrix), KFloat4(R,0.0)).xyz;
+  
+  KOutput(reflectVec).xyz = R.xyz;
+  KVSOutput;
+} 
+
+KVSMain(TerrainReflectVS)
+{
+  KDeclareOutput;
+  KModifyData(BasicTerrainReflect);
+  KVSOutput;
+}
+
+KVSMain(TerrainReflectAreaColorVS)
+{
+  KDeclareOutput;
+  KModifyData(BasicTerrainReflect);
+  KOutput(blockColor).xyz = illumination.xyz;
+  KOutput(blockColor).w = illumination.w * KInput(in_Color1).w;
+  KVSOutput;
+}

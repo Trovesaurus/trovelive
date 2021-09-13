@@ -1,0 +1,40 @@
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+KDeclareColorDepthData
+KPSColorDepthMain(PostEffectDespecklePS) {
+
+  KDeclareColorDepthOutput;
+	
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  KFloat centerDepth = KSampleTexture(depthSampler, depthTexture, KInput(texCoord0)).x;
+  
+  KFloat4 depthAxial;
+  // texCoord0 is pre-added in vertex shader
+  depthAxial.x = KSampleTexture(depthSampler, depthTexture,  KInput(kernelCoords)[1]).x;
+  depthAxial.y = KSampleTexture(depthSampler, depthTexture,  KInput(kernelCoords)[3]).x;
+  depthAxial.z = KSampleTexture(depthSampler, depthTexture,   KInput(kernelCoords)[5]).x;
+  depthAxial.w = KSampleTexture(depthSampler, depthTexture,   KInput(kernelCoords)[7]).x;
+  
+  const KFloat epsilon = 0.0000001;
+  KFloat4 thresholdAxial = step(KFloat4(epsilon,epsilon,epsilon,epsilon),
+                                KFloat4(centerDepth,centerDepth,centerDepth,centerDepth) - depthAxial);
+  // 1 iff every element of the vector crossed the threshold
+  // Should only remove orphan 'hole' pixels (center depth is greater than 1-ring)
+  KFloat detectSpeckle = min(
+                      min(thresholdAxial.x, thresholdAxial.y), 
+                      min(thresholdAxial.z, thresholdAxial.w)
+                      );    
+  KFloat4 sideColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(kernelCoords)[3]);
+  
+  colorSample = KLerp(colorSample, sideColor, detectSpeckle);
+  centerDepth = KLerp(centerDepth, depthAxial.y, detectSpeckle);
+  
+  KPSColorDepthOutput(colorSample, centerDepth);
+  
+}
+

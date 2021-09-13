@@ -1,0 +1,204 @@
+VertexShader "common/KDefines.common";
+FragmentShader "common/KDefines.common";
+VertexShader "common/KShaderGlobals.common";
+FragmentShader "common/KShaderGlobals.common";
+FragmentShader "common/KTextures.common";
+
+VertexShader "vertex/Library_Fog.vertex";
+FragmentShader "fragment/Library_DiffuseLighting.fragment";
+FragmentShader "fragment/Library_SpecularLighting.fragment";
+FragmentShader "fragment/Library_NormalMap.fragment";
+
+technique Terrain_Opaque {
+  Phase = Opaque;
+
+  pass solidPass {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = TerrainPS;
+  }
+}
+
+technique Terrain_Opaque_Simple {
+  Phase = Opaque;
+
+  pass solidPass {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = TerrainSimplePS;
+  }
+}
+
+technique Terrain_Reflect {
+  Phase = Opaque;
+
+  pass solidPass {
+    VertexShader "vertex/Terrain_Reflect.vertex";
+    FragmentShader "fragment/Terrain_Reflect.fragment";
+    
+    VertexMain = TerrainReflectVS;
+    FragmentMain = TerrainReflectPS;
+  }
+}
+
+technique Terrain_Metal {
+  Phase = Opaque;
+
+  pass solidPass {
+    VertexShader "vertex/Terrain_Reflect.vertex";
+    FragmentShader "fragment/Terrain_Reflect.fragment";
+    
+    VertexMain = TerrainReflectVS;
+    FragmentMain = TerrainMetalPS;
+  }
+}
+
+technique Terrain_AlphaBlend {
+  Phase = Transparent_2;
+  
+  pass p1 {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    VertexMain = TerrainVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    VertexMain = TerrainVS;
+    FragmentMain = TerrainPS;
+  }
+}
+
+technique Terrain_AlphaBlend_Simple {
+  Phase = Transparent_2;
+  
+  pass p1 {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    VertexMain = TerrainVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    VertexMain = TerrainVS;
+    FragmentMain = TerrainSimplePS;
+  }
+}
+
+technique Terrain_AlphaTest {
+  Phase = Transparent_1;
+
+  pass solidPass {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    AlphaBlendEnable = 1;
+    VertexMain = TerrainVS;
+    FragmentMain = TerrainAlphaTestPS;
+  }
+}
+
+technique Terrain_Invisible {
+  Phase = Transparent_2;
+
+  pass p1 {
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 0;
+    
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    VertexMain = TerrainVS;
+    FragmentMain = SolidWhitePS;
+  }
+}
+
+technique Terrain_Grayscale {
+  Phase = Transparent_2;
+  
+  pass p1 {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/SolidColors.fragment";
+    
+    ZFunc = LessEqual;
+		ZWriteEnable = 1;
+		ColorWriteEnable = 0;
+		AlphaBlendEnable = 1;
+    VertexMain = TerrainVS;
+    FragmentMain = SolidWhitePS;
+  }
+  
+  pass p2 {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    
+    ZFunc = Equal;
+		ZWriteEnable = 0;
+    AlphaBlendEnable = 1;
+    VertexMain = TerrainVS;
+    FragmentMain = TerrainGrayscalePS;
+  }
+}
+
+technique Terrain_DistanceFade {
+  Phase = Transparent_1;
+
+  pass solidPass {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+    
+    AlphaBlendEnable = 1;
+    
+    VertexMain = TerrainShrinkVS;
+    FragmentMain = TerrainDistanceFadePS;
+  }
+}
+
+technique Terrain_DistanceFadeSimple {
+  Phase = Transparent_1;
+
+  pass solidPass {
+    VertexShader "vertex/Terrain.vertex";
+    FragmentShader "fragment/Terrain.fragment";
+    FragmentShader "fragment/Special.fragment";
+    
+    AlphaBlendEnable = 1;
+    
+    
+    VertexMain = TerrainShrinkVS;
+    FragmentMain = TerrainDistanceFadeSimplePS;
+  }
+}

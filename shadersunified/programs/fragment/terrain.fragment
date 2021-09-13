@@ -1,0 +1,168 @@
+#define BRDFINDEXCOUNT 8.0
+
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, texCoord1, TEXCOORD1)
+  
+  KPDataInOut( KFloat4, tintColor, COLOR0)
+  KPDataInOut( KFloat4, blockColor, COLOR1)
+  KPDataInOut( KFloat2, fogBrdf, COLOR2)
+  
+  KPDataInOut( KFloat3, normal, TEXCOORD2)
+  KPDataInOut( KFloat3, tangent, TEXCOORD3)
+  KPDataInOut( KFloat3, worldPos, TEXCOORD4)
+  KPDataInOut( KFloat3, localPos, TEXCOORD5)
+  KPDataOutColor
+KPDataEnd
+
+KFloat4 GetPointLightingSS(KFloat3 viewNormal, KFloat ssStrength, KFloat3 worldPos)
+{
+  if (dot(viewNormal,viewNormal) > .5)
+  {
+    return KFloat4(Lighting_PointLightingSS(viewNormal, worldPos, sunLightColor.xyz, ssStrength), 0.0);
+  }
+  else
+  {
+    return KFloat4(0.0, 0.0, 0.0, 0.0);
+  }
+}
+
+KFloat4 GetPointLighting(KFloat3 viewNormal, KFloat3 worldPos)
+{
+  if (dot(viewNormal,viewNormal) > .5)
+  {
+    return KFloat4(Lighting_PointLighting(viewNormal, worldPos, sunLightColor.xyz), 0.0);
+  }
+  else
+  {
+    return KFloat4(0.0, 0.0, 0.0, 0.0);
+  }
+}
+
+KFloat CalcDistAtten(KFloat3 worldPos)
+{
+  KFloat worldDist = length(worldPos);
+  KFloat borderCutoff =  worldDist - (gViewDistance*0.5);
+  return 1.0 - clamp(((borderCutoff+20.0)/21.0), 0.0,  1.0);
+}
+
+KFloat4 CalcTerrainColor(KPSData KInputVar)
+{
+  KHalf4 diffuseColor = KSampleTextureNoMip(diffuseSampler, diffuseTexture, KInput(texCoord1));
+  KHalf4 effectColor = KSampleTextureNoMip(effectSampler, effectTexture, KInput(texCoord1));
+  
+  KFloat4 normalLookup = NormalMap_GetNormalWithSS(KInput(texCoord0), KInput(normal), KInput(tangent));
+  KFloat3 viewNormal = normalLookup.xyz;
+  
+  KFloat4 diffuseLighting = Lighting_LightingSS(viewNormal,
+                                                sunLightPosition,
+                                                sunLightColor, 
+                                                normalLookup.w);
+  KFloat4 specularColor = Lighting_BRDFSpecular(viewNormal, 
+                                                sunLightPosition,
+                                                KInput(worldPos),
+                                                effectColor.x*8.0)*sunLightSpecular;
+  KFloat distAtten = CalcDistAtten(KInput(worldPos));
+  specularColor *= distAtten;
+  
+  KFloat fogDarkCoeff = clamp(dot(normalize(KInput(worldPos)), sunLightPosition)*2.0 - 1.0, 0.0, 1.0);
+  KFloat4 fogColor = KLerp(darkFogColor, lightFogColor, fogDarkCoeff);
+  
+  KFloat4 pointLightColor = GetPointLightingSS(viewNormal, normalLookup.w, KInput(worldPos));
+  
+  KFloat darkness = KInput(blockColor).w;
+  KFloat4 nonGlowingColor = (KInput(blockColor) + (diffuseLighting + specularColor) * darkness + ambientLightColor + pointLightColor);
+  
+  KFloat glowAmount = ( 1.0-normalLookup.w) * 0.25 + 0.95;
+  
+  //effectColor.y is the glow amount
+  KFloat4 fullyLitColor = KInput(tintColor) * diffuseColor * KLerp(nonGlowingColor, KFloat4(1.0,1.0,1.0,1.0)*glowAmount, effectColor.y);
+  
+  KFloat4 fogAndLitColor = KLerp(fullyLitColor, fogColor, KInput(fogBrdf.x));
+  fogAndLitColor.w = max( max(specularColor.x, specularColor.y),
+                          max(KInput(tintColor).w, specularColor.z)) *
+                          diffuseColor.w;
+  
+  return fogAndLitColor;
+}
+
+KFloat4 CalcTerrainColorUnlit(KPSData KInputVar)
+{
+  KHalf4 diffuseColor = KSampleTextureNoMip(diffuseSampler, diffuseTexture, KInput(texCoord1));
+  KHalf4 effectColor = KSampleTextureNoMip(effectSampler, effectTexture, KInput(texCoord1));
+  
+  KFloat darkness = KInput(blockColor).w;
+  KFloat fogDarkCoeff = clamp(dot(normalize(KInput(worldPos)), sunLightPosition)*2.0 - 1.0, 0.0, 1.0);
+  KFloat4 fogColor = KLerp(darkFogColor, lightFogColor, fogDarkCoeff);
+  
+  KFloat4 fullyLitColor = KInput(tintColor) * diffuseColor * KLerp(KInput(blockColor) + ambientLightColor, KFloat4(1.0,1.0,1.0,1.0), effectColor.y);
+  
+  KFloat4 fogAndUnLitColor = KLerp(fullyLitColor, fogColor, KInput(fogBrdf).x);
+  fogAndUnLitColor.w = diffuseColor.w;
+  
+  return fogAndUnLitColor;
+}
+
+
+KPSMain(TerrainPS)
+{ 
+  KFloat4 terrainColor = CalcTerrainColor(KInputVar);
+    
+  KPSOutput(terrainColor);
+}
+
+KPSMain(TerrainGrayscalePS)
+{ 
+  KFloat4 terrainColor = CalcTerrainColor(KInputVar);
+  
+  KFloat luminanceStrength = sqrt(dot(terrainColor.xyz, KFloat3(0.299, 0.587, 0.114)));
+  terrainColor.xyz = KFloat3(luminanceStrength, luminanceStrength, luminanceStrength);  
+    
+  KPSOutput(terrainColor);
+}
+
+KPSMain(TerrainAlphaTestPS)
+{ 
+  KFloat4 terrainColor = CalcTerrainColor(KInputVar);
+  
+  if(terrainColor.w < 0.5)
+    discard;
+        
+  KPSOutput(terrainColor);
+}
+
+KFloat4 CalcSimpleTerrainColor(KPSData KInputVar)
+{
+  KFloat fogDarkCoeff = clamp(dot(normalize(KInput(worldPos)), sunLightPosition)*2.0 - 1.0, 0.0, 1.0);
+  
+  KFloat4 fogColor = KLerp(darkFogColor, lightFogColor, fogDarkCoeff);
+  
+  KHalf4 diffuseColor = KSampleTextureNoMip(diffuseSampler, diffuseTexture, KInput(texCoord1));
+  KHalf4 effectColor = KSampleTextureNoMip(effectSampler, effectTexture, KInput(texCoord1));
+  
+  KFloat4 diffuseLighting = Lighting_LightingSS(KInput(normal),
+                                                sunLightPosition,
+                                                sunLightColor, 
+                                                0.0);
+  
+  KFloat4 pointLightColor = GetPointLighting(KInput(normal), KInput(worldPos));
+  
+  KFloat4 nonGlowingColor = (KInput(blockColor) + diffuseLighting*KInput(blockColor).w + ambientLightColor + pointLightColor);
+  
+  KFloat glowAmount = 1.2;
+  KFloat4 litColor = diffuseColor* KInput(tintColor) * KLerp(nonGlowingColor, KFloat4(1.0,1.0,1.0,1.0)*glowAmount, effectColor.y);
+  
+  litColor.xyz = KLerp(litColor, fogColor, KInput(fogBrdf).x).xyz;
+  litColor.w = KInput(tintColor).w * diffuseColor.w;
+  
+  return litColor;
+}
+
+KPSMain(TerrainSimplePS)
+{ 
+  KFloat4 terrainColor = CalcSimpleTerrainColor(KInputVar);
+    
+  KPSOutput(terrainColor);
+}

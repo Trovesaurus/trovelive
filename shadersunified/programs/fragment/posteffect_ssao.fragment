@@ -1,0 +1,171 @@
+
+//#define DEBUGSSAO 1
+#ifndef DEBUGSSAO
+#define DEBUGSSAO 0
+#endif
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, kernelCoords[9], TEXCOORD2)
+  KPDataOutColor
+KPDataEnd
+
+
+KPSMain(PostEffectSSAODownsamplePS)
+{
+  KPSOutput(KFloat4(0.0, 1.0, 0.0, 0.0));
+}
+
+KFloat eyeSpaceDepth(KFloat sampleValue)
+{
+  KFloat z_b = sampleValue;
+  KFloat z_n = KRescaleDepthValue(z_b);
+  KFloat z_e = 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+
+	return z_e;
+}
+
+KFloat GetSampleWeightAndDiscontinuity(KFloat centerDepth, KFloat2 centerPos, KFloat2 offset, KFloat distanceScale)
+{
+  KFloat sampleScaler = distanceScale*3.0;
+  KFloat sample0 = eyeSpaceDepth(KSampleTexture(depthSampler, depthTexture, centerPos + offset*sampleScaler).x);
+  KFloat sample1 = eyeSpaceDepth(KSampleTexture(depthSampler, depthTexture, centerPos - offset*sampleScaler).x);
+  
+  KFloat sampleVol = centerDepth - (sample0 + sample1)*0.5;
+  sampleVol = max(sampleVol, 0.0)*distanceScale;
+  KFloat stepThreshold = 0.01 + ( 1.0 - distanceScale)*0.01;
+  sampleVol *= step(stepThreshold, sampleVol);
+  
+  const KFloat cutoff = 0.325;
+  const KFloat cutoffMin = 0.06;
+    
+  KFloat maxDiff = max(abs(sample0 - centerDepth), abs(sample1 - centerDepth));
+  maxDiff = max(maxDiff, 0.0);
+  
+  KFloat threshold = 1.0-clamp((maxDiff - cutoffMin)/(cutoff - cutoffMin), 0.0, 1.0);
+  sampleVol *= threshold;
+  
+  return sampleVol*5.0;
+}
+
+KPSMain(PostEffectSSAOPS)
+{
+  KFloat centerDepth = eyeSpaceDepth(KSampleTexture(depthSampler, depthTexture, KInput(texCoord0)).x);
+  
+  KFloat distanceScale = 1.0-clamp((centerDepth- 0.0)/(32.0 - 0.0), 0.0, 1.0);
+  distanceScale = pow(distanceScale, 0.5);
+  
+  KFloat summedSample = 0.0;
+  
+   summedSample += GetSampleWeightAndDiscontinuity(centerDepth, KInput(texCoord0), KInput(kernelCoords)[0]*1.0, distanceScale);
+   summedSample += GetSampleWeightAndDiscontinuity(centerDepth, KInput(texCoord0), KFloat2(0.0,  KInput(kernelCoords)[0].y)*1.414, distanceScale);
+   summedSample += GetSampleWeightAndDiscontinuity(centerDepth, KInput(texCoord0), KInput(kernelCoords)[2]*1.0, distanceScale);
+   summedSample += GetSampleWeightAndDiscontinuity(centerDepth, KInput(texCoord0), KInput(kernelCoords)[3]*1.414, distanceScale);
+  
+  summedSample = 1.0-clamp(summedSample, 0.0, 1.0);
+  KFloat4 ssaoColor = KFloat4(summedSample, summedSample, summedSample, 1.0);
+  
+  KPSOutput(ssaoColor);  
+  
+}
+
+//dilate with a 1d box filter
+KPSMain(PostEffectSSAODilateHPS) 
+{
+  KFloat4 ssaoColor = KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0));
+#if (DEBUGSSAO == 1)
+  KPSOutput( ssaoColor);
+#endif  
+  KFloat darkest = ssaoColor.r;
+  
+  darkest += KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[3]).x;
+  darkest += KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[5]).x;
+  darkest += KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[3]*2).x;
+  darkest += KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0) + KInput(kernelCoords)[5]*2).x;
+  darkest *= 0.2;
+  
+  ssaoColor.xyz = KFloat3(darkest,darkest,darkest);
+  
+  KPSOutput( ssaoColor);
+}
+
+KPSMain(PostEffectSSAODilateVPS) {
+  KFloat4 ssaoColor = KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0) );
+#if (DEBUGSSAO == 1)
+  KPSOutput( ssaoColor);
+#endif  
+  KFloat darkest = ssaoColor.r;
+  
+  KFloat2 up = KFloat2(0.0,  KInput(kernelCoords)[0].y);
+  KFloat2 down = KFloat2(0.0,  KInput(kernelCoords)[6].y);
+  
+  darkest += KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0) + up*1).x;
+  darkest += KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0) + down*1).x;
+  darkest += KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0) + up*2).x;
+  darkest += KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0) + down*2).x;
+  darkest *= 0.2;
+  
+  ssaoColor.xyz = KFloat3(darkest,darkest,darkest);
+  
+  KPSOutput( ssaoColor);
+}
+
+// //See gaussianweights.py
+//Pascal row
+//[1, 17, 136, 680, 2380, 6188, 12376, 19448, 24310, 24310, 19448, 12376, 6188, 2380, 680, 136, 17, 1]
+
+//Weights
+//[0.1855215360664245, 0.1484172288531396, 0.09444732745199792, 0.04722366372599896, 0.01816294758692268, 0.005189413596263622, 0.0010378827192527244]
+
+//Discrete weights and offsets
+//[[0.24286455630513754, 0.06538661131292164, 0.006227296315516347], [1.3888888888888888, 3.277777777777778, 5.166666666666666]]
+
+KFloat4 GaussianBlur(  KFloat2 centerUV, KFloat2 pixelOffset )                                                                           
+{        
+#if (KIWI_HLSL == 1) || (KIWI_PSSL == 1)
+  const KFloat offsets[4] = {0.0, 1.3888888888888888, 3.277777777777778, 5.166666666666666};
+  const KFloat weights[4] = {0.371043072132849, 0.24286455630513754, 0.06538661131292164, 0.006227296315516347};
+#else
+  const KFloat offsets[4] = KFloat[](0.0, 1.3888888888888888, 3.277777777777778, 5.166666666666666);
+  const KFloat weights[4] = KFloat[](0.371043072132849, 0.24286455630513754, 0.06538661131292164, 0.006227296315516347);
+#endif
+  
+  KFloat4 blurredResult = KSampleTexture( diffuseSampler, diffuseTexture, centerUV )*weights[0];
+  for (int i=1; i < 4; i++)
+  {
+    blurredResult += KSampleTexture( diffuseSampler, diffuseTexture, centerUV+pixelOffset*offsets[i]) * weights[i];
+    blurredResult += KSampleTexture( diffuseSampler, diffuseTexture, centerUV-pixelOffset*offsets[i]) * weights[i];
+  }
+  return blurredResult;                                                                                                                                                            
+}                       
+
+//separable gaussian kernel
+KPSMain(PostEffectSSAOHGaussianPS) 
+{
+  KFloat4 blurredColor = GaussianBlur( KInput(texCoord0), KInput(kernelCoords)[5]);
+#if (DEBUGSSAO == 1)
+  KPSOutput( KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0)));
+#endif
+  KPSOutput( blurredColor);
+}
+
+KPSMain(PostEffectSSAOVGaussianPS) {
+  KFloat4 blurredColor = GaussianBlur( KInput(texCoord0), KFloat2(0.0,  KInput(kernelCoords)[0].y));
+#if (DEBUGSSAO == 1)
+  KPSOutput( KSampleTexture( diffuseSampler, diffuseTexture, KInput(texCoord0)));
+#endif  
+  KPSOutput( blurredColor);
+}
+
+KPSMain(PostEffectSSAOCompositePS)
+{ 
+  KFloat4 bloomColor = KSampleTexture(effectSampler, effectTexture, KInput(texCoord0)); 
+  //bloomColor.xyz = sqrt(bloomColor.xyz);
+  
+#if (DEBUGSSAO == 0)
+  bloomColor = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0)) * bloomColor;
+#endif
+  
+  KPSOutput(bloomColor);
+}

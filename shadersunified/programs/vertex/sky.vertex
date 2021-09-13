@@ -1,0 +1,22 @@
+
+KVDataBegin
+  KVDataInOut( KFloat3, in_Position, POSITION)
+  KVDataInOut( KFloat3, in_Normal, NORMAL)
+  KVDataInOut( KFloat2, in_TexCoord0, UV0)
+  KVDataInOut( KFloat2, in_TexCoord1, UV1)
+KVDataEnd
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+KPDataEnd
+           
+KVSMain(SkyBasicVS) 
+{
+  KDeclareOutput;
+  
+	KOutput(texCoord0) = KInput(in_TexCoord0);
+  KSetPosition(Pos, KMUL(gModelViewProjectionMatrix, KFloat4(KInput(in_Position), 1.0)));
+  
+  KVSOutput;
+}

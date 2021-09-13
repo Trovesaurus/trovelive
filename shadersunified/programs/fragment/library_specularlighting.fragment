@@ -1,0 +1,44 @@
+
+
+KFloat4 Lighting_BRDFSpecular(KFloat3 viewNormal, KFloat3 lightDir, KFloat3 worldPos, KFloat selectPair)
+{
+  KFloat select = floor(selectPair+0.01);
+  KFloat bias = selectPair-select;
+  KFloat2 index = KFloat2( mod(select, 4.0), step((selectPair+0.01)/4.0, 1.0));
+  
+  KFloat3 N = normalize(viewNormal);
+  KFloat3 E = normalize(-worldPos);
+  KFloat3 L = normalize(lightDir);
+  KFloat3 H = normalize(E+L);
+  
+  KFloat2 txPos;
+  
+  txPos.x = (dot(N,H) / (1.0-bias)) - bias/(1.0-bias);
+  txPos.x = clamp(txPos.x, 0.0078125, 0.9921875); //half-pixel inner sample
+  
+  txPos.y = dot(L,H);
+  txPos.y = clamp(txPos.y, 0.00390625, 0.99609375);
+  
+  txPos = (index + txPos)*KFloat2(0.25,0.5);
+  //txPos.y = 1.0 - txPos.y;
+    
+  KFloat NdotL = clamp((dot(N,L)*2.0+1.0), 0.0, 1.0);
+  
+  return KSampleTextureNoMip(BRDFSampler, BRDFTexture, txPos)*NdotL*1.5;
+}
+
+KFloat Lighting_CubeStrength(KFloat3 viewNormal, KFloat3 worldPos)
+{
+  KFloat3 E = normalize(-worldPos);
+  KFloat3 N = normalize(viewNormal);
+  KFloat eDotN = max(1.0-dot(E,N), 0.0);
+  
+  KFloat bias = 0.5;
+  eDotN = max(bias + (1.0-bias)*eDotN*eDotN, 0.0);
+  return eDotN;
+}
+
+KFloat4 Lighting_CubeSample(KFloat3 reflectDir)
+{   
+  return KSampleCube(cubeSampler, cubeTexture, reflectDir);
+}

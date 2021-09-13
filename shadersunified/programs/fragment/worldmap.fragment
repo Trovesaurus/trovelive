@@ -1,0 +1,96 @@
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat4, color, COLOR0)
+  KPDataOutColor
+KPDataEnd
+
+// From http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
+KFloat3 rgb2hsv(KFloat3 c)
+{
+    KFloat4 K = KFloat4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    KFloat4 p = KLerp(KFloat4(c.zy, K.wz), KFloat4(c.yz, K.xy), step(c.z, c.y));
+    KFloat4 q = KLerp(KFloat4(p.xyw, c.x), KFloat4(c.x, p.yzx), step(p.x, c.x));
+
+    KFloat d = q.x - min(q.w, q.y);
+    KFloat e = 1.0e-10;
+    return KFloat3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+ 
+KFloat3 hsv2rgb(KFloat3 c)
+{
+    KFloat4 K = KFloat4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    KFloat3 p = abs(KFrac(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * KLerp(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+KPSMain(WorldMapElementPS)
+{ 
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  KPSOutput(KInput(color) * colorSample);
+}
+
+KPSMain(HighlightedWorldMapElementPS)
+{ 
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  
+  KFloat scroll = gameTime * 1.0;
+  KFloat3 coord = KPosInput(Pos).xyz * 0.250;
+  const KFloat cos45 = 0.70710678118654752440084436210485;
+  
+  coord.xy = KFloat2(cos45*(coord.x - coord.y), cos45*(coord.x + coord.y));
+  
+  KFloat linearPulse = abs(KFrac(scroll) - 0.5);
+  
+  KFloat stippleSum = abs(sin(coord.x + scroll))
+               + abs(sin(coord.y - scroll*0.5))
+               + linearPulse;
+  KFloat stipple = 1.0-stippleSum*0.3333333333333;
+  KFloat stippleRound = sqrt(stipple);
+
+  KFloat3 baseColor = KInput(color).xyz;
+  
+  //faded color
+  KFloat3 hsv = rgb2hsv(baseColor);
+  KFloat3 fadedColor = hsv2rgb(KFloat3(hsv.x, hsv.y*0.25, hsv.z*0.5));
+  
+  KFloat hueShift = 0.6*stipple - 0.3;
+  if(hueShift + hsv.x < 0.0)
+  {
+    hueShift += 1.0;
+  }
+  
+  //fullbright hueshifted color
+  KFloat3 fullbrightColor = hsv2rgb(KFloat3(hsv.x + hueShift, 1.0, 1.0));
+  
+  KFloat4 outColor = KFloat4(KLerp( baseColor*colorSample.rgb, fadedColor+fullbrightColor, stippleRound), stipple*stipple*0.75 + 0.25);
+  
+  KPSOutput(outColor);
+  
+}
+
+KPSMain(WorldMapLensPS)
+{ 
+  KFloat4 colorSample = KSampleTexture(diffuseSampler, diffuseTexture, KInput(texCoord0));
+  KFloat4 fogOfWarSample = KSampleTexture(effectSampler, effectTexture, KInput(texCoord0)); 
+  
+  KFloat xFade = (0.5 - KInput(texCoord0).x);
+  KFloat yFade = (0.5 - KInput(texCoord0).y);
+  
+  KFloat fadeAmount = length(KFloat2(xFade*1.25, yFade))*1.4142135623730950488016887242097;// sqrt(2)
+  fadeAmount = clamp(fadeAmount, 0.0, 1.0);
+  fadeAmount = pow(fadeAmount, 1.50);
+  
+  KFloat4 fadedColor;
+  KFloat3 hsvColor = rgb2hsv(colorSample.xyz);
+  hsvColor.y *= (1.0 - fadeAmount*0.75);
+  
+  fadedColor.xyz = hsv2rgb(hsvColor);
+  fadedColor.w = 1.0;
+  
+  KFloat blendValue = fogOfWarSample.x;
+
+  fadedColor = KLerp(KFloat4(0.0, 0.0, 0.0, 1.0), fadedColor, blendValue);
+  
+  KPSOutput( fadedColor);
+}

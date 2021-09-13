@@ -1,0 +1,236 @@
+
+KPDataBegin
+  KPDataPosition( KFloat4, Pos, SV_POSITION)
+  KPDataInOut( KFloat2, texCoord0, TEXCOORD0)
+  KPDataInOut( KFloat2, texCoord1, TEXCOORD1)
+  
+  KPDataInOut( KFloat4, tintColor, COLOR0)
+  KPDataInOut( KFloat4, blockColor, COLOR1)
+  
+  KPDataInOut( KFloat4, STAndScroll, TEXCOORD2)
+  
+  KPDataInOut( KFloat, fogStrength, TEXCOORD3)
+  KPDataInOut( KFloat3, normal, TEXCOORD4)
+  KPDataInOut( KFloat3, tangent, TEXCOORD5)
+  KPDataInOut( KFloat3, localPos, TEXCOORD6)
+  KPDataOutColor
+KPDataEnd
+
+#define WATER_FALL_RATE 0.75
+#define WATER_DRIFT_RATE 0.1
+
+KFloat3 GetLiquidNormal(KFloat4 coords, KFloat4 coordsOffsets, KFloat2 scrollAmount)
+{
+  const KFloat fakeRefract = 5.0;
+  KFloat3 octaves;
+  
+  KFloat2 scroll = -KFrac(scrollAmount*gameTime*WATER_FALL_RATE);
+  KFloat2 lowFreqScroll = KFloat2(KFrac(gameTime*WATER_DRIFT_RATE), 0.0);
+  
+  KFloat4 tex = KSampleTextureNoMip(normalSampler, normalTexture, coords.xy+scroll);
+  octaves = tex.xyz*2.0 - 1.0;
+  
+  
+  tex = KSampleTextureNoMip(normalSampler, normalTexture, coords.zw + coordsOffsets.zw*octaves.rg*fakeRefract+scroll + lowFreqScroll);
+  octaves = tex.xyz*2.0 - 1.0;
+  
+  return octaves;
+}
+
+KFloat3 GenerateWaveNormal(KFloat2 localST, KFloat2 scrollAmount, KFloat flowRate)
+{
+  KFloat4 coords;
+  KFloat4 coordsOffsets;
+  
+  KFloat2 distort;
+  const KFloat globalDistortScale = 0.5;
+  const KFloat globalSpatialScale = 2.0;
+  KFloat globalTimeScale = flowRate*5.0 + 5.0;
+  
+  KFloat4 globalScales = KFloat4(globalDistortScale, globalTimeScale, globalSpatialScale, 1.0);
+  //distort, timescale, localscale, offset
+  KFloat4 distort2ScaleOffset = KFloat4(0.015, 0.05, 0.2, 0.0) * globalScales;
+  KFloat angle = dot(distort2ScaleOffset.yzw, KFloat3(gameTime, localST.x + localST.y, 1.0));
+  distort.x = sin(angle);
+  distort.y = cos(angle);
+  coords.xy = localST*distort2ScaleOffset.z + distort2ScaleOffset.x*distort ;
+  coordsOffsets.xy = distort*distort2ScaleOffset.x;
+  
+  
+  distort2ScaleOffset = KFloat4(0.25, 0.1, 0.1, 0.7) * globalScales;
+  angle = dot(distort2ScaleOffset.yzw, KFloat3(gameTime, localST.x + localST.y, 1.0));
+  coords.zw = localST*distort2ScaleOffset.z + distort2ScaleOffset.x*distort ;
+  coordsOffsets.zw = distort*distort2ScaleOffset.x;
+  
+ 
+  return GetLiquidNormal(coords, coordsOffsets, scrollAmount);
+}
+
+KFloat3 TransformLiquidNormal(KFloat3 n, KFloat3 normal, KFloat3 tangent, KFloat lavaish)
+{
+  const KFloat dampener = -0.250;
+  KFloat3 nm = (n+KFloat3(0.0, 0.0, 1.0)*(dampener*lavaish));
+  return NormalMap_ConvertToLocal(nm, normal, tangent);
+}
+
+KFloat CalcDistAtten(KFloat3 wPos)
+{
+  KFloat worldDist = length(wPos);
+  KFloat borderCutoff =  worldDist - (gViewDistance*0.5);
+  return 1.0 - clamp(((borderCutoff+20.0)/21.0), 0.0,  1.0);
+}
+
+KFloat4 CalcFogColor(KFloat3 wPos, KFloat3 sunPos)
+{
+  KFloat fogDarkCoeff = clamp(dot(normalize(wPos), sunPos)*2.0 - 1.0, 0.0, 1.0);
+  return KLerp(darkFogColor, lightFogColor, fogDarkCoeff);
+}
+
+KFloat CalcSimpleWave(KFloat fogStrength, KFloat3 localPos)
+{
+  KFloat xWave = abs(sin((localPos.x)*6.28318530718*0.5));
+  KFloat zWave = abs(sin((localPos.z+xWave*0.21+KFrac(localPos.x)*0.5*sin(gameTime))*6.28318530718*0.5));
+  KFloat falloff = min(1.0, (fogStrength+.35)*2.0 );
+  return (1.0-xWave*zWave)*0.15*(1.0-falloff);
+}
+
+KFloat4 CalcLiquidColor(KFloat3 localPos, KFloat3 viewNormal, KFloat3 flatNormal, KFloat highlightStrength, KFloat lavaish, KFloat4 blockColor, KFloat4 tintColor, KFloat fogStrength)
+{
+  KFloat3 worldPos = KMUL(gModelViewMatrix, KFloat4(localPos,1.0)).xyz;
+  KFloat distAtten = CalcDistAtten(worldPos);
+  
+  float diffuseStrength = Lighting_DiffuseStrength(viewNormal, sunLightPosition);
+  float diffuseStrengthFlat = Lighting_DiffuseStrength(flatNormal, sunLightPosition);
+  
+  diffuseStrength = KLerp(diffuseStrengthFlat, diffuseStrength, distAtten);
+  
+  KFloat4 diffuseColor = sunLightColor*diffuseStrength;
+  KFloat4 specularColor = Lighting_BRDFSpecular(flatNormal, sunLightPosition, worldPos, 2.87)*sunLightSpecular;
+  specularColor *= distAtten*KLerp(0.35, 0.05, lavaish)*blockColor.w; // full specular is too strong for liquids
+  
+  KFloat darkness = blockColor.w;
+  KFloat4 fogColor = CalcFogColor(worldPos, sunLightPosition);
+  
+  KFloat alphaCutoff = 1.0-step(0.9, highlightStrength);
+  alphaCutoff = min(alphaCutoff, darkness+0.2);
+  alphaCutoff = KLerp(0.0, alphaCutoff, distAtten) * (1.0-lavaish);
+  
+  
+  KFloat4 waterColor = KLerp(tintColor*(diffuseColor*darkness + ambientLightColor), tintColor, alphaCutoff);
+  KFloat4 highlightColor = KLerp(
+      waterColor, //water surface
+      tintColor*(diffuseStrength*0.5+0.5), //lava fullbright
+      lavaish);
+      
+  KFloat4 litColor = tintColor * (blockColor) + specularColor +  highlightColor;
+  KFloat simpleLit = CalcSimpleWave(fogStrength, localPos);
+  litColor += (1.0-distAtten)*KFloat4(simpleLit, simpleLit, simpleLit, 0.0);
+  
+  KFloat4 outColor;
+  outColor.xyz = KLerp(litColor, fogColor, fogStrength).xyz;
+  outColor.w = KLerp(
+    tintColor.w,
+    max((alphaCutoff)*(tintColor.w*0.5 + 0.5) + tintColor.w*(1.0 - alphaCutoff), specularColor.z),
+    distAtten);
+    
+  return outColor;
+}
+
+
+KPSMain(TerrainLiquidPS)
+{ 
+  KFloat4 effectColor = KSampleTextureNoMip(effectSampler, effectTexture, KInput(texCoord1));
+  KFloat lavaish = effectColor.x; 
+  KFloat flowRate = effectColor.y;
+  
+  KFloat3 localNormal = GenerateWaveNormal(KInput(STAndScroll).xy, KInput(STAndScroll).zw*flowRate, flowRate);
+  
+  KFloat3 transformedNormal = TransformLiquidNormal(localNormal, KInput(normal), KInput(tangent), lavaish);
+  
+  KFloat3 flatNormal = normalize(KLerp(KInput(normal), transformedNormal, effectColor.z));
+  
+  KFloat4 outColor = CalcLiquidColor(KInput(localPos), transformedNormal, flatNormal, localNormal.z, lavaish, KInput(blockColor), KInput(tintColor), KInput(fogStrength));
+  
+  KPSOutput(outColor);
+}
+
+KPSMain(TerrainLiquidSimplePS)
+{ 
+  KFloat3 worldPos = KMUL(gModelViewMatrix, KFloat4(KInput(localPos),1.0)).xyz;
+  
+  KFloat4 effectColor = KSampleTextureNoMip(effectSampler, effectTexture, KInput(texCoord1));
+  KFloat lavaish = effectColor.x; 
+  
+  KFloat3 flatNormal = normalize(KInput(normal));
+  KFloat diffuseStrength = Lighting_DiffuseStrength(flatNormal, sunLightPosition);
+  KFloat4 diffuseColor = sunLightColor*diffuseStrength;
+  
+  KFloat darkness = KInput(blockColor).w;
+  KFloat4 fogColor = CalcFogColor(worldPos, sunLightPosition);
+  
+  KFloat4 highlightColor = KLerp(
+      KInput(tintColor)*(diffuseColor*darkness + ambientLightColor),
+      KInput(tintColor)*(diffuseStrength*0.5+0.5),
+      lavaish);
+  
+  KFloat4 litColor = KInput(tintColor) * KInput(blockColor) +  highlightColor;
+  KFloat simpleLit = CalcSimpleWave(KInput(fogStrength), KInput(localPos));
+  litColor += KFloat4(simpleLit, simpleLit, simpleLit, 0.0);
+  
+  KFloat4 outColor;
+  outColor.xyz = KLerp(litColor, fogColor, KInput(fogStrength)).xyz;
+  
+  outColor.w = KInput(tintColor).w;
+  
+  KPSOutput(outColor);
+}
+
+KPSMain(TerrainDistanceFadeLiquidPS)
+{ 
+  KFloat4 effectColor = KSampleTextureNoMip(effectSampler, effectTexture, KInput(texCoord1));
+  KFloat lavaish = effectColor.x; 
+  KFloat flowRate = effectColor.y;
+  
+  KFloat3 localNormal = GenerateWaveNormal(KInput(STAndScroll).xy, KInput(STAndScroll).zw*flowRate, flowRate);
+  
+  KFloat3 transformedNormal = TransformLiquidNormal(localNormal, KInput(normal), KInput(tangent), lavaish);
+  
+  KFloat3 flatNormal = normalize(KLerp(KInput(normal), transformedNormal, effectColor.z));
+  
+  KFloat4 outColor = CalcLiquidColor(KInput(localPos), transformedNormal, flatNormal, localNormal.z, lavaish, KInput(blockColor), KInput(tintColor), KInput(fogStrength));
+  
+  outColor.w *= distanceFade;
+    
+  KPSOutput(outColor);
+}
+
+KPSMain(TerrainDistanceFadeLiquidSimplePS)
+{ 
+  KFloat3 worldPos = KMUL(gModelViewMatrix, KFloat4(KInput(localPos),1.0)).xyz;
+  
+  KFloat4 effectColor = KSampleTextureNoMip(effectSampler, effectTexture, KInput(texCoord1));
+  KFloat lavaish = effectColor.x; 
+  
+  KFloat3 flatNormal = normalize(KInput(normal));
+  KFloat diffuseStrength = Lighting_DiffuseStrength(flatNormal, sunLightPosition);
+  KFloat4 diffuseColor = sunLightColor*diffuseStrength;
+  
+  KFloat darkness = KInput(blockColor).w;
+  KFloat4 fogColor = CalcFogColor(worldPos, sunLightPosition);
+  
+  KFloat4 highlightColor = KLerp(
+      KInput(tintColor)*(diffuseColor*darkness + ambientLightColor),
+      KInput(tintColor)*(diffuseStrength*0.5+0.5),
+      lavaish);
+  
+  KFloat4 litColor = KInput(tintColor) * KInput(blockColor) +  highlightColor;
+  KFloat simpleLit = CalcSimpleWave(KInput(fogStrength), KInput(localPos));
+  litColor += KFloat4(simpleLit, simpleLit, simpleLit, 0.0);
+  
+  KFloat4 outColor;
+  outColor.xyz = KLerp(litColor, fogColor, KInput(fogStrength)).xyz;
+  
+  outColor.w = KInput(tintColor).w * distanceFade;
+  
+  KPSOutput(outColor);
+}
