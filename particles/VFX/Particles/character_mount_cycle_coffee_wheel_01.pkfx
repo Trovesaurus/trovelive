@@ -49,28 +49,19 @@ CNEdEditorBackdrop_Model3D	$LOCAL$/CNEdEditorBackdrop_Model3D_63950321
 }
 CParticleDescriptor	$LOCAL$/CParticleDescriptor_7A7E30AB
 {
-	Renderer = "$LOCAL$/CParticleRenderer_Ribbon_2921F74A";
+	Renderer = "$LOCAL$/CParticleRenderer_Billboard_6128E19F";
 	CustomFields = 
 	{
 		"$LOCAL$/CParticleFieldDeclaration_7D2AE2D5",
 		"$LOCAL$/CParticleFieldDeclaration_E2381FBC",
 		"$LOCAL$/CParticleFieldDeclaration_91391B2F",
+		"$LOCAL$/CParticleFieldDeclaration_E71217E3",
 	};
 	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_405E321E";
 	States = 
 	{
 		"$LOCAL$/CParticleState_876F8C39",
 	};
-}
-CParticleRenderer_Ribbon	$LOCAL$/CParticleRenderer_Ribbon_2921F74A
-{
-	CustomName = "Ribbon";
-	BillboardingMaterial = AlphaBlend;
-	Quality = CorrectDeformation;
-	Diffuse = "Textures/vfx_treadmarks_01.dds";
-	BillboardMode = NormalAxisAligned;
-	Width = 3.0000000e+000;
-	AxisField = "Axis";
 }
 CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_7D2AE2D5
 {
@@ -92,10 +83,11 @@ CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_405E321E
 
 {
 
-	Life = 1.0;
-	Position = float3(0.4,-0.08,0.05);
-	Size = 0.1;
+	Life = 1;
+	Position = float3(rand(0.3,0.4),-0.2,0.05);
+	Size = rand(0.1,0.2);
 	Axis = float3(0,1,0);
+	Rotation = rand(-pi,pi);
 }
 
 
@@ -114,6 +106,7 @@ CParticleState	$LOCAL$/CParticleState_876F8C39
 CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_7C2F92F0
 {
 	CustomName = "Physics";
+	ConstantAcceleration = float3(0.0000000e+000, 1.0000000e+000, 0.0000000e+000);
 	Drag = 1.5000001e-001;
 }
 CParticleEvolver_FlipBook	$LOCAL$/CParticleEvolver_FlipBook_87A33473
@@ -177,28 +170,19 @@ CActionFactoryParticleSpawnerBase	$LOCAL$/Layer_1
 }
 CParticleDescriptor	$LOCAL$/CParticleDescriptor_D3686077
 {
-	Renderer = "$LOCAL$/CParticleRenderer_Ribbon_0F98BD06";
+	Renderer = "$LOCAL$/CParticleRenderer_List_A33BCCA0";
 	CustomFields = 
 	{
 		"$LOCAL$/CParticleFieldDeclaration_A06DFD41",
 		"$LOCAL$/CParticleFieldDeclaration_AE4ED498",
 		"$LOCAL$/CParticleFieldDeclaration_DE35433B",
+		"$LOCAL$/CParticleFieldDeclaration_C39BD2E2",
 	};
 	SpawnEvaluator = "$LOCAL$/CCompilerSyntaxNodeExpression_DE16351A";
 	States = 
 	{
 		"$LOCAL$/CParticleState_42820CE5",
 	};
-}
-CParticleRenderer_Ribbon	$LOCAL$/CParticleRenderer_Ribbon_0F98BD06
-{
-	CustomName = "Ribbon";
-	BillboardingMaterial = AlphaBlend;
-	Quality = CorrectDeformation;
-	Diffuse = "Textures/vfx_treadmarks_01.dds";
-	BillboardMode = NormalAxisAligned;
-	Width = 3.0000000e+000;
-	AxisField = "Axis";
 }
 CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_A06DFD41
 {
@@ -221,9 +205,10 @@ CCompilerSyntaxNodeExpression	$LOCAL$/CCompilerSyntaxNodeExpression_DE16351A
 {
 
 	Life = 1.0;
-	Position = float3(-0.4,-0.08,0.05);
-	Size = 0.1;
+	Position = float3(rand(-0.3,-0.4),-0.2,0.05);
+	Size = rand(0.1,0.2);
 	Axis = float3(0,1,0);
+	Rotation = rand(-pi,pi);
 }
 
 
@@ -242,6 +227,7 @@ CParticleState	$LOCAL$/CParticleState_42820CE5
 CParticleEvolver_Physics	$LOCAL$/CParticleEvolver_Physics_FC3A8B0C
 {
 	CustomName = "Physics";
+	ConstantAcceleration = float3(0.0000000e+000, 1.0000000e+000, 0.0000000e+000);
 	Drag = 1.5000001e-001;
 }
 CParticleEvolver_FlipBook	$LOCAL$/CParticleEvolver_FlipBook_4BFB40BF
@@ -302,4 +288,32 @@ CActionFactoryParticleSpawnerBase	$LOCAL$/Layer_2
 	Infinite = true;
 	DurationInSeconds = 5.0000000e+000;
 	SpawnCount = 2.0000000e+001;
+}
+CParticleRenderer_Billboard	$LOCAL$/CParticleRenderer_Billboard_6128E19F
+{
+	CustomName = "Billboard";
+	Diffuse = "Textures/VFX_Smoke_steampunk_fb2x2_01.dds";
+	AtlasDefinition = "AtlasDefinitions/atlasDef_2x2.pkat";
+}
+CParticleRenderer_Billboard	$LOCAL$/CParticleRenderer_Billboard_FE973329
+{
+	CustomName = "Billboard";
+	Diffuse = "Textures/VFX_Smoke_steampunk_fb2x2_01.dds";
+	AtlasDefinition = "AtlasDefinitions/atlasDef_2x2.pkat";
+}
+CParticleRenderer_List	$LOCAL$/CParticleRenderer_List_A33BCCA0
+{
+	CustomName = "List";
+	Renderers = 
+	{
+		"$LOCAL$/CParticleRenderer_Billboard_FE973329",
+	};
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_E71217E3
+{
+	FieldName = "Rotation";
+}
+CParticleFieldDeclaration	$LOCAL$/CParticleFieldDeclaration_C39BD2E2
+{
+	FieldName = "Rotation";
 }
